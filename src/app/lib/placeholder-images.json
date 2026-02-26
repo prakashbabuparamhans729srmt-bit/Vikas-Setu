@@ -1,0 +1,28 @@
+{
+  "placeholderImages": [
+    {
+      "id": "hero-india",
+      "description": "Abstract map of India with growth arrows",
+      "imageUrl": "https://picsum.photos/seed/india-growth/1200/600",
+      "imageHint": "india development"
+    },
+    {
+      "id": "scheme-kisan",
+      "description": "A happy Indian farmer in a field",
+      "imageUrl": "https://picsum.photos/seed/farmer/400/300",
+      "imageHint": "indian agriculture"
+    },
+    {
+      "id": "scheme-jal",
+      "description": "Fresh water flowing from a tap",
+      "imageUrl": "https://picsum.photos/seed/water/400/300",
+      "imageHint": "water supply"
+    },
+    {
+      "id": "scheme-digital",
+      "description": "Digital technology in rural India",
+      "imageUrl": "https://picsum.photos/seed/digital/400/300",
+      "imageHint": "digital india"
+    }
+  ]
+}

@@ -1,59 +1,62 @@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Star, Users, CheckCircle } from "lucide-react"
+import { ArrowRight, Star, Users, CheckCircle, ShieldCheck, Zap, TrendingUp } from "lucide-react"
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden pt-16 pb-20 hero-gradient">
+    <section className="relative overflow-hidden pt-20 pb-32 hero-gradient">
+      {/* Grid Pattern Overlay */}
+      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+
       <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-3xl mx-auto text-center space-y-8">
+        <div className="max-w-4xl mx-auto text-center space-y-10">
           <div className="flex justify-center">
-            <Badge variant="outline" className="bg-white/50 backdrop-blur-sm border-primary/20 text-primary px-4 py-1.5 text-sm font-semibold tracking-wide">
-              🔥 WELCOME, INDIA 2.0! 🔥
+            <Badge variant="outline" className="bg-primary/10 border-primary/20 text-primary px-6 py-2 text-xs font-black tracking-[0.2em] uppercase rounded-full animate-bounce">
+              ⚡ LIVE: BHARAT TRANSFORMATION 2026 ⚡
             </Badge>
           </div>
           
-          <h1 className="text-5xl md:text-7xl font-bold font-headline tracking-tight leading-[1.1]">
+          <h1 className="text-6xl md:text-8xl font-black font-headline tracking-tighter leading-[0.95] text-white">
             Vikas ki Neev, <br />
-            <span className="text-primary italic">Aapke Hatho Mein</span>
+            <span className="text-primary italic inline-block transform -skew-x-6 hover:skew-x-0 transition-transform duration-700 cursor-default">
+              Aapke Hatho Mein
+            </span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-muted-foreground font-medium max-w-2xl mx-auto">
-            मेरा भारत, मेरी आवाज (My India, My Voice). Join the journey of transparency and transformation.
+          <p className="text-xl md:text-2xl text-white/60 font-medium max-w-2xl mx-auto leading-relaxed">
+            मेरा भारत, मेरी आवाज (My India, My Voice). <br /> 
+            Building the world's most transparent growth bridge.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-8">
-            <div className="bg-white rounded-2xl p-6 shadow-xl shadow-primary/5 border border-primary/10 flex flex-col items-center gap-2">
-              <Star className="h-8 w-8 text-primary" />
-              <div className="text-3xl font-bold">5000+</div>
-              <div className="text-sm text-muted-foreground font-medium uppercase tracking-wider">Yojanaye</div>
-            </div>
-            <div className="bg-white rounded-2xl p-6 shadow-xl shadow-secondary/5 border border-secondary/10 flex flex-col items-center gap-2">
-              <Users className="h-8 w-8 text-secondary" />
-              <div className="text-3xl font-bold">2.5L+</div>
-              <div className="text-sm text-muted-foreground font-medium uppercase tracking-wider">Public Votes</div>
-            </div>
-            <div className="bg-white rounded-2xl p-6 shadow-xl shadow-foreground/5 border border-foreground/10 flex flex-col items-center gap-2">
-              <CheckCircle className="h-8 w-8 text-foreground" />
-              <div className="text-3xl font-bold">100%</div>
-              <div className="text-sm text-muted-foreground font-medium uppercase tracking-wider">Transparency</div>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-12">
+            {[
+              { icon: Zap, value: "5000+", label: "Yojanaye", color: "text-primary" },
+              { icon: Users, value: "2.5L+", label: "Public Votes", color: "text-secondary" },
+              { icon: ShieldCheck, value: "100%", label: "Transparency", color: "text-white" }
+            ].map((stat, idx) => (
+              <div key={idx} className="glass-card rounded-3xl p-8 border border-white/5 hover:border-primary/30 hover:bg-primary/5 transition-all duration-500 group">
+                <stat.icon className={`h-10 w-10 ${stat.color} mb-4 group-hover:scale-110 transition-transform duration-500`} />
+                <div className="text-4xl font-black tracking-tighter group-hover:text-primary transition-colors">{stat.value}</div>
+                <div className="text-xs text-white/40 font-black uppercase tracking-widest mt-2">{stat.label}</div>
+              </div>
+            ))}
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button size="lg" className="h-14 px-8 text-lg font-bold gap-2 bg-primary hover:bg-primary/90">
-              Explore Schemes <ArrowRight className="h-5 w-5" />
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+            <Button size="lg" className="h-16 px-10 text-lg font-black gap-3 bg-primary text-black hover:bg-primary/80 cyan-glow hover:scale-105 transition-all">
+              EXPLORE SCHEMES <ArrowRight className="h-6 w-6" />
             </Button>
-            <Button size="lg" variant="outline" className="h-14 px-8 text-lg font-bold border-2">
-              View Progress Map
+            <Button size="lg" variant="outline" className="h-16 px-10 text-lg font-black border-2 border-white/10 hover:bg-white hover:text-black hover:scale-105 transition-all">
+              <TrendingUp className="w-6 h-6 mr-2" /> PROGRESS MAP
             </Button>
           </div>
         </div>
       </div>
       
-      {/* Decorative Elements */}
-      <div className="absolute top-20 -left-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 -right-20 w-80 h-80 bg-secondary/10 rounded-full blur-3xl" />
+      {/* Abstract Neon Glows */}
+      <div className="absolute top-1/4 -left-40 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px] animate-pulse" />
+      <div className="absolute bottom-0 -right-40 w-[600px] h-[600px] bg-secondary/10 rounded-full blur-[120px] animate-pulse" />
     </section>
   )
 }

@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
-import { ThumbsUp, Send, MessageSquare, Quote, Star } from "lucide-react"
+import { ThumbsUp, Send, MessageSquare, Quote, Star, Users, BrainCircuit, Heart } from "lucide-react"
 
 const feedbackItems = [
   { name: "Rahul Kumar", location: "Bihar", text: "जल जीवन मिशन से मेरे गाँव में नल से जल आ गया, धन्यवाद!", rating: 5, date: "2 hours ago" },
@@ -16,122 +16,115 @@ const feedbackItems = [
 
 export function FeedbackSection() {
   return (
-    <section id="feedback" className="py-20 bg-muted/30">
-      <div className="container mx-auto px-4 space-y-12">
-        <div className="text-center space-y-4">
-          <Badge className="bg-foreground px-4 py-1 text-xs font-bold uppercase tracking-widest">सबसे ताकतवर आवाज</Badge>
-          <h2 className="text-4xl font-bold font-headline">🗳️ JANATA KI RAI</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">Your feedback shapes the future of India. Participate in polls and share your experiences with government schemes.</p>
+    <section id="feedback" className="py-32 bg-[#0a0a0a]">
+      <div className="container mx-auto px-4 space-y-20">
+        <div className="text-center space-y-6">
+          <Badge className="bg-primary text-black px-6 py-2 text-xs font-black uppercase tracking-[0.3em] rounded-full">CITIZEN FEEDBACK LOOP</Badge>
+          <h2 className="text-5xl font-black font-headline text-white tracking-tighter">🗳️ JANATA KI RAI</h2>
+          <p className="text-white/40 max-w-2xl mx-auto font-medium">Every citizen is a sensor. Your pulse shapes the national trajectory. Input your data below.</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-stretch">
           {/* Poll of the Day */}
-          <Card className="lg:col-span-4 border-2 border-primary shadow-xl h-full">
-            <CardHeader className="bg-primary text-white text-center rounded-t-lg">
-              <CardTitle className="text-2xl font-bold flex items-center justify-center gap-2">
-                ❓ POLL OF THE DAY
+          <Card className="lg:col-span-4 border border-primary/20 bg-black/60 backdrop-blur-xl rounded-[3rem] shadow-2xl relative overflow-hidden group">
+            <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <CardHeader className="bg-primary p-8 text-black text-center">
+              <CardTitle className="text-sm font-black flex items-center justify-center gap-3 uppercase tracking-[0.2em]">
+                <BrainCircuit className="w-5 h-5 animate-pulse" /> POLL OF THE DAY
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-8 space-y-8">
-              <p className="text-xl font-bold text-center leading-relaxed">
+            <CardContent className="p-10 space-y-10 relative z-10">
+              <p className="text-2xl font-black text-white text-center leading-tight tracking-tighter">
                 क्या आपको लगता है कि "एक राष्ट्र, एक चुनाव" से विकास की गति तेज होगी?
               </p>
               
               <RadioGroup defaultValue="yes" className="space-y-4">
-                <div className="flex items-center justify-between p-4 rounded-xl border-2 hover:border-primary transition-all bg-white shadow-sm">
-                  <div className="flex items-center space-x-3">
-                    <RadioGroupItem value="yes" id="r1" />
-                    <Label htmlFor="r1" className="text-lg font-bold">हाँ, बिल्कुल</Label>
+                {[
+                  { id: 'r1', label: 'हाँ, बिल्कुल', val: 'yes', percent: '67%' },
+                  { id: 'r2', label: 'नहीं', val: 'no', percent: '22%' },
+                  { id: 'r3', label: 'पता नहीं', val: 'idk', percent: '11%' }
+                ].map((option) => (
+                  <div key={option.id} className="flex items-center justify-between p-5 rounded-2xl border border-white/5 hover:border-primary/50 transition-all bg-white/5 group/opt">
+                    <div className="flex items-center space-x-4">
+                      <RadioGroupItem value={option.val} id={option.id} className="border-primary text-primary" />
+                      <Label htmlFor={option.id} className="text-lg font-bold text-white/80 group-hover/opt:text-white transition-colors">{option.label}</Label>
+                    </div>
+                    <span className="text-primary font-black text-xl">{option.percent}</span>
                   </div>
-                  <span className="text-primary font-black">67%</span>
-                </div>
-                <div className="flex items-center justify-between p-4 rounded-xl border-2 hover:border-primary transition-all bg-white shadow-sm">
-                  <div className="flex items-center space-x-3">
-                    <RadioGroupItem value="no" id="r2" />
-                    <Label htmlFor="r2" className="text-lg font-bold">नहीं</Label>
-                  </div>
-                  <span className="text-muted-foreground font-bold">22%</span>
-                </div>
-                <div className="flex items-center justify-between p-4 rounded-xl border-2 hover:border-primary transition-all bg-white shadow-sm">
-                  <div className="flex items-center space-x-3">
-                    <RadioGroupItem value="idk" id="r3" />
-                    <Label htmlFor="r3" className="text-lg font-bold">पता नहीं</Label>
-                  </div>
-                  <span className="text-muted-foreground font-bold">11%</span>
-                </div>
+                ))}
               </RadioGroup>
             </CardContent>
-            <CardFooter className="flex justify-center pb-8">
-              <Button className="w-full h-12 bg-primary hover:bg-primary/90 text-lg font-bold">Vote to See Results</Button>
+            <CardFooter className="flex justify-center p-10 pt-0">
+              <Button className="w-full h-16 bg-white text-black hover:bg-primary transition-all text-lg font-black rounded-2xl">CAST YOUR VOTE</Button>
             </CardFooter>
           </Card>
 
           {/* Feedback Wall */}
-          <div className="lg:col-span-8 space-y-8">
-            <Card className="bg-white shadow-xl border-none">
-              <CardHeader className="border-b">
+          <div className="lg:col-span-8 space-y-10">
+            <Card className="bg-white/5 shadow-2xl border-white/10 rounded-[3rem] backdrop-blur-md overflow-hidden">
+              <CardHeader className="border-b border-white/5 p-8">
                 <div className="flex justify-between items-center">
-                  <CardTitle className="text-xl font-bold flex items-center gap-2">
-                    💬 PUBLIC FEEDBACK WALL
+                  <CardTitle className="text-sm font-black flex items-center gap-3 text-white/60 tracking-widest uppercase">
+                    <MessageSquare className="w-5 h-5 text-primary interactive-icon" /> PUBLIC FEEDBACK STREAM
                   </CardTitle>
-                  <Badge variant="outline" className="border-secondary text-secondary">Live Updates</Badge>
+                  <Badge variant="outline" className="border-primary/40 text-primary uppercase font-black tracking-widest text-[10px] animate-pulse">LIVE CONNECT</Badge>
                 </div>
               </CardHeader>
               <CardContent className="p-0">
-                <div className="divide-y max-h-[400px] overflow-y-auto">
+                <div className="divide-y divide-white/5 max-h-[450px] overflow-y-auto custom-scrollbar">
                   {feedbackItems.map((item, i) => (
-                    <div key={i} className="p-6 space-y-3 hover:bg-muted/50 transition-colors">
+                    <div key={i} className="p-8 space-y-4 hover:bg-primary/[0.02] transition-colors group">
                       <div className="flex justify-between items-start">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                        <div className="flex items-center gap-4">
+                          <div className="w-14 h-14 rounded-2xl bg-primary text-black flex items-center justify-center text-xl font-black shadow-[0_0_20px_rgba(7,241,214,0.3)]">
                             {item.name.charAt(0)}
                           </div>
                           <div>
-                            <p className="font-bold">{item.name}</p>
-                            <p className="text-xs text-muted-foreground">{item.location} • {item.date}</p>
+                            <p className="font-black text-white text-lg">{item.name}</p>
+                            <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">{item.location} • {item.date}</p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-0.5">
+                        <div className="flex items-center gap-1">
                           {[...Array(5)].map((_, star) => (
-                            <Star key={star} className={`w-3 h-3 ${star < item.rating ? 'text-yellow-500 fill-yellow-500' : 'text-muted'}`} />
+                            <Star key={star} className={`w-4 h-4 interactive-icon ${star < item.rating ? 'text-primary fill-primary' : 'text-white/10'}`} />
                           ))}
                         </div>
                       </div>
-                      <div className="relative pl-6">
-                        <Quote className="absolute top-0 left-0 w-4 h-4 text-muted-foreground/30" />
-                        <p className="text-muted-foreground italic font-medium">"{item.text}"</p>
+                      <div className="relative pl-8">
+                        <Quote className="absolute top-0 left-0 w-5 h-5 text-primary/20" />
+                        <p className="text-white/60 italic font-medium text-lg leading-relaxed group-hover:text-white/90 transition-colors">"{item.text}"</p>
                       </div>
                     </div>
                   ))}
                 </div>
               </CardContent>
-              <CardFooter className="p-6 bg-muted/20 border-t rounded-b-xl flex flex-col gap-4">
+              <CardFooter className="p-10 bg-white/[0.02] border-t border-white/5 rounded-b-[3rem] flex flex-col gap-6">
                  <div className="w-full flex gap-4">
                     <Textarea 
                       placeholder="Share your experience or idea for Vikas Setu..." 
-                      className="resize-none min-h-[60px] flex-1 bg-white"
+                      className="resize-none min-h-[80px] flex-1 bg-black/40 border-white/10 focus:border-primary/50 text-white rounded-2xl p-4"
                     />
-                    <Button className="h-full bg-secondary hover:bg-secondary/90 flex flex-col items-center justify-center gap-1 px-6">
-                      <Send className="h-5 w-5" />
-                      <span className="text-[10px] font-bold uppercase">Submit</span>
+                    <Button className="h-auto bg-primary hover:bg-white text-black hover:text-black flex flex-col items-center justify-center gap-2 px-8 rounded-2xl transition-all cyan-glow">
+                      <Send className="h-6 w-6 interactive-icon" />
+                      <span className="text-[10px] font-black uppercase tracking-widest">SEND</span>
                     </Button>
                  </div>
-                 <div className="flex items-center justify-between w-full text-xs font-bold text-muted-foreground">
+                 <div className="flex items-center justify-between w-full text-[10px] font-black uppercase tracking-widest text-white/30">
                     <span className="flex items-center gap-2 text-primary">
-                      <MessageSquare className="w-4 h-4" /> 2,456 comments today
+                      <Users className="w-4 h-4 interactive-icon" /> 2,456 CITIZENS ONLINE
                     </span>
-                    <Button variant="link" className="text-xs h-auto p-0 font-bold">View More Feedback</Button>
+                    <Button variant="link" className="text-[10px] h-auto p-0 font-black text-white/60 hover:text-primary transition-all">VIEW GLOBAL FEED</Button>
                  </div>
               </CardFooter>
             </Card>
 
-            <div className="bg-foreground text-white p-8 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl">
-              <div className="space-y-2 text-center md:text-left">
-                <h3 className="text-2xl font-black font-headline tracking-tighter uppercase italic">Have an Innovation?</h3>
-                <p className="text-white/70 font-medium">Your ideas can build the infrastructure of tomorrow.</p>
+            <div className="bg-primary p-12 rounded-[3.5rem] flex flex-col md:flex-row items-center justify-between gap-10 shadow-[0_0_50px_rgba(7,241,214,0.2)] group hover:scale-[1.01] transition-all duration-500">
+              <div className="space-y-4 text-center md:text-left">
+                <h3 className="text-4xl font-black font-headline tracking-tighter uppercase text-black italic">PROPOSE INNOVATION</h3>
+                <p className="text-black/60 font-black uppercase tracking-widest text-sm">Your code is the architect of tomorrow's Bharat.</p>
               </div>
-              <Button size="lg" className="bg-primary hover:bg-primary/90 text-lg font-bold px-10 h-14 shadow-xl shadow-primary/20 uppercase tracking-widest">
-                📤 Submit Your Idea
+              <Button size="lg" className="bg-black text-primary hover:bg-white hover:text-black text-lg font-black px-12 h-16 rounded-2xl shadow-2xl transition-all uppercase tracking-[0.2em]">
+                📤 SUBMIT IDEA
               </Button>
             </div>
           </div>

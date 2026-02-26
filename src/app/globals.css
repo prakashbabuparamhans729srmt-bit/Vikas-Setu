@@ -4,31 +4,31 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 221 42% 21%;
-    --card: 0 0% 100%;
-    --card-foreground: 221 42% 21%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 221 42% 21%;
-    --primary: 30 100% 60%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 115 88% 28%;
+    --background: 210 20% 2%;
+    --foreground: 0 0% 100%;
+    --card: 210 16% 9%;
+    --card-foreground: 0 0% 100%;
+    --popover: 210 16% 9%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 173 94% 49%;
+    --primary-foreground: 210 20% 2%;
+    --secondary: 358 93% 55%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 221 15% 94%;
-    --muted-foreground: 221 15% 45%;
-    --accent: 115 88% 28%;
-    --accent-foreground: 0 0% 100%;
+    --muted: 210 20% 15%;
+    --muted-foreground: 210 10% 60%;
+    --accent: 173 94% 49%;
+    --accent-foreground: 210 20% 2%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 221 20% 90%;
-    --input: 221 20% 90%;
-    --ring: 30 100% 60%;
-    --chart-1: 30 100% 60%;
-    --chart-2: 115 88% 28%;
-    --chart-3: 221 42% 21%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.75rem;
+    --border: 210 20% 12%;
+    --input: 210 20% 12%;
+    --ring: 173 94% 49%;
+    --chart-1: 173 94% 49%;
+    --chart-2: 358 93% 55%;
+    --chart-3: 0 0% 100%;
+    --chart-4: 210 20% 30%;
+    --chart-5: 173 94% 30%;
+    --radius: 1rem;
   }
 }
 
@@ -37,20 +37,45 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-body antialiased;
+    @apply bg-background text-foreground font-body antialiased selection:bg-primary selection:text-primary-foreground;
   }
 }
 
 .hero-gradient {
-  background: linear-gradient(135deg, rgba(255, 153, 51, 0.1) 0%, rgba(255, 255, 255, 1) 50%, rgba(19, 136, 8, 0.1) 100%);
+  background: radial-gradient(circle at 50% 50%, rgba(7, 241, 214, 0.08) 0%, rgba(7, 7, 7, 1) 100%);
 }
 
-.map-state {
-  transition: all 0.3s ease;
-  cursor: pointer;
+.cyan-glow {
+  box-shadow: 0 0 20px rgba(7, 241, 214, 0.2);
 }
 
-.map-state:hover {
-  filter: brightness(0.9);
-  transform: scale(1.02);
+.cyan-glow:hover {
+  box-shadow: 0 0 30px rgba(7, 241, 214, 0.4);
+}
+
+.glass-card {
+  background: rgba(20, 24, 27, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.interactive-icon {
+  @apply transition-all duration-300 hover:text-primary hover:scale-125 cursor-pointer;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #070707;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #161c21;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #07f1d6;
 }

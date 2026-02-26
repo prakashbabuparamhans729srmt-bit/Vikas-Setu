@@ -3,6 +3,8 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
+import { Button } from "@/components/ui/button"
+import { Map, Layers, Target, Compass } from "lucide-react"
 
 const stateData = [
   { name: "Maharashtra", completion: 98, status: "High" },
@@ -15,80 +17,86 @@ const stateData = [
 
 export function IndiaMap() {
   return (
-    <Card className="w-full border-none shadow-none bg-muted/30">
-      <CardHeader className="text-center">
-        <CardTitle className="text-2xl font-headline flex items-center justify-center gap-2">
-          🌍 INDIA MAP (Interactive)
+    <Card className="w-full border-none shadow-none bg-transparent">
+      <CardHeader className="text-center space-y-4">
+        <Badge variant="outline" className="mx-auto w-fit bg-primary/5 text-primary border-primary/20 px-4 py-1">
+          REAL-TIME ANALYTICS
+        </Badge>
+        <CardTitle className="text-4xl font-black font-headline flex items-center justify-center gap-4 text-white">
+          <Map className="w-10 h-10 text-primary animate-pulse" /> BHARAT DASHBOARD
         </CardTitle>
-        <p className="text-muted-foreground">Vikas ki Gati state-wise tracker</p>
+        <p className="text-white/40 font-bold uppercase tracking-[0.3em] text-xs">Vikas ki Gati state-wise tracker</p>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-          <div className="relative aspect-square bg-white rounded-3xl border shadow-inner flex items-center justify-center overflow-hidden group">
-            <div className="absolute inset-0 bg-secondary/5 opacity-50" />
-            <div className="text-center p-8">
-              <div className="text-6xl mb-4">🇮🇳</div>
-              <h3 className="text-xl font-bold mb-2">Interactive Map Visualization</h3>
-              <p className="text-sm text-muted-foreground">In a production app, this would be a full SVG/Canvas map of India with clickable regions.</p>
-              <Badge className="mt-4 bg-secondary">Click on State for Details</Badge>
+      <CardContent className="space-y-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Virtual Map Area */}
+          <div className="relative aspect-square bg-[#0c0c0c] rounded-[3rem] border border-white/5 shadow-[inset_0_0_50px_rgba(0,0,0,1)] flex items-center justify-center overflow-hidden group">
+            <div className="absolute inset-0 bg-primary/5 opacity-30 group-hover:opacity-50 transition-opacity" />
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:30px_30px]" />
+            
+            <div className="text-center p-12 relative z-10">
+              <div className="text-9xl mb-8 group-hover:scale-110 transition-transform duration-700">🇮🇳</div>
+              <h3 className="text-2xl font-black text-white mb-4 tracking-tighter">HOLOGRAPHIC MAP ENGINE</h3>
+              <p className="text-sm text-white/40 leading-relaxed max-w-xs mx-auto">Clicking any state triggers deep-layer resource allocation analytics.</p>
+              <Button className="mt-8 bg-primary text-black font-black cyan-glow hover:scale-105 transition-all px-8">
+                ACTIVATE FULL VIEW
+              </Button>
             </div>
             
             {/* Mock map pulses */}
-            <div className="absolute top-1/4 left-1/2 w-4 h-4 bg-secondary rounded-full animate-ping" />
-            <div className="absolute top-1/2 left-1/3 w-4 h-4 bg-primary rounded-full animate-ping" />
-            <div className="absolute bottom-1/4 right-1/2 w-4 h-4 bg-destructive rounded-full animate-ping" />
+            <div className="absolute top-1/4 left-1/2 w-4 h-4 bg-primary rounded-full animate-ping" />
+            <div className="absolute top-1/2 left-1/3 w-4 h-4 bg-primary rounded-full animate-ping shadow-[0_0_20px_#07f1d6]" />
+            <div className="absolute bottom-1/4 right-1/2 w-4 h-4 bg-secondary rounded-full animate-ping" />
+            
+            <Compass className="absolute top-8 right-8 w-12 h-12 text-white/10 animate-spin-slow" />
           </div>
 
-          <div className="space-y-5">
+          <div className="space-y-8 bg-white/5 p-8 rounded-[2.5rem] border border-white/5">
+            <div className="flex items-center justify-between mb-4">
+               <h4 className="text-lg font-black text-white flex items-center gap-2">
+                 <Layers className="w-5 h-5 text-primary" /> STATE PROGRESSION
+               </h4>
+               <Badge className="bg-primary/10 text-primary border-primary/20">LIVE 24/7</Badge>
+            </div>
+
             {stateData.map((state) => (
-              <div key={state.name} className="space-y-2">
-                <div className="flex justify-between items-center font-medium">
-                  <span className="flex items-center gap-2">
-                    <span className={`w-3 h-3 rounded-full ${state.completion > 80 ? 'bg-secondary' : state.completion > 50 ? 'bg-primary' : 'bg-destructive'}`} />
+              <div key={state.name} className="space-y-3 group cursor-pointer">
+                <div className="flex justify-between items-center font-bold">
+                  <span className="flex items-center gap-3 text-white/80 group-hover:text-primary transition-colors">
+                    <span className={`w-3 h-3 rounded-full ${state.completion > 80 ? 'bg-primary shadow-[0_0_10px_#07f1d6]' : state.completion > 50 ? 'bg-white/40' : 'bg-secondary'}`} />
                     {state.name}
                   </span>
-                  <span className="text-sm font-bold">{state.completion}% Completed</span>
+                  <span className="text-sm font-black text-white">{state.completion}%</span>
                 </div>
-                <Progress 
-                  value={state.completion} 
-                  className="h-3"
-                  indicatorClassName={
-                    state.completion > 80 ? 'bg-secondary' : 
-                    state.completion > 50 ? 'bg-primary' : 'bg-destructive'
-                  }
-                />
+                <div className="relative h-2 w-full bg-white/5 rounded-full overflow-hidden">
+                   <div 
+                    className={`absolute inset-y-0 left-0 transition-all duration-1000 ease-out rounded-full ${
+                      state.completion > 80 ? 'bg-primary cyan-glow' : 
+                      state.completion > 50 ? 'bg-white/40' : 'bg-secondary'
+                    }`}
+                    style={{ width: `${state.completion}%` }}
+                  />
+                </div>
               </div>
             ))}
             
-            <div className="pt-4 flex flex-wrap gap-4">
-              <div className="flex items-center gap-2 text-xs font-medium">
-                <span className="w-3 h-3 rounded-full bg-secondary" /> 75-100% (Excellent)
+            <div className="pt-6 grid grid-cols-2 gap-4">
+              <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-white/40">
+                <span className="w-3 h-3 rounded-full bg-primary shadow-[0_0_10px_#07f1d6]" /> EXCELLENT
               </div>
-              <div className="flex items-center gap-2 text-xs font-medium">
-                <span className="w-3 h-3 rounded-full bg-primary" /> 50-75% (Improving)
+              <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-white/40">
+                <span className="w-3 h-3 rounded-full bg-white/20" /> STABLE
               </div>
-              <div className="flex items-center gap-2 text-xs font-medium">
-                <span className="w-3 h-3 rounded-full bg-destructive" /> 0-50% (Needs Focus)
+              <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-white/40">
+                <span className="w-3 h-3 rounded-full bg-secondary shadow-[0_0_10px_#f71f26]" /> CRITICAL
+              </div>
+              <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-white/40">
+                <Target className="w-3 h-3 text-primary" /> ACTIVE NODES
               </div>
             </div>
           </div>
         </div>
       </CardContent>
     </Card>
-  )
-}
-
-function ProgressWithColor({ value }: { value: number }) {
-  // Shadcn Progress component doesn't natively support indicatorClassName easily without prop modification
-  // But we use it as a standard wrapper
-  return (
-    <div className="relative w-full h-3 bg-secondary/20 rounded-full overflow-hidden">
-      <div 
-        className={`absolute top-0 left-0 h-full transition-all duration-500 ${
-          value > 80 ? 'bg-secondary' : value > 50 ? 'bg-primary' : 'bg-destructive'
-        }`}
-        style={{ width: `${value}%` }}
-      />
-    </div>
   )
 }

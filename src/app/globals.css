@@ -6,13 +6,13 @@
   :root {
     --background: 0 0% 3%; /* #070707 */
     --foreground: 0 0% 100%; /* #FFFFFF */
-    --card: 210 18% 11%; /* #14181B */
+    --card: 207 19% 11%; /* #161C21 */
     --card-foreground: 0 0% 100%;
-    --popover: 210 18% 11%;
+    --popover: 210 18% 11%; /* #14181B */
     --popover-foreground: 0 0% 100%;
     --primary: 173 94% 49%; /* #07F1D6 */
     --primary-foreground: 210 20% 2%;
-    --secondary: 358 93% 55%; /* #F71F26 approx */
+    --secondary: 358 93% 55%; /* #F71F26 */
     --secondary-foreground: 0 0% 100%;
     --muted: 210 20% 12%;
     --muted-foreground: 210 10% 60%;
@@ -49,7 +49,7 @@
 }
 
 .glass-card {
-  @apply bg-[#14181B]/80 backdrop-blur-2xl border border-white/5 shadow-2xl;
+  @apply bg-[#161C21]/80 backdrop-blur-2xl border border-white/5 shadow-2xl;
 }
 
 .interactive-icon {

@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState } from "react"
@@ -8,9 +7,10 @@ import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
-import { ThumbsUp, Send, MessageSquare, Quote, Star, Users, BrainCircuit, Heart, Sparkles, CheckCircle2 } from "lucide-react"
+import { Send, MessageSquare, Quote, Star, Users, BrainCircuit, Sparkles, CheckCircle2 } from "lucide-react"
 import { useLanguage } from "@/context/language-context"
 import { toast } from "@/hooks/use-toast"
+import { cn } from "@/lib/utils"
 
 const initialFeedbackItems = [
   { name: "Rahul Kumar", location: "Bihar", text: "जल जीवन मिशन से मेरे गाँव में नल से जल आ गया, धन्यवाद!", rating: 5, date: "2 hours ago" },

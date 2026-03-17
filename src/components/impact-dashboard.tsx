@@ -19,7 +19,7 @@ const initialSchemes = [
 
 export function ImpactDashboard() {
   const { t } = useLanguage()
-  const [schemes, setSchemes] = useState(initialSchemes)
+  const [schemes] = useState(initialSchemes)
   const [activeActions, setActiveActions] = useState<Record<string, 'up' | 'down' | null>>({})
 
   const handleAction = (id: number, type: 'up' | 'down') => {
@@ -41,7 +41,7 @@ export function ImpactDashboard() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-          <Card className="lg:col-span-2 shadow-2xl border border-white/5 bg-[#14181B]/40 backdrop-blur-3xl rounded-[3rem] overflow-hidden group">
+          <Card className="lg:col-span-2 shadow-2xl border border-white/5 bg-[#161C21]/40 backdrop-blur-3xl rounded-[3rem] overflow-hidden group">
             <CardHeader className="border-b border-white/5 p-10">
               <CardTitle className="flex items-center gap-4 text-white uppercase font-black tracking-tighter text-2xl">
                 <BarChart3 className="text-primary w-8 h-8 interactive-icon" /> SYSTEM THROUGHPUT ANALYSIS

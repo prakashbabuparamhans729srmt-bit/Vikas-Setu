@@ -1,6 +1,9 @@
+
 import type {Metadata} from 'next';
 import './globals.css';
 import { LanguageProvider } from '@/context/language-context';
+import { ThemeProvider } from '@/context/theme-context';
+import { AIChatbot } from '@/components/ai-chatbot';
 
 export const metadata: Metadata = {
   title: 'Vikas Setu | 🇮🇳 The Growth Bridge',
@@ -13,17 +16,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased min-h-screen flex flex-col bg-background text-foreground">
-        <LanguageProvider>
-          {children}
-        </LanguageProvider>
-        {/* Tricolor Bottom Accent - Moved here for global presence */}
+        <ThemeProvider>
+          <LanguageProvider>
+            {children}
+            <AIChatbot />
+          </LanguageProvider>
+        </ThemeProvider>
+        {/* Tricolor Bottom Accent */}
         <div className="fixed bottom-0 left-0 w-full h-1 flex shadow-[0_-5px_20px_rgba(7,241,214,0.2)] z-[100]">
            <div className="flex-1 bg-primary" />
            <div className="flex-1 bg-white" />

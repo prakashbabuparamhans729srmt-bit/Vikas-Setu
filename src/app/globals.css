@@ -1,9 +1,33 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
+    --background: 0 0% 100%;
+    --foreground: 210 20% 2%;
+    --card: 0 0% 98%;
+    --card-foreground: 210 20% 2%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 20% 2%;
+    --primary: 173 94% 49%;
+    --primary-foreground: 210 20% 2%;
+    --secondary: 358 93% 55%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 210 20% 95%;
+    --muted-foreground: 210 10% 40%;
+    --accent: 173 94% 49%;
+    --accent-foreground: 210 20% 2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 210 20% 90%;
+    --input: 210 20% 90%;
+    --ring: 173 94% 49%;
+    --radius: 1rem;
+  }
+
+  .dark {
     --background: 210 20% 2%;
     --foreground: 0 0% 100%;
     --card: 210 16% 9%;
@@ -23,12 +47,6 @@
     --border: 210 20% 12%;
     --input: 210 20% 12%;
     --ring: 173 94% 49%;
-    --chart-1: 173 94% 49%;
-    --chart-2: 358 93% 55%;
-    --chart-3: 0 0% 100%;
-    --chart-4: 210 20% 30%;
-    --chart-5: 173 94% 30%;
-    --radius: 1rem;
   }
 }
 
@@ -37,11 +55,15 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-body antialiased selection:bg-primary selection:text-primary-foreground;
+    @apply bg-background text-foreground font-body antialiased selection:bg-primary selection:text-primary-foreground transition-colors duration-300;
   }
 }
 
 .hero-gradient {
+  background: radial-gradient(circle at 50% 50%, rgba(7, 241, 214, 0.08) 0%, rgba(7, 7, 7, 1) 100%);
+}
+
+.dark .hero-gradient {
   background: radial-gradient(circle at 50% 50%, rgba(7, 241, 214, 0.08) 0%, rgba(7, 7, 7, 1) 100%);
 }
 
@@ -54,9 +76,7 @@
 }
 
 .glass-card {
-  background: rgba(20, 24, 27, 0.7);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  @apply bg-card/70 backdrop-blur-xl border border-white/5;
 }
 
 .interactive-icon {
@@ -68,14 +88,14 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #070707;
+  background: hsl(var(--background));
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #161c21;
+  background: hsl(var(--muted));
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #07f1d6;
+  background: hsl(var(--primary));
 }

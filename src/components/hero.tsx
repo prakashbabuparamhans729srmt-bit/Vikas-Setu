@@ -30,7 +30,8 @@ export function Hero() {
           </h1>
           
           <p className="text-xl md:text-2xl text-white/60 font-medium max-w-2xl mx-auto leading-relaxed">
-            {t('hero_subtitle')}
+            मेरा भारत, मेरी आवाज (My India, My Voice). <br />
+            Building the world's most transparent growth bridge.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-12">
@@ -41,7 +42,7 @@ export function Hero() {
             ].map((stat, idx) => (
               <div key={idx} className="glass-card rounded-3xl p-8 border border-white/5 hover:border-primary/30 hover:bg-primary/5 transition-all duration-500 group">
                 <stat.icon className={`h-10 w-10 ${stat.color} mb-4 group-hover:scale-110 transition-transform duration-500 interactive-icon`} />
-                <div className="text-4xl font-black tracking-tighter group-hover:text-primary transition-colors">{stat.value}</div>
+                <div className="text-4xl font-black tracking-tighter group-hover:text-primary transition-colors text-white">{stat.value}</div>
                 <div className="text-xs text-white/40 font-black uppercase tracking-widest mt-2">{stat.label}</div>
               </div>
             ))}
@@ -49,10 +50,10 @@ export function Hero() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
             <Button size="lg" className="h-16 px-10 text-lg font-black gap-3 bg-primary text-black hover:bg-primary/80 cyan-glow hover:scale-105 transition-all rounded-2xl">
-              {t('button_explore')} <ArrowRight className="h-6 w-6 interactive-icon" />
+              EXPLORE SCHEMES <ArrowRight className="h-6 w-6 interactive-icon" />
             </Button>
-            <Button size="lg" variant="outline" className="h-16 px-10 text-lg font-black border-2 border-white/10 hover:bg-white hover:text-black hover:scale-105 transition-all rounded-2xl">
-              <TrendingUp className="w-6 h-6 mr-2 interactive-icon" /> {t('button_progress')}
+            <Button size="lg" variant="outline" className="h-16 px-10 text-lg font-black border-2 border-white/10 hover:bg-white hover:text-black hover:scale-105 transition-all rounded-2xl bg-background text-white">
+              <TrendingUp className="w-6 h-6 mr-2 interactive-icon" /> PROGRESS MAP
             </Button>
           </div>
         </div>

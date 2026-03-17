@@ -1,4 +1,3 @@
-
 "use client"
 
 import Link from "next/link"
@@ -53,27 +52,27 @@ export function Navbar() {
   ]
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-xl">
+    <nav className="sticky top-0 z-50 w-full border-b border-white/5 bg-[#070707]/80 backdrop-blur-xl">
       <div className="container mx-auto px-4 flex h-20 items-center justify-between">
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500">
-               <span className="text-xl font-bold">V</span>
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-black transition-all duration-500">
+               <span className="text-xl font-black">V</span>
             </div>
             <span className="text-2xl font-black font-headline tracking-tighter flex items-center">
               <span className="text-primary group-hover:tracking-normal transition-all duration-500 uppercase">{t('brand_vikas')}</span>
-              <span className="text-foreground ml-1 uppercase">{t('brand_setu')}</span>
+              <span className="text-white ml-1 uppercase">{t('brand_setu')}</span>
               <span className="ml-2 animate-pulse">🇮🇳</span>
             </span>
           </Link>
         </div>
 
-        <div className="hidden md:flex items-center gap-10 text-sm font-bold uppercase tracking-widest">
+        <div className="hidden md:flex items-center gap-10 text-xs font-black uppercase tracking-widest">
           {navItems.map((item) => (
             <Link 
               key={item.id}
               href={`#${item.id}`} 
-              className="text-muted-foreground hover:text-primary transition-all duration-300 relative group"
+              className="text-white/40 hover:text-primary transition-all duration-300 relative group"
             >
               {item.name}
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
@@ -85,11 +84,11 @@ export function Navbar() {
           <div className="hidden lg:flex items-center gap-4 mr-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary transition-colors">
+                <Button variant="ghost" size="icon" className="text-white/40 hover:text-primary transition-colors">
                   <Globe className="w-5 h-5 interactive-icon" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-64 bg-background/90 border-border backdrop-blur-xl rounded-2xl p-2">
+              <DropdownMenuContent align="end" className="w-64 bg-[#14181B] border-white/10 backdrop-blur-xl rounded-2xl p-2">
                 <ScrollArea className="h-80 pr-4">
                   <div className="p-2 space-y-1">
                     {LANGUAGES.map((lang) => (
@@ -101,7 +100,7 @@ export function Navbar() {
                         }}
                         className={cn(
                           "flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition-all",
-                          language === lang.code ? "bg-primary text-black" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                          language === lang.code ? "bg-primary text-black" : "text-white/60 hover:bg-white/5 hover:text-white"
                         )}
                       >
                         <div className="flex flex-col text-left">
@@ -117,64 +116,64 @@ export function Navbar() {
             </DropdownMenu>
             
             <Link href="/settings">
-              <Settings className="w-5 h-5 text-muted-foreground hover:text-primary transition-colors cursor-pointer interactive-icon" />
+              <Settings className="w-5 h-5 text-white/40 hover:text-primary transition-colors cursor-pointer interactive-icon" />
             </Link>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-primary transition-colors">
+                <Button variant="ghost" size="icon" className="relative text-white/40 hover:text-primary transition-colors">
                   <Bell className="w-5 h-5 interactive-icon" />
                   <span className="absolute top-2 right-2 w-2 h-2 bg-secondary rounded-full animate-ping" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-80 bg-background/95 border-border backdrop-blur-xl rounded-2xl p-4 shadow-2xl">
-                <DropdownMenuLabel className="font-black uppercase tracking-widest text-xs flex items-center justify-between">
+              <DropdownMenuContent align="end" className="w-80 bg-[#14181B] border-white/10 backdrop-blur-xl rounded-2xl p-4 shadow-2xl">
+                <DropdownMenuLabel className="font-black uppercase tracking-widest text-[10px] flex items-center justify-between text-white/60">
                   NOTIFICATIONS <Sparkles className="w-3 h-3 text-primary" />
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator className="my-2 bg-border/50" />
+                <DropdownMenuSeparator className="my-2 bg-white/5" />
                 <div className="space-y-4 py-2">
                   {notifications.map((n) => (
-                    <div key={n.id} className="p-3 rounded-xl hover:bg-muted transition-colors cursor-pointer group">
+                    <div key={n.id} className="p-3 rounded-xl hover:bg-white/5 transition-colors cursor-pointer group">
                       <div className="flex justify-between items-start mb-1">
-                        <p className="font-bold text-sm group-hover:text-primary transition-colors">{n.title}</p>
-                        <span className="text-[8px] font-black text-muted-foreground uppercase">{n.time}</span>
+                        <p className="font-bold text-sm group-hover:text-primary transition-colors text-white/80">{n.title}</p>
+                        <span className="text-[8px] font-black text-white/20 uppercase">{n.time}</span>
                       </div>
-                      <p className="text-xs text-muted-foreground line-clamp-2">{n.desc}</p>
+                      <p className="text-xs text-white/40 line-clamp-2">{n.desc}</p>
                     </div>
                   ))}
                 </div>
-                <Button variant="ghost" className="w-full mt-2 text-[10px] font-black uppercase tracking-widest hover:text-primary">VIEW ALL LOGS</Button>
+                <Button variant="ghost" className="w-full mt-2 text-[10px] font-black uppercase tracking-widest hover:text-primary text-white/20">VIEW ALL LOGS</Button>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
           
-          <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+          <Button variant="ghost" size="icon" className="md:hidden text-white" onClick={() => setIsMenuOpen(!isMenuOpen)}>
             {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </Button>
           
           <Link href="/login">
-            <Button variant="outline" className="hidden md:flex gap-2 border-border hover:border-primary/50 hover:bg-primary/10 text-foreground font-bold uppercase tracking-widest text-xs h-10 px-6 rounded-xl">
+            <Button variant="outline" className="hidden md:flex gap-2 border-white/10 hover:border-primary/50 hover:bg-primary/10 text-white font-black uppercase tracking-widest text-[10px] h-10 px-6 rounded-xl">
               <User className="h-4 w-4 interactive-icon" /> {t('login')}
             </Button>
           </Link>
           
           <Dialog>
             <DialogTrigger asChild>
-              <Button className="bg-primary text-black font-black hover:bg-primary/90 hover:scale-105 transition-all cyan-glow px-6 h-10 rounded-xl uppercase tracking-widest text-xs">
+              <Button className="bg-primary text-black font-black hover:bg-white hover:scale-105 transition-all cyan-glow px-6 h-10 rounded-xl uppercase tracking-widest text-[10px]">
                 {t('join')}
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-background/95 backdrop-blur-2xl border-primary/20 rounded-[2.5rem]">
+            <DialogContent className="bg-[#070707] border-white/10 rounded-[2.5rem] shadow-2xl">
               <DialogHeader>
-                <DialogTitle className="text-2xl font-black uppercase tracking-tighter">Bharat Growth Network</DialogTitle>
-                <DialogDescription className="text-muted-foreground font-medium">
+                <DialogTitle className="text-2xl font-black uppercase tracking-tighter text-white">Bharat Growth Network</DialogTitle>
+                <DialogDescription className="text-white/40 font-medium">
                   Initialize your node to access direct benefits and participate in national development protocols.
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-6 py-4">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Aadhar Virtual ID</label>
-                  <input className="w-full h-12 bg-muted border-border rounded-xl px-4 text-sm focus:outline-none focus:ring-1 focus:ring-primary" placeholder="XXXX-XXXX-XXXX" />
+                  <label className="text-[10px] font-black uppercase tracking-widest text-white/20 ml-1">Aadhar Virtual ID</label>
+                  <input className="w-full h-12 bg-[#14181B] border-white/5 rounded-xl px-4 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary" placeholder="XXXX-XXXX-XXXX" />
                 </div>
                 <Button onClick={handleJoinGrowth} className="w-full h-14 bg-primary text-black font-black text-lg rounded-xl hover:scale-[1.02] transition-all cyan-glow">
                   AUTHORIZE IDENTITY
@@ -187,21 +186,21 @@ export function Navbar() {
       
       {/* Mobile Menu */}
       <div className={cn(
-        "md:hidden fixed inset-x-0 bg-background/95 border-b border-border backdrop-blur-2xl transition-all duration-500 ease-in-out overflow-hidden",
+        "md:hidden fixed inset-x-0 bg-[#070707]/95 border-b border-white/5 backdrop-blur-2xl transition-all duration-500 ease-in-out overflow-hidden",
         isMenuOpen ? "max-h-[600px] py-6 opacity-100" : "max-h-0 py-0 opacity-0"
       )}>
         <div className="container mx-auto px-6 flex flex-col gap-6">
           {navItems.map((item) => (
-            <Link key={item.id} href={`#${item.id}`} className="text-xl font-bold hover:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
+            <Link key={item.id} href={`#${item.id}`} className="text-xl font-black uppercase tracking-tighter text-white hover:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
               {item.name}
             </Link>
           ))}
-          <Link href="/settings" className="text-xl font-bold hover:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
+          <Link href="/settings" className="text-xl font-black uppercase tracking-tighter text-white hover:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
             Settings
           </Link>
-          <div className="h-px bg-border w-full" />
+          <div className="h-px bg-white/5 w-full" />
           
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">SELECT LANGUAGE</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/20">SELECT LANGUAGE</p>
           <ScrollArea className="h-48">
             <div className="grid grid-cols-2 gap-3 pr-4">
                {LANGUAGES.map((lang) => (
@@ -214,7 +213,7 @@ export function Navbar() {
                     setIsMenuOpen(false)
                     toast({ title: "Protocol Update", description: `Language set to ${lang.native}` });
                   }}
-                  className="rounded-lg h-10 font-bold text-xs"
+                  className={cn("rounded-lg h-10 font-bold text-[10px] border-white/10", language === lang.code ? "bg-primary text-black" : "text-white/60")}
                  >
                    {lang.native}
                  </Button>
@@ -223,7 +222,7 @@ export function Navbar() {
           </ScrollArea>
 
           <Link href="/login" onClick={() => setIsMenuOpen(false)}>
-            <Button variant="outline" className="w-full justify-center gap-2 border-border text-foreground font-bold h-12 rounded-xl">
+            <Button variant="outline" className="w-full justify-center gap-2 border-white/10 text-white font-black h-12 rounded-xl">
               <User className="h-4 w-4 interactive-icon" /> {t('login')}
             </Button>
           </Link>

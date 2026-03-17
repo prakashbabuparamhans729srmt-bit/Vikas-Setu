@@ -1,21 +1,37 @@
+
 "use client"
 
+import { useState } from "react"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { ThumbsUp, ThumbsDown, TrendingUp, BarChart3, Clock, Globe, Shield } from "lucide-react"
+import { ThumbsUp, ThumbsDown, TrendingUp, BarChart3, Clock, Globe, Shield, Activity } from "lucide-react"
 import { useLanguage } from "@/context/language-context"
+import { toast } from "@/hooks/use-toast"
+import { cn } from "@/lib/utils"
 
-const topRatedSchemes = [
-  { name: "PM Kisan", state: "National", rating: 4.9, votes: "125k", progress: 95 },
-  { name: "Rythu Bharosa", state: "Telangana", rating: 4.8, votes: "89k", progress: 92 },
-  { name: "Ladki Bahin", state: "Maharashtra", rating: 4.5, votes: "210k", progress: 88 },
-  { name: "Ayushman Bharat", state: "National", rating: 4.4, votes: "450k", progress: 76 },
+const initialSchemes = [
+  { id: 1, name: "PM Kisan", state: "National", rating: 4.9, votes: 125, progress: 95 },
+  { id: 2, name: "Rythu Bharosa", state: "Telangana", rating: 4.8, votes: 89, progress: 92 },
+  { id: 3, name: "Majhi Ladki Bahin", state: "Maharashtra", rating: 4.5, votes: 210, progress: 88 },
+  { id: 4, name: "Ayushman Bharat", state: "National", rating: 4.4, votes: 450, progress: 76 },
 ]
 
 export function ImpactDashboard() {
   const { t } = useLanguage()
+  const [schemes, setSchemes] = useState(initialSchemes)
+  const [activeActions, setActiveActions] = useState<Record<string, 'up' | 'down' | null>>({})
+
+  const handleAction = (id: number, type: 'up' | 'down') => {
+    const key = `${id}-${type}`;
+    setActiveActions(prev => ({ ...prev, [id]: prev[id] === type ? null : type }));
+    
+    toast({
+      title: type === 'up' ? "Trust Vector Increased" : "Efficiency Logged",
+      description: `Data node ${id} feedback processed via public protocol.`,
+    });
+  }
 
   return (
     <section id="impact" className="py-32 bg-background">
@@ -51,13 +67,13 @@ export function ImpactDashboard() {
                   { label: "2022-23 FY", val: 82, active: true },
                   { label: "2023-24 LIVE", val: 68, live: true }
                 ].map((stat, i) => (
-                  <div key={i} className="space-y-4 group/stat cursor-default">
+                  <div key={i} className="space-y-4 group/stat cursor-default" onClick={() => toast({ title: `${stat.label} Snapshot`, description: `Historical completion vector: ${stat.val}%` })}>
                     <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-[0.2em] text-white/30">
                       <span className="flex items-center gap-3"><Clock className="w-4 h-4 text-primary interactive-icon" /> {stat.label}</span>
-                      <span className={stat.active ? 'text-primary' : stat.live ? 'text-secondary' : ''}>{stat.val}%</span>
+                      <span className={cn("transition-colors", stat.active ? 'text-primary' : stat.live ? 'text-secondary' : '')}>{stat.val}%</span>
                     </div>
                     <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
-                       <div className={`h-full transition-all duration-700 ${stat.live ? 'bg-secondary' : stat.active ? 'bg-primary' : 'bg-white/20'}`} style={{ width: `${stat.val}%` }} />
+                       <div className={cn("h-full transition-all duration-700", stat.live ? 'bg-secondary' : stat.active ? 'bg-primary' : 'bg-white/20')} style={{ width: `${stat.val}%` }} />
                     </div>
                   </div>
                 ))}
@@ -75,17 +91,17 @@ export function ImpactDashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-10 pt-0 space-y-8">
-              <div className="p-8 rounded-[2rem] bg-white/5 border border-white/10 space-y-3 group hover:border-primary/50 transition-all">
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">High-Velocity Sector</p>
-                <p className="text-2xl font-black text-white leading-tight">Infrastructure (NHAI)</p>
-                <p className="text-xs text-white/30 font-bold uppercase tracking-widest">+15.4% Completion YoY</p>
-              </div>
-              <div className="p-8 rounded-[2rem] bg-white/5 border border-white/10 space-y-3 group hover:border-secondary/50 transition-all">
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-secondary">Public Trust Vector</p>
-                <p className="text-2xl font-black text-white leading-tight">8.4 / 10.0</p>
-                <p className="text-xs text-white/30 font-bold uppercase tracking-widest">250,000 Verified Nodes</p>
-              </div>
-              <div className="p-8 rounded-[2rem] bg-primary/[0.05] border border-primary/30 flex items-center justify-between group hover:bg-primary transition-all duration-500">
+              {[
+                { label: "High-Velocity Sector", title: "Infrastructure (NHAI)", desc: "+15.4% Completion YoY", color: "hover:border-primary/50" },
+                { label: "Public Trust Vector", title: "8.4 / 10.0", desc: "250,000 Verified Nodes", color: "hover:border-secondary/50" }
+              ].map((item, i) => (
+                <div key={i} className={cn("p-8 rounded-[2rem] bg-white/5 border border-white/10 space-y-3 group transition-all cursor-pointer", item.color)} onClick={() => toast({ title: item.label, description: item.title })}>
+                  <p className={cn("text-[10px] font-black uppercase tracking-[0.3em]", i === 0 ? "text-primary" : "text-secondary")}>{item.label}</p>
+                  <p className="text-2xl font-black text-white leading-tight">{item.title}</p>
+                  <p className="text-xs text-white/30 font-bold uppercase tracking-widest">{item.desc}</p>
+                </div>
+              ))}
+              <div className="p-8 rounded-[2rem] bg-primary/[0.05] border border-primary/30 flex items-center justify-between group hover:bg-primary transition-all duration-500 cursor-pointer" onClick={() => toast({ title: "Hyper Growth Protocol", description: "Digital index performance exceeded expectations." })}>
                  <div className="space-y-1">
                    <p className="text-[10px] font-black uppercase tracking-widest text-primary group-hover:text-black">Digital Index</p>
                    <p className="text-xl font-black text-white group-hover:text-black uppercase">HYPER GROWTH</p>
@@ -100,9 +116,14 @@ export function ImpactDashboard() {
 
         <Card className="shadow-2xl border-white/5 bg-white/[0.01] rounded-[4rem] overflow-hidden">
           <CardHeader className="bg-white/[0.02] border-b border-white/5 p-12">
-            <CardTitle className="text-3xl font-black font-headline flex items-center gap-6 text-white uppercase tracking-tighter">
-              <Shield className="w-10 h-10 text-primary interactive-icon" /> TOP RATED RESOURCE NODES
-            </CardTitle>
+            <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+              <CardTitle className="text-3xl font-black font-headline flex items-center gap-6 text-white uppercase tracking-tighter">
+                <Shield className="w-10 h-10 text-primary interactive-icon" /> TOP RATED RESOURCE NODES
+              </CardTitle>
+              <Button variant="outline" className="border-primary/20 text-primary uppercase font-black tracking-widest h-12 px-8 rounded-xl hover:bg-primary/10" onClick={() => toast({ title: "Analysis Refreshed", description: "Fetching latest node performance metrics..." })}>
+                <Activity className="mr-2 w-4 h-4 animate-pulse" /> REFRESH SYNC
+              </Button>
+            </div>
           </CardHeader>
           <CardContent className="p-0">
             <Table>
@@ -116,7 +137,7 @@ export function ImpactDashboard() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {topRatedSchemes.map((scheme) => (
+                {schemes.map((scheme) => (
                   <TableRow key={scheme.name} className="border-white/5 hover:bg-primary/[0.03] transition-all cursor-pointer group">
                     <TableCell className="p-8 font-black text-2xl text-white group-hover:text-primary transition-colors">{scheme.name}</TableCell>
                     <TableCell className="p-8">
@@ -130,13 +151,23 @@ export function ImpactDashboard() {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="p-8 text-center text-white/40 font-black uppercase tracking-widest text-[10px]">{scheme.votes} INTERACTIONS</TableCell>
+                    <TableCell className="p-8 text-center text-white/40 font-black uppercase tracking-widest text-[10px]">{scheme.votes}k INTERACTIONS</TableCell>
                     <TableCell className="p-8 text-right">
                       <div className="flex justify-end gap-3">
-                        <Button variant="ghost" size="icon" className="h-12 w-12 text-primary border border-primary/20 hover:bg-primary hover:text-black transition-all rounded-xl">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className={cn("h-12 w-12 border border-primary/20 hover:bg-primary hover:text-black transition-all rounded-xl", activeActions[scheme.id] === 'up' && "bg-primary text-black")}
+                          onClick={(e) => { e.stopPropagation(); handleAction(scheme.id, 'up'); }}
+                        >
                           <ThumbsUp className="h-6 w-6 interactive-icon" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-12 w-12 text-secondary border border-secondary/20 hover:bg-secondary hover:text-white transition-all rounded-xl">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className={cn("h-12 w-12 border border-secondary/20 hover:bg-secondary hover:text-white transition-all rounded-xl", activeActions[scheme.id] === 'down' && "bg-secondary text-white")}
+                          onClick={(e) => { e.stopPropagation(); handleAction(scheme.id, 'down'); }}
+                        >
                           <ThumbsDown className="h-6 w-6 interactive-icon" />
                         </Button>
                       </div>

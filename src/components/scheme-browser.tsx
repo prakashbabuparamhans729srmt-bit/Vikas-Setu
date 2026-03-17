@@ -6,9 +6,19 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
-import { Search, Filter, ThumbsUp, ThumbsDown, Info, Star, Users, Mic, MicOff } from "lucide-react"
+import { Search, Filter, ThumbsUp, Info, Star, Users, Mic, MicOff, CheckCircle2, ArrowUpRight, ShieldCheck } from "lucide-react"
 import { useLanguage } from "@/context/language-context"
 import { cn } from "@/lib/utils"
+import { toast } from "@/hooks/use-toast"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog"
 
 const categories = [
   { name: "All Yojanaye", count: 5300, icon: "✅" },
@@ -24,12 +34,12 @@ const categories = [
 ]
 
 const allSchemes = [
-  { id: 1, name: "PM Kisan Samman Nidhi", type: "Central", description: "Direct income support of ₹6,000 per year to all landholding farmers' families.", rating: 4.9, users: "125M", progress: 95, tags: ["Agriculture", "Direct Benefit"] },
-  { id: 2, name: "Jal Jeevan Mission", type: "Central", description: "Providing safe and adequate drinking water through individual household tap connections by 2024.", rating: 4.8, users: "89M", progress: 78, tags: ["Infrastructure", "Water"] },
-  { id: 3, name: "Digital India Mission", type: "Central", description: "Ensuring government services are made available to citizens electronically.", rating: 4.7, users: "250M", progress: 82, tags: ["Technology", "Connectivity"] },
-  { id: 4, name: "Ladki Bahin Yojana", type: "Maharashtra", description: "Financial assistance program for women empowerment in Maharashtra.", rating: 4.5, users: "3.8M", progress: 88, tags: ["Women", "State"] },
-  { id: 5, name: "Ayushman Bharat", type: "Central", description: "World's largest government-funded healthcare program providing coverage of ₹5 lakh per family.", rating: 4.6, users: "450M", progress: 76, tags: ["Health", "Insurance"] },
-  { id: 6, name: "PM Awas Yojana", type: "Central", description: "Housing for All initiative ensuring every family has a pucca house with basic amenities.", rating: 4.4, users: "12M", progress: 91, tags: ["Housing", "Infrastructure"] },
+  { id: 1, name: "PM Kisan Samman Nidhi", type: "Central", description: "Direct income support of ₹6,000 per year to all landholding farmers' families.", rating: 4.9, users: "125M", progress: 95, tags: ["Agriculture", "Direct Benefit"], details: "The Pradhan Mantri Kisan Samman Nidhi (PM-KISAN) is a Central Sector Scheme with 100% funding from Government of India. The scheme is effective from 1.12.2018. Under the scheme an income support of ₹6,000/- per year in three equal installments will be provided to all landholding farmer families." },
+  { id: 2, name: "Jal Jeevan Mission", type: "Central", description: "Providing safe and adequate drinking water through individual household tap connections by 2024.", rating: 4.8, users: "89M", progress: 78, tags: ["Infrastructure", "Water"], details: "Jal Jeevan Mission, is envisioned to provide safe and adequate drinking water through individual household tap connections by 2024 to all households in rural India. The programme will also implement source sustainability measures as mandatory elements, such as recharge and reuse through grey water management, water conservation, rain water harvesting." },
+  { id: 3, name: "Digital India Mission", type: "Central", description: "Ensuring government services are made available to citizens electronically.", rating: 4.7, users: "250M", progress: 82, tags: ["Technology", "Connectivity"], details: "Digital India is a campaign launched by the Government of India in order to ensure that the Government's services are made available to citizens electronically by improved online infrastructure and by increasing Internet connectivity or making the country digitally empowered in the field of technology." },
+  { id: 4, name: "Ladki Bahin Yojana", type: "Maharashtra", description: "Financial assistance program for women empowerment in Maharashtra.", rating: 4.5, users: "3.8M", progress: 88, tags: ["Women", "State"], details: "The Majhi Ladki Bahin Yojana is a flagship scheme of the Maharashtra Government aimed at providing monthly financial assistance to women from economically weaker sections. The scheme focuses on improving health, nutrition, and overall empowerment of women in the state." },
+  { id: 5, name: "Ayushman Bharat", type: "Central", description: "World's largest government-funded healthcare program providing coverage of ₹5 lakh per family.", rating: 4.6, users: "450M", progress: 76, tags: ["Health", "Insurance"], details: "Ayushman Bharat - Pradhan Mantri Jan Arogya Yojana (PM-JAY), is a flagship scheme of Government of India to provide cashless secondary and tertiary care treatment from the empanelled public and private hospitals providing coverage up to ₹5 lakh per family per year." },
+  { id: 6, name: "PM Awas Yojana", type: "Central", description: "Housing for All initiative ensuring every family has a pucca house with basic amenities.", rating: 4.4, users: "12M", progress: 91, tags: ["Housing", "Infrastructure"], details: "Pradhan Mantri Awas Yojana (PMAY) is an initiative by the Government of India in which affordable housing will be provided to the urban poor with a target of building 2 crore affordable houses by 31 March 2022. It has two components: Pradhan Mantri Awas Yojana (Urban) (PMAY-U) and Pradhan Mantri Awas Yojana (Gramin) (PMAY-G)." },
 ]
 
 const trendingSchemes = [
@@ -44,6 +54,7 @@ export function SchemeBrowser() {
   const [activeCategory, setActiveCategory] = useState("All Yojanaye")
   const [searchQuery, setSearchQuery] = useState("")
   const [isListening, setIsListening] = useState(false)
+  const [isApplying, setIsApplying] = useState<number | null>(null)
   const { t } = useLanguage()
 
   const filteredSchemes = useMemo(() => {
@@ -59,13 +70,38 @@ export function SchemeBrowser() {
   }, [searchQuery, activeCategory]);
 
   const handleVoiceSearch = () => {
-    if (!('webkitSpeechRecognition' in window)) return;
+    if (!('webkitSpeechRecognition' in window)) {
+      toast({ variant: "destructive", title: "Protocol Error", description: "Voice recognition not supported in this terminal." });
+      return;
+    }
     const recognition = new (window as any).webkitSpeechRecognition();
     recognition.onstart = () => setIsListening(true);
     recognition.onend = () => setIsListening(false);
-    recognition.onresult = (event: any) => setSearchQuery(event.results[0][0].transcript);
+    recognition.onresult = (event: any) => {
+      const text = event.results[0][0].transcript;
+      setSearchQuery(text);
+      toast({ title: "Voice Input Captured", description: `Query: "${text}"` });
+    };
     recognition.start();
   };
+
+  const handleApply = (id: number, name: string) => {
+    setIsApplying(id);
+    setTimeout(() => {
+      setIsApplying(null);
+      toast({
+        title: "Application Logged",
+        description: `Your intent for ${name} has been synchronized with the national registry.`,
+      });
+    }, 2000);
+  };
+
+  const handleVote = (name: string) => {
+    toast({
+      title: "Public Vote Recorded",
+      description: `Support vector for ${name} increased.`,
+    });
+  }
 
   return (
     <div id="schemes" className="container mx-auto px-4 py-32 space-y-16">
@@ -87,7 +123,7 @@ export function SchemeBrowser() {
           <Button size="lg" className="h-14 bg-primary text-black font-black hover:bg-primary/80 gap-3 px-8 cyan-glow rounded-2xl">
             <Search className="h-6 w-6" /> {t('search_btn')}
           </Button>
-          <Button size="lg" variant="outline" className="h-14 gap-3 hidden sm:flex border-border hover:bg-muted rounded-2xl">
+          <Button size="lg" variant="outline" className="h-14 gap-3 hidden sm:flex border-border hover:bg-muted rounded-2xl" onClick={() => toast({ title: "Filters Optimized", description: "Advanced search parameters applied." })}>
             <Filter className="h-6 w-6" /> {t('filter_btn')}
           </Button>
         </div>
@@ -106,7 +142,10 @@ export function SchemeBrowser() {
                 {categories.map((cat) => (
                   <button
                     key={cat.name}
-                    onClick={() => setActiveCategory(cat.name)}
+                    onClick={() => {
+                      setActiveCategory(cat.name);
+                      toast({ title: "Filter Node Activated", description: `Showing ${cat.name} protocols.` });
+                    }}
                     className={`w-full flex items-center justify-between p-4 rounded-2xl text-sm font-bold transition-all duration-300 ${
                       activeCategory === cat.name 
                       ? 'bg-primary text-black shadow-lg shadow-primary/20 scale-105' 
@@ -135,7 +174,7 @@ export function SchemeBrowser() {
             </CardHeader>
             <CardContent className="space-y-6 p-6">
               {trendingSchemes.map((scheme, i) => (
-                <div key={i} className="flex items-center justify-between group/item cursor-pointer">
+                <div key={i} className="flex items-center justify-between group/item cursor-pointer" onClick={() => handleVote(scheme.name)}>
                   <div className="space-y-1">
                     <p className="text-sm font-black group-hover/item:text-primary transition-colors">{scheme.name}</p>
                     <div className="flex items-center gap-3 text-[10px] text-muted-foreground font-bold uppercase tracking-widest">
@@ -144,7 +183,7 @@ export function SchemeBrowser() {
                       <span>{scheme.type}</span>
                     </div>
                   </div>
-                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-[10px] font-black text-muted-foreground border border-border">
+                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-[10px] font-black text-muted-foreground border border-border group-hover/item:border-primary/50 group-hover/item:text-primary transition-all">
                     {i+1}
                   </div>
                 </div>
@@ -176,8 +215,68 @@ export function SchemeBrowser() {
                   </div>
                 </CardContent>
                 <CardFooter className="p-8 pt-0 flex gap-4">
-                   <Button variant="ghost" size="sm" className="flex-1 text-[10px] font-black uppercase border border-border hover:border-primary hover:bg-transparent rounded-xl">DETAILS</Button>
-                   <Button variant="secondary" size="sm" className="flex-1 text-[10px] font-black uppercase bg-primary text-black hover:bg-foreground hover:text-background transition-colors rounded-xl">APPLY NOW</Button>
+                   <Dialog>
+                     <DialogTrigger asChild>
+                       <Button variant="ghost" size="sm" className="flex-1 text-[10px] font-black uppercase border border-border hover:border-primary hover:bg-transparent rounded-xl">DETAILS</Button>
+                     </DialogTrigger>
+                     <DialogContent className="bg-background/95 backdrop-blur-3xl border-primary/20 rounded-[2.5rem] max-w-2xl overflow-hidden">
+                       <div className="absolute top-0 left-0 w-full h-1 flex">
+                         <div className="flex-1 bg-primary" />
+                         <div className="flex-1 bg-white" />
+                         <div className="flex-1 bg-secondary" />
+                       </div>
+                       <DialogHeader className="pt-6">
+                         <div className="flex items-center gap-2 mb-2">
+                           <Badge className="bg-primary/10 text-primary border-primary/20 uppercase text-[8px] tracking-widest font-black">{scheme.type} NODE</Badge>
+                           <Badge variant="outline" className="border-border text-[8px] uppercase tracking-widest font-black">{scheme.tags[0]}</Badge>
+                         </div>
+                         <DialogTitle className="text-3xl font-black uppercase tracking-tighter text-primary">{scheme.name}</DialogTitle>
+                         <DialogDescription className="text-foreground/80 font-medium leading-relaxed mt-4">
+                           {scheme.details}
+                         </DialogDescription>
+                       </DialogHeader>
+                       <div className="grid grid-cols-2 gap-4 my-6">
+                         <div className="bg-muted/50 p-4 rounded-2xl border border-border space-y-1">
+                           <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Public Rating</p>
+                           <div className="flex items-center gap-2">
+                             <Star className="w-4 h-4 text-primary fill-primary" />
+                             <span className="text-xl font-black">{scheme.rating} / 5.0</span>
+                           </div>
+                         </div>
+                         <div className="bg-muted/50 p-4 rounded-2xl border border-border space-y-1">
+                           <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Impact Reach</p>
+                           <div className="flex items-center gap-2">
+                             <Users className="w-4 h-4 text-primary" />
+                             <span className="text-xl font-black">{scheme.users} Beneficiaries</span>
+                           </div>
+                         </div>
+                       </div>
+                       <div className="space-y-4">
+                         <h4 className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2">
+                           <ShieldCheck className="w-3 h-3" /> Eligibility Protocol
+                         </h4>
+                         <ul className="text-xs text-muted-foreground space-y-2 font-medium">
+                           <li>• Verified landholding status or resident credentials.</li>
+                           <li>• Income node within prescribed demographic limits.</li>
+                           <li>• Valid digital identity (Aadhar/PAN) synchronization.</li>
+                         </ul>
+                       </div>
+                       <DialogFooter className="mt-8">
+                         <Button onClick={() => handleApply(scheme.id, scheme.name)} className="w-full h-14 bg-primary text-black font-black text-lg rounded-2xl hover:scale-[1.02] transition-all cyan-glow uppercase">
+                           INITIALIZE APPLICATION <ArrowUpRight className="ml-2 w-5 h-5" />
+                         </Button>
+                       </DialogFooter>
+                     </DialogContent>
+                   </Dialog>
+                   <Button 
+                    disabled={isApplying === scheme.id}
+                    onClick={() => handleApply(scheme.id, scheme.name)}
+                    variant="secondary" 
+                    size="sm" 
+                    className="flex-1 text-[10px] font-black uppercase bg-primary text-black hover:bg-foreground hover:text-background transition-colors rounded-xl"
+                   >
+                     {isApplying === scheme.id ? "SYNCING..." : "APPLY NOW"}
+                   </Button>
                 </CardFooter>
               </Card>
             ))}
@@ -190,7 +289,9 @@ export function SchemeBrowser() {
           )}
 
           <div className="text-center">
-             <Button variant="link" className="text-primary font-black text-lg hover:tracking-widest transition-all uppercase">SEE ALL 5,300+ RESOURCE NODES</Button>
+             <Button variant="link" className="text-primary font-black text-lg hover:tracking-widest transition-all uppercase" onClick={() => toast({ title: "Registry Expanded", description: "Loading full historical database..." })}>
+               SEE ALL 5,300+ RESOURCE NODES
+             </Button>
           </div>
         </div>
       </div>

@@ -1,10 +1,20 @@
+
 "use client"
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
-import { Map, Layers, Target, Compass } from "lucide-react"
+import { Map, Layers, Target, Compass, Sparkles, Zap, ShieldCheck } from "lucide-react"
+import { toast } from "@/hooks/use-toast"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
 const stateData = [
   { name: "Maharashtra", completion: 98, status: "High" },
@@ -16,6 +26,20 @@ const stateData = [
 ]
 
 export function IndiaMap() {
+  const handleStateClick = (name: string) => {
+    toast({
+      title: `${name} Node Analysis`,
+      description: "Fetching real-time implementation metrics...",
+    })
+  }
+
+  const handleActivateFullView = () => {
+    toast({
+      title: "Holographic Stream Initialized",
+      description: "Visualizing high-resolution implementation layers.",
+    })
+  }
+
   return (
     <Card className="w-full border-none shadow-none bg-transparent">
       <CardHeader className="text-center space-y-4">
@@ -35,12 +59,48 @@ export function IndiaMap() {
             <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:30px_30px]" />
             
             <div className="text-center p-12 relative z-10">
-              <div className="text-9xl mb-8 group-hover:scale-110 transition-transform duration-700">🇮🇳</div>
+              <div className="text-9xl mb-8 group-hover:scale-110 transition-transform duration-700 select-none">🇮🇳</div>
               <h3 className="text-2xl font-black text-white mb-4 tracking-tighter">HOLOGRAPHIC MAP ENGINE</h3>
               <p className="text-sm text-white/40 leading-relaxed max-w-xs mx-auto">Clicking any state triggers deep-layer resource allocation analytics.</p>
-              <Button className="mt-8 bg-primary text-black font-black cyan-glow hover:scale-105 transition-all px-8">
-                ACTIVATE FULL VIEW
-              </Button>
+              
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button onClick={handleActivateFullView} className="mt-8 bg-primary text-black font-black cyan-glow hover:scale-105 transition-all px-8">
+                    ACTIVATE FULL VIEW
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-black/95 backdrop-blur-3xl border-primary/20 max-w-5xl h-[80vh] flex flex-col items-center justify-center rounded-[3rem]">
+                  <div className="absolute inset-0 bg-[linear-gradient(rgba(7,241,214,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(7,241,214,0.05)_1px,transparent_1px)] bg-[size:40px_40px] opacity-20" />
+                  <DialogHeader className="z-10 text-center">
+                    <DialogTitle className="text-5xl font-black uppercase tracking-tighter text-white flex items-center gap-4">
+                      <Sparkles className="w-10 h-10 text-primary animate-spin-slow" /> BHARAT ANALYTICS PRO
+                    </DialogTitle>
+                    <DialogDescription className="text-primary font-black uppercase tracking-[0.4em] text-xs">Layer 0: Full National Connectivity</DialogDescription>
+                  </DialogHeader>
+                  <div className="flex-1 flex items-center justify-center relative w-full overflow-hidden">
+                    <div className="text-[20rem] opacity-10 select-none animate-pulse">🇮🇳</div>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-8">
+                      <div className="grid grid-cols-3 gap-12 text-center">
+                        <div className="space-y-2">
+                          <p className="text-[10px] font-black uppercase text-primary tracking-widest">Active Projects</p>
+                          <p className="text-4xl font-black text-white">45,892</p>
+                        </div>
+                        <div className="space-y-2">
+                          <p className="text-[10px] font-black uppercase text-secondary tracking-widest">Live Nodes</p>
+                          <p className="text-4xl font-black text-white">1.2M</p>
+                        </div>
+                        <div className="space-y-2">
+                          <p className="text-[10px] font-black uppercase text-white tracking-widest">Growth Rate</p>
+                          <p className="text-4xl font-black text-white">12.4%</p>
+                        </div>
+                      </div>
+                      <Button className="bg-primary text-black font-black uppercase rounded-2xl h-14 px-12 cyan-glow group">
+                        <Zap className="mr-2 w-5 h-5 group-hover:animate-bounce" /> INITIALIZE DISTRICT SYNC
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
             
             {/* Mock map pulses */}
@@ -60,7 +120,7 @@ export function IndiaMap() {
             </div>
 
             {stateData.map((state) => (
-              <div key={state.name} className="space-y-3 group cursor-pointer">
+              <div key={state.name} className="space-y-3 group cursor-pointer" onClick={() => handleStateClick(state.name)}>
                 <div className="flex justify-between items-center font-bold">
                   <span className="flex items-center gap-3 text-white/80 group-hover:text-primary transition-colors">
                     <span className={`w-3 h-3 rounded-full ${state.completion > 80 ? 'bg-primary shadow-[0_0_10px_#07f1d6]' : state.completion > 50 ? 'bg-white/40' : 'bg-secondary'}`} />

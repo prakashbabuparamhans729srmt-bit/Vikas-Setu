@@ -1,15 +1,18 @@
+
 "use client"
 
+import { useState } from "react"
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
-import { ThumbsUp, Send, MessageSquare, Quote, Star, Users, BrainCircuit, Heart } from "lucide-react"
+import { ThumbsUp, Send, MessageSquare, Quote, Star, Users, BrainCircuit, Heart, Sparkles, CheckCircle2 } from "lucide-react"
 import { useLanguage } from "@/context/language-context"
+import { toast } from "@/hooks/use-toast"
 
-const feedbackItems = [
+const initialFeedbackItems = [
   { name: "Rahul Kumar", location: "Bihar", text: "जल जीवन मिशन से मेरे गाँव में नल से जल आ गया, धन्यवाद!", rating: 5, date: "2 hours ago" },
   { name: "Priya Sharma", location: "MP", text: "PM आवास योजना में मेरा घर बन गया, सरकार जनता के साथ है!", rating: 5, date: "5 hours ago" },
   { name: "Suresh Singh", location: "UP", text: "डिजिटल इंडिया से अब गाँव में भी बैंकिंग आसान हो गई है।", rating: 4, date: "1 day ago" },
@@ -17,6 +20,38 @@ const feedbackItems = [
 
 export function FeedbackSection() {
   const { t } = useLanguage()
+  const [voted, setVoted] = useState(false)
+  const [feedback, setFeedback] = useState("")
+  const [isSending, setIsSending] = useState(false)
+  const [pollValue, setPollValue] = useState("yes")
+
+  const handleVote = () => {
+    setVoted(true)
+    toast({
+      title: "Vote Initialized",
+      description: "Opinion node synchronized with national pool.",
+    })
+  }
+
+  const handleSendFeedback = () => {
+    if (!feedback.trim()) return
+    setIsSending(true)
+    setTimeout(() => {
+      setIsSending(false)
+      setFeedback("")
+      toast({
+        title: "Feedback Logged",
+        description: "Your data node has been added to the public stream.",
+      })
+    }, 1500)
+  }
+
+  const handleSubmitIdea = () => {
+    toast({
+      title: "Innovation Proposal Protocol",
+      description: "Opening secure proposal gateway...",
+    })
+  }
 
   return (
     <section id="feedback" className="py-32 bg-[#0a0a0a]">
@@ -41,24 +76,52 @@ export function FeedbackSection() {
                 {t('poll_q')}
               </p>
               
-              <RadioGroup defaultValue="yes" className="space-y-4">
-                {[
-                  { id: 'r1', label: 'हाँ, बिल्कुल', val: 'yes', percent: '67%' },
-                  { id: 'r2', label: 'नहीं', val: 'no', percent: '22%' },
-                  { id: 'r3', label: 'पता नहीं', val: 'idk', percent: '11%' }
-                ].map((option) => (
-                  <div key={option.id} className="flex items-center justify-between p-5 rounded-2xl border border-white/5 hover:border-primary/50 transition-all bg-white/5 group/opt">
-                    <div className="flex items-center space-x-4">
-                      <RadioGroupItem value={option.val} id={option.id} className="border-primary text-primary" />
-                      <Label htmlFor={option.id} className="text-lg font-bold text-white/80 group-hover/opt:text-white transition-colors">{option.label}</Label>
+              {!voted ? (
+                <RadioGroup value={pollValue} onValueChange={setPollValue} className="space-y-4">
+                  {[
+                    { id: 'r1', label: 'हाँ, बिल्कुल', val: 'yes' },
+                    { id: 'r2', label: 'नहीं', val: 'no' },
+                    { id: 'r3', label: 'पता नहीं', val: 'idk' }
+                  ].map((option) => (
+                    <div key={option.id} className="flex items-center justify-between p-5 rounded-2xl border border-white/5 hover:border-primary/50 transition-all bg-white/5 group/opt cursor-pointer" onClick={() => setPollValue(option.val)}>
+                      <div className="flex items-center space-x-4">
+                        <RadioGroupItem value={option.val} id={option.id} className="border-primary text-primary" />
+                        <Label htmlFor={option.id} className="text-lg font-bold text-white/80 group-hover/opt:text-white transition-colors cursor-pointer">{option.label}</Label>
+                      </div>
                     </div>
-                    <span className="text-primary font-black text-xl">{option.percent}</span>
+                  ))}
+                </RadioGroup>
+              ) : (
+                <div className="space-y-6 animate-in fade-in duration-500">
+                  {[
+                    { label: 'हाँ, बिल्कुल', percent: 67, color: 'bg-primary' },
+                    { label: 'नहीं', percent: 22, color: 'bg-secondary' },
+                    { label: 'पता नहीं', percent: 11, color: 'bg-white/20' }
+                  ].map((res, i) => (
+                    <div key={i} className="space-y-2">
+                      <div className="flex justify-between text-xs font-black uppercase tracking-widest">
+                        <span className="text-white/60">{res.label}</span>
+                        <span className="text-primary">{res.percent}%</span>
+                      </div>
+                      <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+                        <div className={cn("h-full transition-all duration-1000", res.color)} style={{ width: `${res.percent}%` }} />
+                      </div>
+                    </div>
+                  ))}
+                  <div className="pt-4 flex items-center justify-center gap-2 text-primary font-black uppercase text-[10px] tracking-widest">
+                    <CheckCircle2 className="w-4 h-4" /> VOTE REGISTERED ON CHAIN
                   </div>
-                ))}
-              </RadioGroup>
+                </div>
+              )}
             </CardContent>
             <CardFooter className="flex justify-center p-10 pt-0">
-              <Button className="w-full h-16 bg-white text-black hover:bg-primary transition-all text-lg font-black rounded-2xl uppercase">{t('poll_btn')}</Button>
+              <Button 
+                disabled={voted}
+                onClick={handleVote}
+                className="w-full h-16 bg-white text-black hover:bg-primary transition-all text-lg font-black rounded-2xl uppercase"
+              >
+                {voted ? "VOTE LOGGED" : t('poll_btn')}
+              </Button>
             </CardFooter>
           </Card>
 
@@ -75,7 +138,7 @@ export function FeedbackSection() {
               </CardHeader>
               <CardContent className="p-0">
                 <div className="divide-y divide-white/5 max-h-[450px] overflow-y-auto custom-scrollbar">
-                  {feedbackItems.map((item, i) => (
+                  {initialFeedbackItems.map((item, i) => (
                     <div key={i} className="p-8 space-y-4 hover:bg-primary/[0.02] transition-colors group">
                       <div className="flex justify-between items-start">
                         <div className="flex items-center gap-4">
@@ -104,19 +167,25 @@ export function FeedbackSection() {
               <CardFooter className="p-10 bg-white/[0.02] border-t border-white/5 rounded-b-[3rem] flex flex-col gap-6">
                  <div className="w-full flex gap-4">
                     <Textarea 
+                      value={feedback}
+                      onChange={(e) => setFeedback(e.target.value)}
                       placeholder="Share your experience or idea for Vikas Setu..." 
                       className="resize-none min-h-[80px] flex-1 bg-black/40 border-white/10 focus:border-primary/50 text-white rounded-2xl p-4"
                     />
-                    <Button className="h-auto bg-primary hover:bg-white text-black hover:text-black flex flex-col items-center justify-center gap-2 px-8 rounded-2xl transition-all cyan-glow">
-                      <Send className="h-6 w-6 interactive-icon" />
-                      <span className="text-[10px] font-black uppercase tracking-widest">{t('button_send')}</span>
+                    <Button 
+                      disabled={isSending || !feedback.trim()}
+                      onClick={handleSendFeedback}
+                      className="h-auto bg-primary hover:bg-white text-black hover:text-black flex flex-col items-center justify-center gap-2 px-8 rounded-2xl transition-all cyan-glow"
+                    >
+                      <Send className={cn("h-6 w-6 interactive-icon", isSending && "animate-ping")} />
+                      <span className="text-[10px] font-black uppercase tracking-widest">{isSending ? "SYNCING" : t('button_send')}</span>
                     </Button>
                  </div>
                  <div className="flex items-center justify-between w-full text-[10px] font-black uppercase tracking-widest text-white/30">
                     <span className="flex items-center gap-2 text-primary">
                       <Users className="w-4 h-4 interactive-icon" /> 2,456 CITIZENS ONLINE
                     </span>
-                    <Button variant="link" className="text-[10px] h-auto p-0 font-black text-white/60 hover:text-primary transition-all uppercase">VIEW GLOBAL FEED</Button>
+                    <Button variant="link" className="text-[10px] h-auto p-0 font-black text-white/60 hover:text-primary transition-all uppercase" onClick={() => toast({ title: "Global Feed Initialized", description: "Loading unified opinion stream." })}>VIEW GLOBAL FEED</Button>
                  </div>
               </CardFooter>
             </Card>
@@ -126,8 +195,8 @@ export function FeedbackSection() {
                 <h3 className="text-4xl font-black font-headline tracking-tighter uppercase text-black italic">{t('propose_title')}</h3>
                 <p className="text-black/60 font-black uppercase tracking-widest text-sm">Your code is the architect of tomorrow's Bharat.</p>
               </div>
-              <Button size="lg" className="bg-black text-primary hover:bg-white hover:text-black text-lg font-black px-12 h-16 rounded-2xl shadow-2xl transition-all uppercase tracking-[0.2em]">
-                📤 {t('submit_idea')}
+              <Button size="lg" onClick={handleSubmitIdea} className="bg-black text-primary hover:bg-white hover:text-black text-lg font-black px-12 h-16 rounded-2xl shadow-2xl transition-all uppercase tracking-[0.2em] group">
+                <Sparkles className="mr-2 w-6 h-6 group-hover:rotate-12 transition-transform" /> {t('submit_idea')}
               </Button>
             </div>
           </div>

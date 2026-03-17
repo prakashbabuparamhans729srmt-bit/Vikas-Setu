@@ -2,7 +2,7 @@
 "use client"
 
 import Link from "next/link"
-import { Search, User, Menu, X, Bell, Globe, Check, Settings } from "lucide-react"
+import { Search, User, Menu, X, Bell, Globe, Check, Settings, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
@@ -13,8 +13,19 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { toast } from "@/hooks/use-toast"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -26,6 +37,19 @@ export function Navbar() {
     { name: t('nav_progress'), id: 'impact' },
     { name: t('nav_rai'), id: 'feedback' },
     { name: t('nav_impact'), id: 'impact' },
+  ]
+
+  const handleJoinGrowth = () => {
+    toast({
+      title: "Protocol Initialized",
+      description: "Redirecting to the National Growth Registry...",
+    })
+  }
+
+  const notifications = [
+    { id: 1, title: "New Scheme Alert", desc: "PM-Surya Ghar Muft Bijli Yojana is live.", time: "2m ago" },
+    { id: 2, title: "Feedback Acknowledged", desc: "Your suggestion for Rural Digital Hubs was seen.", time: "1h ago" },
+    { id: 3, title: "System Update", desc: "Vikas Setu Core upgraded to version 2.6.0.", time: "5h ago" },
   ]
 
   return (
@@ -71,7 +95,10 @@ export function Navbar() {
                     {LANGUAGES.map((lang) => (
                       <DropdownMenuItem 
                         key={lang.code}
-                        onClick={() => setLanguage(lang.code)}
+                        onClick={() => {
+                          setLanguage(lang.code);
+                          toast({ title: "Language Switched", description: `Interface Protocol: ${lang.native}` });
+                        }}
                         className={cn(
                           "flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition-all",
                           language === lang.code ? "bg-primary text-black" : "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -88,10 +115,37 @@ export function Navbar() {
                 </ScrollArea>
               </DropdownMenuContent>
             </DropdownMenu>
+            
             <Link href="/settings">
               <Settings className="w-5 h-5 text-muted-foreground hover:text-primary transition-colors cursor-pointer interactive-icon" />
             </Link>
-            <Bell className="w-5 h-5 text-muted-foreground hover:text-primary transition-colors cursor-pointer interactive-icon" />
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-primary transition-colors">
+                  <Bell className="w-5 h-5 interactive-icon" />
+                  <span className="absolute top-2 right-2 w-2 h-2 bg-secondary rounded-full animate-ping" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-80 bg-background/95 border-border backdrop-blur-xl rounded-2xl p-4 shadow-2xl">
+                <DropdownMenuLabel className="font-black uppercase tracking-widest text-xs flex items-center justify-between">
+                  NOTIFICATIONS <Sparkles className="w-3 h-3 text-primary" />
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className="my-2 bg-border/50" />
+                <div className="space-y-4 py-2">
+                  {notifications.map((n) => (
+                    <div key={n.id} className="p-3 rounded-xl hover:bg-muted transition-colors cursor-pointer group">
+                      <div className="flex justify-between items-start mb-1">
+                        <p className="font-bold text-sm group-hover:text-primary transition-colors">{n.title}</p>
+                        <span className="text-[8px] font-black text-muted-foreground uppercase">{n.time}</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground line-clamp-2">{n.desc}</p>
+                    </div>
+                  ))}
+                </div>
+                <Button variant="ghost" className="w-full mt-2 text-[10px] font-black uppercase tracking-widest hover:text-primary">VIEW ALL LOGS</Button>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
           
           <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
@@ -104,9 +158,30 @@ export function Navbar() {
             </Button>
           </Link>
           
-          <Button className="bg-primary text-black font-black hover:bg-primary/90 hover:scale-105 transition-all cyan-glow px-6 h-10 rounded-xl uppercase tracking-widest text-xs">
-            {t('join')}
-          </Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button className="bg-primary text-black font-black hover:bg-primary/90 hover:scale-105 transition-all cyan-glow px-6 h-10 rounded-xl uppercase tracking-widest text-xs">
+                {t('join')}
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="bg-background/95 backdrop-blur-2xl border-primary/20 rounded-[2.5rem]">
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-black uppercase tracking-tighter">Bharat Growth Network</DialogTitle>
+                <DialogDescription className="text-muted-foreground font-medium">
+                  Initialize your node to access direct benefits and participate in national development protocols.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-6 py-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Aadhar Virtual ID</label>
+                  <input className="w-full h-12 bg-muted border-border rounded-xl px-4 text-sm focus:outline-none focus:ring-1 focus:ring-primary" placeholder="XXXX-XXXX-XXXX" />
+                </div>
+                <Button onClick={handleJoinGrowth} className="w-full h-14 bg-primary text-black font-black text-lg rounded-xl hover:scale-[1.02] transition-all cyan-glow">
+                  AUTHORIZE IDENTITY
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
       
@@ -137,6 +212,7 @@ export function Navbar() {
                   onClick={() => {
                     setLanguage(lang.code)
                     setIsMenuOpen(false)
+                    toast({ title: "Protocol Update", description: `Language set to ${lang.native}` });
                   }}
                   className="rounded-lg h-10 font-bold text-xs"
                  >

@@ -1,5 +1,6 @@
 import type {Metadata} from 'next';
 import './globals.css';
+import { LanguageProvider } from '@/context/language-context';
 
 export const metadata: Metadata = {
   title: 'Vikas Setu | 🇮🇳 The Growth Bridge',
@@ -18,7 +19,17 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
-      <body className="font-body antialiased min-h-screen flex flex-col">{children}</body>
+      <body className="font-body antialiased min-h-screen flex flex-col bg-background text-foreground">
+        <LanguageProvider>
+          {children}
+        </LanguageProvider>
+        {/* Tricolor Bottom Accent - Moved here for global presence */}
+        <div className="fixed bottom-0 left-0 w-full h-1 flex shadow-[0_-5px_20px_rgba(7,241,214,0.2)] z-[100]">
+           <div className="flex-1 bg-primary" />
+           <div className="flex-1 bg-white" />
+           <div className="flex-1 bg-secondary" />
+        </div>
+      </body>
     </html>
   );
 }

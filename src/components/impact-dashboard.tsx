@@ -6,6 +6,7 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ThumbsUp, ThumbsDown, TrendingUp, BarChart3, Clock, ArrowUpRight, Globe, Shield } from "lucide-react"
+import { useLanguage } from "@/context/language-context"
 
 const topRatedSchemes = [
   { name: "PM Kisan", state: "National", rating: 4.9, votes: "125k", progress: 95 },
@@ -15,12 +16,14 @@ const topRatedSchemes = [
 ]
 
 export function ImpactDashboard() {
+  const { t } = useLanguage()
+
   return (
     <section id="impact" className="py-32 bg-background">
       <div className="container mx-auto px-4 space-y-20">
         <div className="text-center space-y-6">
           <Badge className="bg-primary/10 text-primary border-primary/20 px-6 py-2 rounded-full uppercase font-black text-xs tracking-widest">NATIONAL PROGRESS ENGINE</Badge>
-          <h2 className="text-5xl font-black font-headline tracking-tighter text-white uppercase">📈 BHARAT KI VIKAS GATI</h2>
+          <h2 className="text-5xl font-black font-headline tracking-tighter text-white uppercase">{t('section_impact_title')}</h2>
           <p className="text-white/40 max-w-2xl mx-auto font-medium leading-relaxed">Processing real-time data from 1.4B demographic nodes to visualize the national trajectory.</p>
         </div>
 
@@ -65,7 +68,7 @@ export function ImpactDashboard() {
 
           <Card className="shadow-2xl border border-primary/20 bg-black text-white rounded-[3rem] overflow-hidden relative">
             <div className="absolute top-0 right-0 p-8">
-               <Globe className="w-12 h-12 text-primary/10 animate-spin-slow" />
+               <Globe className="w-12 h-12 text-primary/10 animate-spin-slow interactive-icon" />
             </div>
             <CardHeader className="p-10">
               <CardTitle className="flex items-center gap-4 text-primary uppercase font-black text-xl tracking-tighter">
@@ -86,7 +89,7 @@ export function ImpactDashboard() {
               <div className="p-8 rounded-[2rem] bg-primary/[0.05] border border-primary/30 flex items-center justify-between group hover:bg-primary transition-all duration-500">
                  <div className="space-y-1">
                    <p className="text-[10px] font-black uppercase tracking-widest text-primary group-hover:text-black">Digital Index</p>
-                   <p className="text-xl font-black text-white group-hover:text-black">HYPER GROWTH</p>
+                   <p className="text-xl font-black text-white group-hover:text-black uppercase">HYPER GROWTH</p>
                  </div>
                  <div className="text-right">
                     <span className="text-4xl font-black text-primary group-hover:text-black">↑ 22%</span>

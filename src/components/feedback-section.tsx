@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { ThumbsUp, Send, MessageSquare, Quote, Star, Users, BrainCircuit, Heart } from "lucide-react"
+import { useLanguage } from "@/context/language-context"
 
 const feedbackItems = [
   { name: "Rahul Kumar", location: "Bihar", text: "जल जीवन मिशन से मेरे गाँव में नल से जल आ गया, धन्यवाद!", rating: 5, date: "2 hours ago" },
@@ -15,12 +16,14 @@ const feedbackItems = [
 ]
 
 export function FeedbackSection() {
+  const { t } = useLanguage()
+
   return (
     <section id="feedback" className="py-32 bg-[#0a0a0a]">
       <div className="container mx-auto px-4 space-y-20">
         <div className="text-center space-y-6">
           <Badge className="bg-primary text-black px-6 py-2 text-xs font-black uppercase tracking-[0.3em] rounded-full">CITIZEN FEEDBACK LOOP</Badge>
-          <h2 className="text-5xl font-black font-headline text-white tracking-tighter">🗳️ JANATA KI RAI</h2>
+          <h2 className="text-5xl font-black font-headline text-white tracking-tighter uppercase">{t('section_feedback_title')}</h2>
           <p className="text-white/40 max-w-2xl mx-auto font-medium">Every citizen is a sensor. Your pulse shapes the national trajectory. Input your data below.</p>
         </div>
 
@@ -30,7 +33,7 @@ export function FeedbackSection() {
             <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
             <CardHeader className="bg-primary p-8 text-black text-center">
               <CardTitle className="text-sm font-black flex items-center justify-center gap-3 uppercase tracking-[0.2em]">
-                <BrainCircuit className="w-5 h-5 animate-pulse" /> POLL OF THE DAY
+                <BrainCircuit className="w-5 h-5 animate-pulse interactive-icon" /> POLL OF THE DAY
               </CardTitle>
             </CardHeader>
             <CardContent className="p-10 space-y-10 relative z-10">
@@ -91,7 +94,7 @@ export function FeedbackSection() {
                         </div>
                       </div>
                       <div className="relative pl-8">
-                        <Quote className="absolute top-0 left-0 w-5 h-5 text-primary/20" />
+                        <Quote className="absolute top-0 left-0 w-5 h-5 text-primary/20 interactive-icon" />
                         <p className="text-white/60 italic font-medium text-lg leading-relaxed group-hover:text-white/90 transition-colors">"{item.text}"</p>
                       </div>
                     </div>
@@ -113,7 +116,7 @@ export function FeedbackSection() {
                     <span className="flex items-center gap-2 text-primary">
                       <Users className="w-4 h-4 interactive-icon" /> 2,456 CITIZENS ONLINE
                     </span>
-                    <Button variant="link" className="text-[10px] h-auto p-0 font-black text-white/60 hover:text-primary transition-all">VIEW GLOBAL FEED</Button>
+                    <Button variant="link" className="text-[10px] h-auto p-0 font-black text-white/60 hover:text-primary transition-all uppercase">VIEW GLOBAL FEED</Button>
                  </div>
               </CardFooter>
             </Card>

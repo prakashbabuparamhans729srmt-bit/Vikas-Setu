@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
 import { Search, Filter, ThumbsUp, ThumbsDown, Info, ExternalLink, Star, Briefcase, Heart, Book, Home, Smartphone, Users } from "lucide-react"
+import { useLanguage } from "@/context/language-context"
 
 const categories = [
   { name: "All Yojanaye", count: 5300, icon: "✅" },
@@ -30,21 +31,22 @@ const trendingSchemes = [
 
 export function SchemeBrowser() {
   const [activeCategory, setActiveCategory] = useState("All Yojanaye")
+  const { t } = useLanguage()
 
   return (
     <div id="schemes" className="container mx-auto px-4 py-32 space-y-16">
       <div className="max-w-4xl mx-auto space-y-8 text-center">
-        <h2 className="text-5xl font-black font-headline tracking-tighter text-white">🔎 EXPLORE RESOURCE NODES</h2>
+        <h2 className="text-5xl font-black font-headline tracking-tighter text-white uppercase">{t('section_schemes_title')}</h2>
         <div className="flex gap-4 p-3 bg-white/5 rounded-3xl shadow-2xl border border-white/10 focus-within:border-primary/50 transition-all backdrop-blur-md">
           <Input 
             className="border-none bg-transparent shadow-none text-xl h-14 focus-visible:ring-0 text-white placeholder:text-white/20" 
-            placeholder="Search Yojana by Name, State, Ministry..." 
+            placeholder={t('placeholder_search')}
           />
-          <Button size="lg" className="h-14 bg-primary text-black font-black hover:bg-primary/80 gap-3 px-8 cyan-glow">
-            <Search className="h-6 w-6" /> SEARCH
+          <Button size="lg" className="h-14 bg-primary text-black font-black hover:bg-primary/80 gap-3 px-8 cyan-glow rounded-2xl">
+            <Search className="h-6 w-6 interactive-icon" /> SEARCH
           </Button>
-          <Button size="lg" variant="outline" className="h-14 gap-3 hidden sm:flex border-white/10 text-white hover:bg-white hover:text-black">
-            <Filter className="h-6 w-6" /> FILTER
+          <Button size="lg" variant="outline" className="h-14 gap-3 hidden sm:flex border-white/10 text-white hover:bg-white hover:text-black rounded-2xl">
+            <Filter className="h-6 w-6 interactive-icon" /> FILTER
           </Button>
         </div>
       </div>
@@ -55,7 +57,7 @@ export function SchemeBrowser() {
           <Card className="bg-white/5 border-white/10 rounded-[2rem] overflow-hidden">
             <CardHeader className="border-b border-white/5 pb-4">
               <CardTitle className="text-sm font-black flex items-center gap-3 text-white/60 tracking-widest uppercase">
-                <Filter className="w-4 h-4 text-primary" /> CATEGORIES
+                <Filter className="w-4 h-4 text-primary interactive-icon" /> CATEGORIES
               </CardTitle>
             </CardHeader>
             <CardContent className="p-3">
@@ -71,7 +73,7 @@ export function SchemeBrowser() {
                     }`}
                   >
                     <span className="flex items-center gap-4">
-                      <span className="text-xl group-hover:scale-125 transition-transform">{cat.icon}</span>
+                      <span className="text-xl transition-transform">{cat.icon}</span>
                       {cat.name}
                     </span>
                     <Badge variant={activeCategory === cat.name ? "secondary" : "outline"} className="rounded-full border-white/10 bg-black/20 text-[10px]">
@@ -166,7 +168,7 @@ export function SchemeBrowser() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60" />
                 </div>
                 <CardHeader className="p-8 pb-4">
-                  <CardTitle className="text-xl font-black text-white group-hover:text-primary transition-colors leading-tight">PM GARIB KALYAN <br />YOJANA SYSTEM</CardTitle>
+                  <CardTitle className="text-xl font-black text-white group-hover:text-primary transition-colors leading-tight uppercase">PM GARIB KALYAN <br />YOJANA SYSTEM</CardTitle>
                 </CardHeader>
                 <CardContent className="p-8 pt-0 space-y-6 flex-1">
                   <p className="text-sm text-white/40 font-medium leading-relaxed line-clamp-2">Securing the nutrition pipeline for the subcontinent's most vulnerable demographic nodes.</p>
@@ -176,8 +178,8 @@ export function SchemeBrowser() {
                   </div>
                 </CardContent>
                 <CardFooter className="p-8 pt-0 flex gap-4">
-                   <Button variant="ghost" size="sm" className="flex-1 text-[10px] font-black uppercase border border-white/5 hover:border-primary hover:bg-transparent text-white">DETAILS</Button>
-                   <Button variant="secondary" size="sm" className="flex-1 text-[10px] font-black uppercase bg-primary text-black hover:bg-white transition-colors">APPLY NOW</Button>
+                   <Button variant="ghost" size="sm" className="flex-1 text-[10px] font-black uppercase border border-white/5 hover:border-primary hover:bg-transparent text-white rounded-xl">DETAILS</Button>
+                   <Button variant="secondary" size="sm" className="flex-1 text-[10px] font-black uppercase bg-primary text-black hover:bg-white transition-colors rounded-xl">APPLY NOW</Button>
                 </CardFooter>
               </Card>
             ))}

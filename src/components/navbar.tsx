@@ -1,3 +1,4 @@
+
 "use client"
 
 import Link from "next/link"
@@ -94,9 +95,11 @@ export function Navbar() {
             {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </Button>
           
-          <Button variant="outline" className="hidden md:flex gap-2 border-white/10 hover:border-primary/50 hover:bg-primary/10 text-white font-bold uppercase tracking-widest text-xs h-10 px-6 rounded-xl">
-            <User className="h-4 w-4 interactive-icon" /> {t('login')}
-          </Button>
+          <Link href="/login">
+            <Button variant="outline" className="hidden md:flex gap-2 border-white/10 hover:border-primary/50 hover:bg-primary/10 text-white font-bold uppercase tracking-widest text-xs h-10 px-6 rounded-xl">
+              <User className="h-4 w-4 interactive-icon" /> {t('login')}
+            </Button>
+          </Link>
           
           <Button className="bg-primary text-black font-black hover:bg-primary/90 hover:scale-105 transition-all cyan-glow px-6 h-10 rounded-xl uppercase tracking-widest text-xs">
             {t('join')}
@@ -137,9 +140,11 @@ export function Navbar() {
             </div>
           </ScrollArea>
 
-          <Button variant="outline" className="w-full justify-center gap-2 border-white/10 text-white font-bold h-12 rounded-xl">
-            <User className="h-4 w-4 interactive-icon" /> {t('login')}
-          </Button>
+          <Link href="/login" onClick={() => setIsMenuOpen(false)}>
+            <Button variant="outline" className="w-full justify-center gap-2 border-white/10 text-white font-bold h-12 rounded-xl">
+              <User className="h-4 w-4 interactive-icon" /> {t('login')}
+            </Button>
+          </Link>
         </div>
       </div>
     </nav>

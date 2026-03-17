@@ -1,11 +1,10 @@
 "use client"
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { ThumbsUp, ThumbsDown, TrendingUp, BarChart3, Clock, ArrowUpRight, Globe, Shield } from "lucide-react"
+import { ThumbsUp, ThumbsDown, TrendingUp, BarChart3, Clock, Globe, Shield } from "lucide-react"
 import { useLanguage } from "@/context/language-context"
 
 const topRatedSchemes = [
@@ -38,7 +37,7 @@ export function ImpactDashboard() {
               <div className="space-y-6">
                 <div className="flex justify-between items-end">
                   <span className="text-6xl font-black text-white tracking-tighter">68.4% <span className="text-xs font-black text-primary uppercase tracking-[0.4em] ml-4">Overall Completion</span></span>
-                  <Badge className="bg-primary text-black font-black px-6 py-2 rounded-xl text-[10px] tracking-widest">TARGET 2030: 100%</Badge>
+                  <Badge className="bg-primary text-black font-black px-6 py-2 rounded-xl text-[10px] tracking-widest uppercase">TARGET 2030: 100%</Badge>
                 </div>
                 <div className="relative h-6 w-full bg-white/5 rounded-full overflow-hidden">
                    <div className="absolute inset-y-0 left-0 bg-primary shadow-[0_0_20px_#07f1d6] transition-all duration-1000 ease-out" style={{ width: '68.4%' }} />

@@ -36,8 +36,8 @@ export function Navbar() {
                <span className="text-xl font-bold">V</span>
             </div>
             <span className="text-2xl font-black font-headline tracking-tighter flex items-center">
-              <span className="text-primary group-hover:tracking-normal transition-all duration-500">{t('brand_vikas')}</span>
-              <span className="text-white ml-1">{t('brand_setu')}</span>
+              <span className="text-primary group-hover:tracking-normal transition-all duration-500 uppercase">{t('brand_vikas')}</span>
+              <span className="text-white ml-1 uppercase">{t('brand_setu')}</span>
               <span className="ml-2 animate-pulse">🇮🇳</span>
             </span>
           </Link>
@@ -76,7 +76,7 @@ export function Navbar() {
                           language === lang.code ? "bg-primary text-black" : "text-white/60 hover:bg-white/5 hover:text-white"
                         )}
                       >
-                        <div className="flex flex-col">
+                        <div className="flex flex-col text-left">
                           <span className="font-bold">{lang.native}</span>
                           <span className="text-[10px] opacity-70 uppercase tracking-widest">{lang.label}</span>
                         </div>
@@ -107,7 +107,7 @@ export function Navbar() {
       {/* Mobile Menu */}
       <div className={cn(
         "md:hidden fixed inset-x-0 bg-background/95 border-b border-white/5 backdrop-blur-2xl transition-all duration-500 ease-in-out overflow-hidden",
-        isMenuOpen ? "max-h-[500px] py-6 opacity-100" : "max-h-0 py-0 opacity-0"
+        isMenuOpen ? "max-h-[600px] py-6 opacity-100" : "max-h-0 py-0 opacity-0"
       )}>
         <div className="container mx-auto px-6 flex flex-col gap-6">
           {navItems.map((item) => (
@@ -117,19 +117,25 @@ export function Navbar() {
           ))}
           <div className="h-px bg-white/5 w-full" />
           
-          <div className="grid grid-cols-2 gap-4">
-             {LANGUAGES.slice(0, 4).map((lang) => (
-               <Button 
-                key={lang.code}
-                variant={language === lang.code ? "default" : "outline"}
-                size="sm"
-                onClick={() => setLanguage(lang.code)}
-                className="rounded-lg h-10 font-bold"
-               >
-                 {lang.native}
-               </Button>
-             ))}
-          </div>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30">SELECT LANGUAGE</p>
+          <ScrollArea className="h-48">
+            <div className="grid grid-cols-2 gap-3 pr-4">
+               {LANGUAGES.map((lang) => (
+                 <Button 
+                  key={lang.code}
+                  variant={language === lang.code ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => {
+                    setLanguage(lang.code)
+                    setIsMenuOpen(false)
+                  }}
+                  className="rounded-lg h-10 font-bold text-xs"
+                 >
+                   {lang.native}
+                 </Button>
+               ))}
+            </div>
+          </ScrollArea>
 
           <Button variant="outline" className="w-full justify-center gap-2 border-white/10 text-white font-bold h-12 rounded-xl">
             <User className="h-4 w-4 interactive-icon" /> {t('login')}

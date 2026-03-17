@@ -35,9 +35,9 @@ export function Hero() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-12">
             {[
-              { icon: Zap, value: "5000+", label: t('nav_yojanaye'), color: "text-primary" },
-              { icon: Users, value: "2.5L+", label: "Public Votes", color: "text-secondary" },
-              { icon: ShieldCheck, value: "100%", label: "Transparency", color: "text-white" }
+              { icon: Zap, value: "5000+", label: t('stat_yojanaye'), color: "text-primary" },
+              { icon: Users, value: "2.5L+", label: t('stat_votes'), color: "text-secondary" },
+              { icon: ShieldCheck, value: "100%", label: t('stat_transparency'), color: "text-white" }
             ].map((stat, idx) => (
               <div key={idx} className="glass-card rounded-3xl p-8 border border-white/5 hover:border-primary/30 hover:bg-primary/5 transition-all duration-500 group">
                 <stat.icon className={`h-10 w-10 ${stat.color} mb-4 group-hover:scale-110 transition-transform duration-500 interactive-icon`} />

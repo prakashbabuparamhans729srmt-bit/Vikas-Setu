@@ -33,7 +33,7 @@ export function Footer() {
           <div className="space-y-8">
             <h4 className="font-black text-white uppercase tracking-[0.3em] text-xs">NAVIGATION</h4>
             <nav className="flex flex-col gap-4 text-sm text-white/40 font-bold uppercase tracking-widest">
-              {[t('nav_yojanaye'), 'State Initiatives', 'Impact Dashboard', 'Public Feedback'].map((link) => (
+              {['Central Schemes', 'State Initiatives', 'Impact Dashboard', 'Public Feedback'].map((link) => (
                 <Link key={link} href="#" className="hover:text-primary hover:translate-x-2 transition-all duration-300 w-fit">{link}</Link>
               ))}
             </nav>

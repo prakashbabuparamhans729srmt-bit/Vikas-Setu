@@ -43,10 +43,10 @@ export function SchemeBrowser() {
             placeholder={t('placeholder_search')}
           />
           <Button size="lg" className="h-14 bg-primary text-black font-black hover:bg-primary/80 gap-3 px-8 cyan-glow rounded-2xl">
-            <Search className="h-6 w-6 interactive-icon" /> SEARCH
+            <Search className="h-6 w-6 interactive-icon" /> {t('search_btn')}
           </Button>
           <Button size="lg" variant="outline" className="h-14 gap-3 hidden sm:flex border-white/10 text-white hover:bg-white hover:text-black rounded-2xl">
-            <Filter className="h-6 w-6 interactive-icon" /> FILTER
+            <Filter className="h-6 w-6 interactive-icon" /> {t('filter_btn')}
           </Button>
         </div>
       </div>
@@ -186,7 +186,7 @@ export function SchemeBrowser() {
           </div>
           
           <div className="text-center">
-             <Button variant="link" className="text-primary font-black text-lg hover:tracking-widest transition-all">SEE ALL 5,300+ RESOURCE NODES</Button>
+             <Button variant="link" className="text-primary font-black text-lg hover:tracking-widest transition-all uppercase">SEE ALL 5,300+ RESOURCE NODES</Button>
           </div>
         </div>
       </div>

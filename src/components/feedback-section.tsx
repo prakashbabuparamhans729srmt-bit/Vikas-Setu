@@ -33,12 +33,12 @@ export function FeedbackSection() {
             <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
             <CardHeader className="bg-primary p-8 text-black text-center">
               <CardTitle className="text-sm font-black flex items-center justify-center gap-3 uppercase tracking-[0.2em]">
-                <BrainCircuit className="w-5 h-5 animate-pulse interactive-icon" /> POLL OF THE DAY
+                <BrainCircuit className="w-5 h-5 animate-pulse interactive-icon" /> {t('poll_title')}
               </CardTitle>
             </CardHeader>
             <CardContent className="p-10 space-y-10 relative z-10">
               <p className="text-2xl font-black text-white text-center leading-tight tracking-tighter">
-                क्या आपको लगता है कि "एक राष्ट्र, एक चुनाव" से विकास की गति तेज होगी?
+                {t('poll_q')}
               </p>
               
               <RadioGroup defaultValue="yes" className="space-y-4">
@@ -58,7 +58,7 @@ export function FeedbackSection() {
               </RadioGroup>
             </CardContent>
             <CardFooter className="flex justify-center p-10 pt-0">
-              <Button className="w-full h-16 bg-white text-black hover:bg-primary transition-all text-lg font-black rounded-2xl">CAST YOUR VOTE</Button>
+              <Button className="w-full h-16 bg-white text-black hover:bg-primary transition-all text-lg font-black rounded-2xl uppercase">{t('poll_btn')}</Button>
             </CardFooter>
           </Card>
 
@@ -68,7 +68,7 @@ export function FeedbackSection() {
               <CardHeader className="border-b border-white/5 p-8">
                 <div className="flex justify-between items-center">
                   <CardTitle className="text-sm font-black flex items-center gap-3 text-white/60 tracking-widest uppercase">
-                    <MessageSquare className="w-5 h-5 text-primary interactive-icon" /> PUBLIC FEEDBACK STREAM
+                    <MessageSquare className="w-5 h-5 text-primary interactive-icon" /> {t('feedback_title')}
                   </CardTitle>
                   <Badge variant="outline" className="border-primary/40 text-primary uppercase font-black tracking-widest text-[10px] animate-pulse">LIVE CONNECT</Badge>
                 </div>
@@ -109,7 +109,7 @@ export function FeedbackSection() {
                     />
                     <Button className="h-auto bg-primary hover:bg-white text-black hover:text-black flex flex-col items-center justify-center gap-2 px-8 rounded-2xl transition-all cyan-glow">
                       <Send className="h-6 w-6 interactive-icon" />
-                      <span className="text-[10px] font-black uppercase tracking-widest">SEND</span>
+                      <span className="text-[10px] font-black uppercase tracking-widest">{t('button_send')}</span>
                     </Button>
                  </div>
                  <div className="flex items-center justify-between w-full text-[10px] font-black uppercase tracking-widest text-white/30">
@@ -123,11 +123,11 @@ export function FeedbackSection() {
 
             <div className="bg-primary p-12 rounded-[3.5rem] flex flex-col md:flex-row items-center justify-between gap-10 shadow-[0_0_50px_rgba(7,241,214,0.2)] group hover:scale-[1.01] transition-all duration-500">
               <div className="space-y-4 text-center md:text-left">
-                <h3 className="text-4xl font-black font-headline tracking-tighter uppercase text-black italic">PROPOSE INNOVATION</h3>
+                <h3 className="text-4xl font-black font-headline tracking-tighter uppercase text-black italic">{t('propose_title')}</h3>
                 <p className="text-black/60 font-black uppercase tracking-widest text-sm">Your code is the architect of tomorrow's Bharat.</p>
               </div>
               <Button size="lg" className="bg-black text-primary hover:bg-white hover:text-black text-lg font-black px-12 h-16 rounded-2xl shadow-2xl transition-all uppercase tracking-[0.2em]">
-                📤 SUBMIT IDEA
+                📤 {t('submit_idea')}
               </Button>
             </div>
           </div>

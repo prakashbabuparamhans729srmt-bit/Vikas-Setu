@@ -32,7 +32,10 @@ export function FeedbackSection() {
   const { data: feedbackItems, loading: feedbackLoading } = useCollection(feedbackQuery);
 
   const handleVote = () => {
-    if (!user) return;
+    if (!user) {
+      toast({ title: "Auth Required", description: "Log in to synchronize your opinion node.", variant: "destructive" });
+      return;
+    }
     const voteRef = doc(db, "polls", "day-poll", "votes", user.uid);
     setDoc(voteRef, {
       optionId: pollValue,
@@ -50,7 +53,11 @@ export function FeedbackSection() {
   }
 
   const handleSendFeedback = () => {
-    if (!feedback.trim() || !user) return
+    if (!feedback.trim()) return;
+    if (!user) {
+      toast({ title: "Auth Required", description: "Connect your node to share feedback.", variant: "destructive" });
+      return;
+    }
     setIsSending(true)
     
     const feedbackRef = collection(db, "feedback");
@@ -131,8 +138,9 @@ export function FeedbackSection() {
               <CardContent className="p-0">
                 <div className="divide-y divide-white/5 max-h-[450px] overflow-y-auto custom-scrollbar">
                   {feedbackLoading ? (
-                    <div className="p-8 text-center animate-pulse text-primary font-black uppercase tracking-widest text-[10px]">SYNCING NODES...</div>
-                  ) : feedbackItems?.map((item: any, i: number) => (
+                    <div className="p-10 text-center animate-pulse text-primary font-black uppercase tracking-widest text-[10px]">SYNCING NODES...</div>
+                  ) : feedbackItems && feedbackItems.length > 0 ? (
+                    feedbackItems.map((item: any, i: number) => (
                     <div key={i} className="p-8 space-y-4 hover:bg-primary/[0.02] transition-colors group">
                       <div className="flex justify-between items-start">
                         <div className="flex items-center gap-4">
@@ -141,7 +149,7 @@ export function FeedbackSection() {
                           </div>
                           <div>
                             <p className="font-black text-white text-lg">{item.userName}</p>
-                            <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">{item.location} • Just now</p>
+                            <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">{item.location} • LIVE DATA</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-1">
@@ -155,7 +163,9 @@ export function FeedbackSection() {
                         <p className="text-white/60 italic font-medium text-lg leading-relaxed group-hover:text-white/90 transition-colors">"{item.text}"</p>
                       </div>
                     </div>
-                  ))}
+                  ))) : (
+                    <div className="p-20 text-center text-white/20 font-black uppercase tracking-widest">NO NODES DETECTED IN STREAM</div>
+                  )}
                 </div>
               </CardContent>
               <CardFooter className="p-10 bg-white/[0.02] border-t border-white/5 rounded-b-[3rem] flex flex-col gap-6">

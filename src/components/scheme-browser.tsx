@@ -46,14 +46,6 @@ const allSchemes = [
   { id: 6, name: "PM Awas Yojana", type: "Central", description: "Housing for All initiative ensuring every family has a pucca house with basic amenities.", rating: 4.4, users: "12M", progress: 91, tags: ["Housing", "Infrastructure"], details: "Pradhan Mantri Awas Yojana (PMAY) is an initiative by the Government of India in which affordable housing will be provided to the urban poor with a target of building 2 crore affordable houses by 31 March 2022. It has two components: Pradhan Mantri Awas Yojana (Urban) (PMAY-U) and Pradhan Mantri Awas Yojana (Gramin) (PMAY-G)." },
 ]
 
-const trendingSchemes = [
-  { name: "PM Kisan Samman Nidhi", votes: "12k", type: "Central" },
-  { name: "Jal Jeevan Mission", votes: "8.5k", type: "Central" },
-  { name: "UP: Swamitva Yojana", votes: "5.2k", type: "Uttar Pradesh" },
-  { name: "Digital India Mission", votes: "4.1k", type: "Central" },
-  { name: "Maharashtra: Ladki Bahin", votes: "3.8k", type: "Maharashtra" },
-]
-
 export function SchemeBrowser() {
   const [activeCategory, setActiveCategory] = useState("All Yojanaye")
   const [searchQuery, setSearchQuery] = useState("")

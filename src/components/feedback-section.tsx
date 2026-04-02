@@ -1,6 +1,7 @@
+
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -11,46 +12,67 @@ import { Send, MessageSquare, Quote, Star, Users, BrainCircuit, Sparkles, CheckC
 import { useLanguage } from "@/context/language-context"
 import { toast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
-
-const initialFeedbackItems = [
-  { name: "Rahul Kumar", location: "Bihar", text: "जल जीवन मिशन से मेरे गाँव में नल से जल आ गया, धन्यवाद!", rating: 5, date: "2 hours ago" },
-  { name: "Priya Sharma", location: "MP", text: "PM आवास योजना में मेरा घर बन गया, सरकार जनता के साथ है!", rating: 5, date: "5 hours ago" },
-  { name: "Suresh Singh", location: "UP", text: "डिजिटल इंडिया से अब गाँव में भी बैंकिंग आसान हो गई है।", rating: 4, date: "1 day ago" },
-]
+import { useFirestore, useUser, useCollection } from "@/firebase"
+import { collection, addDoc, serverTimestamp, setDoc, doc, query, orderBy, limit } from "firebase/firestore"
+import { errorEmitter } from "@/firebase/error-emitter"
+import { FirestorePermissionError } from "@/firebase/errors"
 
 export function FeedbackSection() {
   const { t } = useLanguage()
-  const [voted, setVoted] = useState(false)
+  const { user } = useUser()
+  const db = useFirestore()
   const [feedback, setFeedback] = useState("")
   const [isSending, setIsSending] = useState(false)
   const [pollValue, setPollValue] = useState("yes")
 
+  // Use real-time feedback from Firestore
+  const feedbackQuery = useMemo(() => {
+    return query(collection(db, "feedback"), orderBy("timestamp", "desc"), limit(10));
+  }, [db]);
+  const { data: feedbackItems, loading: feedbackLoading } = useCollection(feedbackQuery);
+
   const handleVote = () => {
-    setVoted(true)
-    toast({
-      title: "Vote Initialized",
-      description: "Opinion node synchronized with national pool.",
-    })
+    if (!user) return;
+    const voteRef = doc(db, "polls", "day-poll", "votes", user.uid);
+    setDoc(voteRef, {
+      optionId: pollValue,
+      userId: user.uid,
+      timestamp: serverTimestamp()
+    }).then(() => {
+      toast({ title: "Vote Synchronized", description: "Opinion node registered." });
+    }).catch(async (e) => {
+      errorEmitter.emit('permission-error', new FirestorePermissionError({
+        path: voteRef.path,
+        operation: 'write',
+        requestResourceData: { optionId: pollValue }
+      }));
+    });
   }
 
   const handleSendFeedback = () => {
-    if (!feedback.trim()) return
+    if (!feedback.trim() || !user) return
     setIsSending(true)
-    setTimeout(() => {
+    
+    const feedbackRef = collection(db, "feedback");
+    addDoc(feedbackRef, {
+      userName: user.displayName || "Anonymous Citizen",
+      location: "Bharat",
+      text: feedback,
+      rating: 5,
+      timestamp: serverTimestamp(),
+      userId: user.uid
+    }).then(() => {
       setIsSending(false)
       setFeedback("")
-      toast({
-        title: "Feedback Logged",
-        description: "Your data node has been added to the public stream.",
-      })
-    }, 1500)
-  }
-
-  const handleSubmitIdea = () => {
-    toast({
-      title: "Innovation Proposal Protocol",
-      description: "Opening secure proposal gateway...",
-    })
+      toast({ title: "Feedback Logged", description: "Your data node has been added to the public stream." });
+    }).catch(async (e) => {
+      setIsSending(false)
+      errorEmitter.emit('permission-error', new FirestorePermissionError({
+        path: 'feedback',
+        operation: 'create',
+        requestResourceData: { text: feedback }
+      }));
+    });
   }
 
   return (
@@ -63,9 +85,7 @@ export function FeedbackSection() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-stretch">
-          {/* Poll of the Day */}
           <Card className="lg:col-span-4 border border-primary/20 bg-black/60 backdrop-blur-xl rounded-[3rem] shadow-2xl relative overflow-hidden group">
-            <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
             <CardHeader className="bg-primary p-8 text-black text-center">
               <CardTitle className="text-sm font-black flex items-center justify-center gap-3 uppercase tracking-[0.2em]">
                 <BrainCircuit className="w-5 h-5 animate-pulse interactive-icon" /> {t('poll_title')}
@@ -76,56 +96,28 @@ export function FeedbackSection() {
                 {t('poll_q')}
               </p>
               
-              {!voted ? (
-                <RadioGroup value={pollValue} onValueChange={setPollValue} className="space-y-4">
-                  {[
-                    { id: 'r1', label: 'हाँ, बिल्कुल', val: 'yes' },
-                    { id: 'r2', label: 'नहीं', val: 'no' },
-                    { id: 'r3', label: 'पता नहीं', val: 'idk' }
-                  ].map((option) => (
-                    <div key={option.id} className="flex items-center justify-between p-5 rounded-2xl border border-white/5 hover:border-primary/50 transition-all bg-white/5 group/opt cursor-pointer" onClick={() => setPollValue(option.val)}>
-                      <div className="flex items-center space-x-4">
-                        <RadioGroupItem value={option.val} id={option.id} className="border-primary text-primary" />
-                        <Label htmlFor={option.id} className="text-lg font-bold text-white/80 group-hover/opt:text-white transition-colors cursor-pointer">{option.label}</Label>
-                      </div>
+              <RadioGroup value={pollValue} onValueChange={setPollValue} className="space-y-4">
+                {[
+                  { id: 'r1', label: 'हाँ, बिल्कुल', val: 'yes' },
+                  { id: 'r2', label: 'नहीं', val: 'no' },
+                  { id: 'r3', label: 'पता नहीं', val: 'idk' }
+                ].map((option) => (
+                  <div key={option.id} className="flex items-center justify-between p-5 rounded-2xl border border-white/5 hover:border-primary/50 transition-all bg-white/5 group/opt cursor-pointer" onClick={() => setPollValue(option.val)}>
+                    <div className="flex items-center space-x-4">
+                      <RadioGroupItem value={option.val} id={option.id} className="border-primary text-primary" />
+                      <Label htmlFor={option.id} className="text-lg font-bold text-white/80 group-hover/opt:text-white transition-colors cursor-pointer">{option.label}</Label>
                     </div>
-                  ))}
-                </RadioGroup>
-              ) : (
-                <div className="space-y-6 animate-in fade-in duration-500">
-                  {[
-                    { label: 'हाँ, बिल्कुल', percent: 67, color: 'bg-primary' },
-                    { label: 'नहीं', percent: 22, color: 'bg-secondary' },
-                    { label: 'पता नहीं', percent: 11, color: 'bg-white/20' }
-                  ].map((res, i) => (
-                    <div key={i} className="space-y-2">
-                      <div className="flex justify-between text-xs font-black uppercase tracking-widest">
-                        <span className="text-white/60">{res.label}</span>
-                        <span className="text-primary">{res.percent}%</span>
-                      </div>
-                      <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
-                        <div className={cn("h-full transition-all duration-1000", res.color)} style={{ width: `${res.percent}%` }} />
-                      </div>
-                    </div>
-                  ))}
-                  <div className="pt-4 flex items-center justify-center gap-2 text-primary font-black uppercase text-[10px] tracking-widest">
-                    <CheckCircle2 className="w-4 h-4" /> VOTE REGISTERED ON CHAIN
                   </div>
-                </div>
-              )}
+                ))}
+              </RadioGroup>
             </CardContent>
             <CardFooter className="flex justify-center p-10 pt-0">
-              <Button 
-                disabled={voted}
-                onClick={handleVote}
-                className="w-full h-16 bg-white text-black hover:bg-primary transition-all text-lg font-black rounded-2xl uppercase"
-              >
-                {voted ? "VOTE LOGGED" : t('poll_btn')}
+              <Button onClick={handleVote} className="w-full h-16 bg-white text-black hover:bg-primary transition-all text-lg font-black rounded-2xl uppercase">
+                {t('poll_btn')}
               </Button>
             </CardFooter>
           </Card>
 
-          {/* Feedback Wall */}
           <div className="lg:col-span-8 space-y-10">
             <Card className="bg-white/5 shadow-2xl border-white/10 rounded-[3rem] backdrop-blur-md overflow-hidden">
               <CardHeader className="border-b border-white/5 p-8">
@@ -138,21 +130,23 @@ export function FeedbackSection() {
               </CardHeader>
               <CardContent className="p-0">
                 <div className="divide-y divide-white/5 max-h-[450px] overflow-y-auto custom-scrollbar">
-                  {initialFeedbackItems.map((item, i) => (
+                  {feedbackLoading ? (
+                    <div className="p-8 text-center animate-pulse text-primary font-black uppercase tracking-widest text-[10px]">SYNCING NODES...</div>
+                  ) : feedbackItems?.map((item: any, i: number) => (
                     <div key={i} className="p-8 space-y-4 hover:bg-primary/[0.02] transition-colors group">
                       <div className="flex justify-between items-start">
                         <div className="flex items-center gap-4">
                           <div className="w-14 h-14 rounded-2xl bg-primary text-black flex items-center justify-center text-xl font-black shadow-[0_0_20px_rgba(7,241,214,0.3)]">
-                            {item.name.charAt(0)}
+                            {item.userName.charAt(0)}
                           </div>
                           <div>
-                            <p className="font-black text-white text-lg">{item.name}</p>
-                            <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">{item.location} • {item.date}</p>
+                            <p className="font-black text-white text-lg">{item.userName}</p>
+                            <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">{item.location} • Just now</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-1">
                           {[...Array(5)].map((_, star) => (
-                            <Star key={star} className={`w-4 h-4 interactive-icon ${star < item.rating ? 'text-primary fill-primary' : 'text-white/10'}`} />
+                            <Star key={star} className={`w-4 h-4 interactive-icon ${star < (item.rating || 5) ? 'text-primary fill-primary' : 'text-white/10'}`} />
                           ))}
                         </div>
                       </div>
@@ -181,24 +175,8 @@ export function FeedbackSection() {
                       <span className="text-[10px] font-black uppercase tracking-widest">{isSending ? "SYNCING" : t('button_send')}</span>
                     </Button>
                  </div>
-                 <div className="flex items-center justify-between w-full text-[10px] font-black uppercase tracking-widest text-white/30">
-                    <span className="flex items-center gap-2 text-primary">
-                      <Users className="w-4 h-4 interactive-icon" /> 2,456 CITIZENS ONLINE
-                    </span>
-                    <Button variant="link" className="text-[10px] h-auto p-0 font-black text-white/60 hover:text-primary transition-all uppercase" onClick={() => toast({ title: "Global Feed Initialized", description: "Loading unified opinion stream." })}>VIEW GLOBAL FEED</Button>
-                 </div>
               </CardFooter>
             </Card>
-
-            <div className="bg-primary p-12 rounded-[3.5rem] flex flex-col md:flex-row items-center justify-between gap-10 shadow-[0_0_50px_rgba(7,241,214,0.2)] group hover:scale-[1.01] transition-all duration-500">
-              <div className="space-y-4 text-center md:text-left">
-                <h3 className="text-4xl font-black font-headline tracking-tighter uppercase text-black italic">{t('propose_title')}</h3>
-                <p className="text-black/60 font-black uppercase tracking-widest text-sm">Your code is the architect of tomorrow's Bharat.</p>
-              </div>
-              <Button size="lg" onClick={handleSubmitIdea} className="bg-black text-primary hover:bg-white hover:text-black text-lg font-black px-12 h-16 rounded-2xl shadow-2xl transition-all uppercase tracking-[0.2em] group">
-                <Sparkles className="mr-2 w-6 h-6 group-hover:rotate-12 transition-transform" /> {t('submit_idea')}
-              </Button>
-            </div>
           </div>
         </div>
       </div>

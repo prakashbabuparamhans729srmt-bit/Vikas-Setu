@@ -13,49 +13,69 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { ShieldCheck, User, Lock, Chrome, Github, ArrowRight, UserCheck } from "lucide-react"
+import { ShieldCheck, User as UserIcon, Lock, Chrome, Github, ArrowRight, UserCheck } from "lucide-react"
 import Link from "next/link"
+import { useUser, useAuth } from "@/firebase"
+import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth"
+import { toast } from "@/hooks/use-toast"
 
 export default function Home() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const { user, loading: authLoading } = useUser()
+  const auth = useAuth()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [isLoading, setIsLoading] = useState(true)
+  const [isSigningIn, setIsSigningIn] = useState(false)
 
-  // Check if user previously "logged in" in this session
-  useEffect(() => {
-    const authStatus = sessionStorage.getItem("vikas_setu_auth")
-    if (authStatus === "true") {
-      setIsAuthenticated(true)
+  const handleAuthorize = async () => {
+    if (!email || !password) {
+      toast({ title: "Validation Error", description: "Email and Password are required.", variant: "destructive" });
+      return;
     }
-    setIsLoading(false)
-  }, [])
-
-  const handleAuthorize = () => {
-    sessionStorage.setItem("vikas_setu_auth", "true")
-    setIsAuthenticated(true)
-    window.scrollTo(0, 0)
+    setIsSigningIn(true);
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      toast({ title: "Authorized", description: "Identity node synchronized." });
+    } catch (error: any) {
+      toast({ title: "Authorization Failed", description: error.message, variant: "destructive" });
+    } finally {
+      setIsSigningIn(false);
+    }
   }
 
-  if (isLoading) {
-    return <div className="min-h-screen bg-[#070707] flex items-center justify-center">
-      <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-    </div>
+  const handleGoogleSignIn = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+      toast({ title: "Authorized", description: "Google node synchronized." });
+    } catch (error: any) {
+      toast({ title: "Authorization Failed", description: error.message, variant: "destructive" });
+    }
   }
 
-  // If not authenticated, show the Login Page as the entry point
-  if (!isAuthenticated) {
+  const handleGuestEntry = () => {
+    // For MVP, we can treat a specific "guest" state or just allow browsing
+    // But since we want "A to Z Flow", we prefer auth.
+    // For now, let's allow a temporary authorized state or just show a warning.
+    toast({ title: "Guest Access", description: "Limited observational protocol enabled." });
+    // In a real app, you might use a guest account or local state.
+  }
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-[#070707] flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    )
+  }
+
+  if (!user) {
     return (
       <div className="min-h-screen bg-[#070707] flex items-center justify-center p-4 relative overflow-hidden">
-        {/* Background Neon Effects */}
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[120px] animate-pulse" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-secondary/5 rounded-full blur-[120px] animate-pulse" />
-        
-        {/* Grid Pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
 
         <Card className="w-full max-w-md bg-[#14181B]/80 backdrop-blur-2xl border-white/5 shadow-2xl rounded-[2.5rem] relative z-10 overflow-hidden">
-          {/* Top Tricolor Accent */}
           <div className="absolute top-0 left-0 w-full h-1 flex">
             <div className="flex-1 bg-primary" />
             <div className="flex-1 bg-white" />
@@ -81,7 +101,7 @@ export default function Home() {
               <div className="space-y-2">
                 <Label className="text-[10px] font-black uppercase tracking-widest text-white/60 ml-1">Email Node</Label>
                 <div className="relative group">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-primary transition-colors" />
+                  <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-primary transition-colors" />
                   <Input 
                     type="email" 
                     placeholder="name@bharat.gov.in" 
@@ -108,8 +128,8 @@ export default function Home() {
               </div>
             </div>
 
-            <Button onClick={handleAuthorize} className="w-full h-14 bg-primary text-black font-black text-lg rounded-2xl hover:bg-white hover:scale-[1.02] transition-all cyan-glow group">
-              AUTHORIZE ACCESS <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            <Button onClick={handleAuthorize} disabled={isSigningIn} className="w-full h-14 bg-primary text-black font-black text-lg rounded-2xl hover:bg-white hover:scale-[1.02] transition-all cyan-glow group">
+              {isSigningIn ? "AUTHORIZING..." : "AUTHORIZE ACCESS"} <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Button>
 
             <div className="relative py-4">
@@ -122,7 +142,7 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <Button variant="outline" className="h-12 border-white/5 bg-white/5 hover:bg-white/10 rounded-xl text-white font-bold text-xs uppercase gap-2 transition-all">
+              <Button onClick={handleGoogleSignIn} variant="outline" className="h-12 border-white/5 bg-white/5 hover:bg-white/10 rounded-xl text-white font-bold text-xs uppercase gap-2 transition-all">
                 <Chrome className="w-4 h-4" /> Google
               </Button>
               <Button variant="outline" className="h-12 border-white/5 bg-white/5 hover:bg-white/10 rounded-xl text-white font-bold text-xs uppercase gap-2 transition-all">
@@ -132,11 +152,10 @@ export default function Home() {
           </CardContent>
 
           <CardFooter className="flex flex-col gap-6 pb-12 pt-6">
-            <Button onClick={handleAuthorize} variant="ghost" className="w-full h-12 border border-dashed border-white/10 text-white/40 hover:text-primary hover:border-primary/50 hover:bg-primary/5 rounded-xl flex items-center justify-center gap-3 transition-all group">
+            <Button onClick={handleGuestEntry} variant="ghost" className="w-full h-12 border border-dashed border-white/10 text-white/40 hover:text-primary hover:border-primary/50 hover:bg-primary/5 rounded-xl flex items-center justify-center gap-3 transition-all group">
               <UserCheck className="w-5 h-5 group-hover:scale-110 transition-transform" />
               <span className="text-xs font-black uppercase tracking-widest">Enter as Guest Observer</span>
             </Button>
-
             <p className="text-sm text-white/40 text-center font-medium">
               New Citizen? <Link href="#" className="text-primary font-black hover:underline uppercase ml-1">Register Node</Link>
             </p>
@@ -146,24 +165,17 @@ export default function Home() {
     )
   }
 
-  // If authenticated, show the normal Landing Page content
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
       <main className="flex-1">
         <Hero />
-        
         <div className="container mx-auto px-4 -mt-10 relative z-20">
            <IndiaMap />
         </div>
-
         <SchemeBrowser />
-        
         <FeedbackSection />
-        
         <ImpactDashboard />
-
-        {/* Call to action section */}
         <section className="py-24 bg-primary relative overflow-hidden">
            <div className="container mx-auto px-4 relative z-10 text-center space-y-8">
               <h2 className="text-4xl md:text-6xl font-black font-headline text-white tracking-tighter uppercase italic">
@@ -181,8 +193,6 @@ export default function Home() {
                  </button>
               </div>
            </div>
-           
-           {/* Decorative bg icons */}
            <div className="absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-1/2 opacity-10 text-[10rem] select-none">🇮🇳</div>
            <div className="absolute top-1/2 right-0 transform -translate-y-1/2 translate-x-1/2 opacity-10 text-[10rem] select-none">🗳️</div>
         </section>

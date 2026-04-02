@@ -1,0 +1,60 @@
+
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Information about the citizen node.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "displayName": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "photoURL": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email"]
+    },
+    "Feedback": {
+      "title": "Citizen Feedback",
+      "description": "Real-time feedback stream from citizens.",
+      "type": "object",
+      "properties": {
+        "userName": { "type": "string" },
+        "location": { "type": "string" },
+        "text": { "type": "string" },
+        "rating": { "type": "number" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "userId": { "type": "string" }
+      },
+      "required": ["text", "userId"]
+    },
+    "PollVote": {
+      "title": "Poll Vote",
+      "description": "Votes recorded for the poll of the day.",
+      "type": "object",
+      "properties": {
+        "pollId": { "type": "string" },
+        "optionId": { "type": "string" },
+        "userId": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "auth": {
+    "providers": ["google.com", "password"]
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Citizen profile data."
+    },
+    "/feedback": {
+      "schema": "Feedback",
+      "description": "Global feedback stream."
+    },
+    "/polls/{pollId}/votes/{userId}": {
+      "schema": "PollVote",
+      "description": "Individual votes for specific polls."
+    }
+  }
+}

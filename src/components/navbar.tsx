@@ -38,7 +38,7 @@ export function Navbar() {
     try {
       await signOut(auth);
       toast({ title: "Disconnected", description: "Identity node offline." });
-      window.location.reload(); // Refresh to trigger login guard
+      window.location.reload(); 
     } catch (error: any) {
       toast({ title: "Error", description: "Failed to disconnect node.", variant: "destructive" });
     }

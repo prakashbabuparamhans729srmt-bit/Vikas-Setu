@@ -25,7 +25,6 @@ export function FeedbackSection() {
   const [isSending, setIsSending] = useState(false)
   const [pollValue, setPollValue] = useState("yes")
 
-  // Use real-time feedback from Firestore
   const feedbackQuery = useMemo(() => {
     return query(collection(db, "feedback"), orderBy("timestamp", "desc"), limit(10));
   }, [db]);

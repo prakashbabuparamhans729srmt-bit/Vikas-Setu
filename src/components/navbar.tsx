@@ -2,7 +2,7 @@
 "use client"
 
 import Link from "next/link"
-import { User, Menu, X, Bell, Globe, Check, Settings, Sparkles, LogOut } from "lucide-react"
+import { User, Menu, X, Bell, Globe, Check, Settings, Sparkles, LogOut, LayoutDashboard, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
@@ -36,11 +36,10 @@ export function Navbar() {
   const { user } = useUser()
 
   const navItems = [
-    { name: t('nav_home'), id: 'home' },
-    { name: t('nav_yojanaye'), id: 'schemes' },
-    { name: t('nav_progress'), id: 'impact' },
-    { name: t('nav_rai'), id: 'feedback' },
-    { name: t('nav_impact'), id: 'impact' },
+    { name: t('nav_home'), id: 'home', href: '/' },
+    { name: t('nav_yojanaye'), id: 'schemes', href: '/#schemes' },
+    { name: t('nav_progress'), id: 'impact', href: '/#impact' },
+    { name: t('nav_rai'), id: 'feedback', href: '/#feedback' },
   ]
 
   const handleJoinGrowth = () => {
@@ -85,13 +84,18 @@ export function Navbar() {
           {navItems.map((item) => (
             <Link 
               key={item.id}
-              href={`#${item.id}`} 
+              href={item.href} 
               className="text-white/40 hover:text-primary transition-all duration-300 relative group"
             >
               {item.name}
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
             </Link>
           ))}
+          {user && (
+            <Link href="/my-applications" className="text-primary hover:text-white transition-all flex items-center gap-2">
+              <FileText className="w-4 h-4" /> MY APPLICATIONS
+            </Link>
+          )}
         </div>
 
         <div className="flex items-center gap-4">
@@ -156,95 +160,32 @@ export function Navbar() {
                     </div>
                   ))}
                 </div>
-                <Button variant="ghost" className="w-full mt-2 text-[10px] font-black uppercase tracking-widest hover:text-primary text-white/20">VIEW ALL LOGS</Button>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
           
-          <Button variant="ghost" size="icon" className="md:hidden text-white" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-            {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </Button>
-          
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="hidden md:flex gap-2 border-white/10 hover:border-primary/50 hover:bg-primary/10 text-white font-black uppercase tracking-widest text-[10px] h-10 px-6 rounded-xl">
-                <User className="h-4 w-4 interactive-icon" /> {user?.displayName || t('login')}
+              <Button variant="outline" className="flex gap-2 border-white/10 hover:border-primary/50 hover:bg-primary/10 text-white font-black uppercase tracking-widest text-[10px] h-10 px-6 rounded-xl">
+                <User className="h-4 w-4 interactive-icon" /> {user?.displayName?.split(' ')[0] || t('login')}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-[#14181B] border-white/10 backdrop-blur-xl rounded-2xl p-2">
+              {user && (
+                <>
+                  <DropdownMenuItem asChild className="cursor-pointer rounded-xl font-black uppercase text-[10px] tracking-widest py-3 px-4 text-white">
+                    <Link href="/my-applications" className="flex items-center">
+                      <FileText className="w-4 h-4 mr-2" /> My Applications
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-white/5" />
+                </>
+              )}
               <DropdownMenuItem onClick={handleSignOut} className="text-secondary hover:bg-secondary/10 cursor-pointer rounded-xl font-black uppercase text-[10px] tracking-widest py-3 px-4">
                 <LogOut className="w-4 h-4 mr-2" /> DISCONNECT NODE
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button className="bg-primary text-black font-black hover:bg-white hover:scale-105 transition-all cyan-glow px-6 h-10 rounded-xl uppercase tracking-widest text-[10px]">
-                {t('join')}
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="bg-[#070707] border-white/10 rounded-[2.5rem] shadow-2xl">
-              <DialogHeader>
-                <DialogTitle className="text-2xl font-black uppercase tracking-tighter text-white">Bharat Growth Network</DialogTitle>
-                <DialogDescription className="text-white/40 font-medium">
-                  Initialize your node to access direct benefits and participate in national development protocols.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-6 py-4">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-white/20 ml-1">Aadhar Virtual ID</label>
-                  <input className="w-full h-12 bg-[#14181B] border-white/5 rounded-xl px-4 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary" placeholder="XXXX-XXXX-XXXX" />
-                </div>
-                <Button onClick={handleJoinGrowth} className="w-full h-14 bg-primary text-black font-black text-lg rounded-xl hover:scale-[1.02] transition-all cyan-glow">
-                  AUTHORIZE IDENTITY
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </div>
-      </div>
-      
-      {/* Mobile Menu */}
-      <div className={cn(
-        "md:hidden fixed inset-x-0 bg-[#070707]/95 border-b border-white/5 backdrop-blur-2xl transition-all duration-500 ease-in-out overflow-hidden",
-        isMenuOpen ? "max-h-[600px] py-6 opacity-100" : "max-h-0 py-0 opacity-0"
-      )}>
-        <div className="container mx-auto px-6 flex flex-col gap-6">
-          {navItems.map((item) => (
-            <Link key={item.id} href={`#${item.id}`} className="text-xl font-black uppercase tracking-tighter text-white hover:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
-              {item.name}
-            </Link>
-          ))}
-          <Link href="/settings" className="text-xl font-black uppercase tracking-tighter text-white hover:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
-            Settings
-          </Link>
-          <div className="h-px bg-white/5 w-full" />
-          
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/20">SELECT LANGUAGE</p>
-          <ScrollArea className="h-48">
-            <div className="grid grid-cols-2 gap-3 pr-4">
-               {LANGUAGES.map((lang) => (
-                 <Button 
-                  key={lang.code}
-                  variant={language === lang.code ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => {
-                    setLanguage(lang.code)
-                    setIsMenuOpen(false)
-                    toast({ title: "Protocol Update", description: `Language set to ${lang.native}` });
-                  }}
-                  className={cn("rounded-lg h-10 font-bold text-[10px] border-white/10", language === lang.code ? "bg-primary text-black" : "text-white/60")}
-                 >
-                   {lang.native}
-                 </Button>
-               ))}
-            </div>
-          </ScrollArea>
-
-          <Button onClick={handleSignOut} variant="outline" className="w-full justify-center gap-2 border-white/10 text-secondary font-black h-12 rounded-xl">
-            <LogOut className="h-4 w-4" /> DISCONNECT
-          </Button>
         </div>
       </div>
     </nav>

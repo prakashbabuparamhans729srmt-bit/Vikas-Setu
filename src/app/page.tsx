@@ -19,6 +19,8 @@ import { useUser, useAuth, useFirestore } from "@/firebase"
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, User } from "firebase/auth"
 import { setDoc, doc, serverTimestamp } from "firebase/firestore"
 import { toast } from "@/hooks/use-toast"
+import { errorEmitter } from "@/firebase/error-emitter"
+import { FirestorePermissionError } from "@/firebase/errors"
 
 export default function Home() {
   const { user, loading: authLoading } = useUser()
@@ -28,15 +30,22 @@ export default function Home() {
   const [password, setPassword] = useState("")
   const [isSigningIn, setIsSigningIn] = useState(false)
 
-  const syncProfile = async (u: User) => {
+  const syncProfile = (u: User) => {
     const userRef = doc(db, "users", u.uid);
-    await setDoc(userRef, {
+    setDoc(userRef, {
       uid: u.uid,
       displayName: u.displayName || "Citizen Node",
       email: u.email,
       photoURL: u.photoURL,
-      createdAt: serverTimestamp(),
-    }, { merge: true });
+      lastActive: serverTimestamp(),
+      createdAt: serverTimestamp(), // Will be merged if already exists
+    }, { merge: true }).catch(async (e) => {
+      errorEmitter.emit('permission-error', new FirestorePermissionError({
+        path: userRef.path,
+        operation: 'write',
+        requestResourceData: { uid: u.uid }
+      }));
+    });
   }
 
   const handleAuthorize = async () => {
@@ -47,7 +56,7 @@ export default function Home() {
     setIsSigningIn(true);
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
-      await syncProfile(result.user);
+      syncProfile(result.user);
       toast({ title: "Authorized", description: "Identity node synchronized." });
     } catch (error: any) {
       toast({ title: "Authorization Failed", description: error.message, variant: "destructive" });
@@ -60,7 +69,7 @@ export default function Home() {
     const provider = new GoogleAuthProvider();
     try {
       const result = await signInWithPopup(auth, provider);
-      await syncProfile(result.user);
+      syncProfile(result.user);
       toast({ title: "Authorized", description: "Google node synchronized." });
     } catch (error: any) {
       toast({ title: "Authorization Failed", description: error.message, variant: "destructive" });
@@ -68,7 +77,7 @@ export default function Home() {
   }
 
   const handleGuestEntry = () => {
-    toast({ title: "Guest Access", description: "Limited observational protocol enabled." });
+    toast({ title: "Guest Access", description: "Limited observational protocol enabled. Sign in for full features." });
   }
 
   if (authLoading) {

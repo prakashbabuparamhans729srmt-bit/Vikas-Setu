@@ -98,6 +98,7 @@ export function SchemeBrowser() {
     }
     setIsApplying(id);
     const appRef = collection(db, "users", user.uid, "applications");
+    
     addDoc(appRef, {
       schemeId: id,
       schemeName: name,
@@ -223,6 +224,7 @@ export function SchemeBrowser() {
                   <img 
                     src={`https://picsum.photos/seed/scheme-${scheme.id}/600/400`} 
                     className="w-full h-full object-cover opacity-60 grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700" 
+                    alt={scheme.name}
                   />
                   <Badge className="absolute top-4 right-4 bg-background/80 border border-border text-foreground backdrop-blur-md uppercase text-[10px] font-black tracking-widest">{scheme.type}</Badge>
                   <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-60" />
@@ -274,19 +276,13 @@ export function SchemeBrowser() {
                            </div>
                          </div>
                        </div>
-                       <div className="space-y-4">
-                         <h4 className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2">
-                           <ShieldCheck className="w-3 h-3" /> Eligibility Protocol
-                         </h4>
-                         <ul className="text-xs text-muted-foreground space-y-2 font-medium">
-                           <li>• Verified landholding status or resident credentials.</li>
-                           <li>• Income node within prescribed demographic limits.</li>
-                           <li>• Valid digital identity (Aadhar/PAN) synchronization.</li>
-                         </ul>
-                       </div>
                        <DialogFooter className="mt-8">
-                         <Button onClick={() => handleApply(scheme.id, scheme.name)} className="w-full h-14 bg-primary text-black font-black text-lg rounded-2xl hover:scale-[1.02] transition-all cyan-glow uppercase">
-                           INITIALIZE APPLICATION <ArrowUpRight className="ml-2 w-5 h-5" />
+                         <Button 
+                            disabled={isApplying === scheme.id}
+                            onClick={() => handleApply(scheme.id, scheme.name)} 
+                            className="w-full h-14 bg-primary text-black font-black text-lg rounded-2xl hover:scale-[1.02] transition-all cyan-glow uppercase"
+                          >
+                           {isApplying === scheme.id ? "SYNCING..." : "INITIALIZE APPLICATION"} <ArrowUpRight className="ml-2 w-5 h-5" />
                          </Button>
                        </DialogFooter>
                      </DialogContent>
@@ -303,18 +299,6 @@ export function SchemeBrowser() {
                 </CardFooter>
               </Card>
             ))}
-          </div>
-          
-          {filteredSchemes.length === 0 && (
-            <div className="text-center py-20 bg-muted/20 rounded-[3rem] border border-dashed border-border">
-              <p className="text-2xl font-black text-muted-foreground uppercase tracking-widest">No matching resource nodes found</p>
-            </div>
-          )}
-
-          <div className="text-center">
-             <Button variant="link" className="text-primary font-black text-lg hover:tracking-widest transition-all uppercase" onClick={() => toast({ title: "Registry Expanded", description: "Loading full historical database..." })}>
-               SEE ALL 5,300+ RESOURCE NODES
-             </Button>
           </div>
         </div>
       </div>

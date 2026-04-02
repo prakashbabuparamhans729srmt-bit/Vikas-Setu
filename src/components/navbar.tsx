@@ -1,7 +1,8 @@
+
 "use client"
 
 import Link from "next/link"
-import { User, Menu, X, Bell, Globe, Check, Settings, Sparkles } from "lucide-react"
+import { User, Menu, X, Bell, Globe, Check, Settings, Sparkles, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
@@ -17,6 +18,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { toast } from "@/hooks/use-toast"
+import { useAuth, useUser } from "@/firebase"
+import { signOut } from "firebase/auth"
 import {
   Dialog,
   DialogContent,
@@ -29,6 +32,8 @@ import {
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { t, language, setLanguage } = useLanguage()
+  const auth = useAuth()
+  const { user } = useUser()
 
   const navItems = [
     { name: t('nav_home'), id: 'home' },
@@ -43,6 +48,15 @@ export function Navbar() {
       title: "Protocol Initialized",
       description: "Redirecting to the National Growth Registry...",
     })
+  }
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      toast({ title: "Disconnected", description: "Identity node offline." });
+    } catch (error: any) {
+      toast({ title: "Error", description: "Failed to disconnect node.", variant: "destructive" });
+    }
   }
 
   const notifications = [
@@ -151,11 +165,18 @@ export function Navbar() {
             {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </Button>
           
-          <Link href="/login">
-            <Button variant="outline" className="hidden md:flex gap-2 border-white/10 hover:border-primary/50 hover:bg-primary/10 text-white font-black uppercase tracking-widest text-[10px] h-10 px-6 rounded-xl">
-              <User className="h-4 w-4 interactive-icon" /> {t('login')}
-            </Button>
-          </Link>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="hidden md:flex gap-2 border-white/10 hover:border-primary/50 hover:bg-primary/10 text-white font-black uppercase tracking-widest text-[10px] h-10 px-6 rounded-xl">
+                <User className="h-4 w-4 interactive-icon" /> {user?.displayName || t('login')}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="bg-[#14181B] border-white/10 backdrop-blur-xl rounded-2xl p-2">
+              <DropdownMenuItem onClick={handleSignOut} className="text-secondary hover:bg-secondary/10 cursor-pointer rounded-xl font-black uppercase text-[10px] tracking-widest py-3 px-4">
+                <LogOut className="w-4 h-4 mr-2" /> DISCONNECT NODE
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           
           <Dialog>
             <DialogTrigger asChild>
@@ -221,11 +242,9 @@ export function Navbar() {
             </div>
           </ScrollArea>
 
-          <Link href="/login" onClick={() => setIsMenuOpen(false)}>
-            <Button variant="outline" className="w-full justify-center gap-2 border-white/10 text-white font-black h-12 rounded-xl">
-              <User className="h-4 w-4 interactive-icon" /> {t('login')}
-            </Button>
-          </Link>
+          <Button onClick={handleSignOut} variant="outline" className="w-full justify-center gap-2 border-white/10 text-secondary font-black h-12 rounded-xl">
+            <LogOut className="h-4 w-4" /> DISCONNECT
+          </Button>
         </div>
       </div>
     </nav>

@@ -38,6 +38,17 @@
         "userId": { "type": "string" },
         "timestamp": { "type": "string", "format": "date-time" }
       }
+    },
+    "SchemeApplication": {
+      "title": "Scheme Application",
+      "description": "Application submitted by a user for a government scheme.",
+      "type": "object",
+      "properties": {
+        "schemeId": { "type": "number" },
+        "schemeName": { "type": "string" },
+        "status": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      }
     }
   },
   "auth": {
@@ -55,6 +66,10 @@
     "/polls/{pollId}/votes/{userId}": {
       "schema": "PollVote",
       "description": "Individual votes for specific polls."
+    },
+    "/users/{userId}/applications/{appId}": {
+      "schema": "SchemeApplication",
+      "description": "User specific scheme applications."
     }
   }
 }

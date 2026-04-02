@@ -10,6 +10,10 @@ import { Search, Filter, ThumbsUp, Info, Star, Users, Mic, MicOff, CheckCircle2,
 import { useLanguage } from "@/context/language-context"
 import { cn } from "@/lib/utils"
 import { toast } from "@/hooks/use-toast"
+import { useFirestore, useUser } from "@/firebase"
+import { collection, addDoc, serverTimestamp } from "firebase/firestore"
+import { errorEmitter } from "@/firebase/error-emitter"
+import { FirestorePermissionError } from "@/firebase/errors"
 import {
   Dialog,
   DialogContent,
@@ -56,6 +60,8 @@ export function SchemeBrowser() {
   const [isListening, setIsListening] = useState(false)
   const [isApplying, setIsApplying] = useState<number | null>(null)
   const { t } = useLanguage()
+  const { user } = useUser()
+  const db = useFirestore()
 
   const filteredSchemes = useMemo(() => {
     return allSchemes.filter(scheme => {
@@ -86,14 +92,31 @@ export function SchemeBrowser() {
   };
 
   const handleApply = (id: number, name: string) => {
+    if (!user) {
+      toast({ title: "Auth Required", description: "Please authorize your node to apply.", variant: "destructive" });
+      return;
+    }
     setIsApplying(id);
-    setTimeout(() => {
+    const appRef = collection(db, "users", user.uid, "applications");
+    addDoc(appRef, {
+      schemeId: id,
+      schemeName: name,
+      status: "Submitted",
+      timestamp: serverTimestamp()
+    }).then(() => {
       setIsApplying(null);
       toast({
         title: "Application Logged",
         description: `Your intent for ${name} has been synchronized with the national registry.`,
       });
-    }, 2000);
+    }).catch(async (e) => {
+      setIsApplying(null);
+      errorEmitter.emit('permission-error', new FirestorePermissionError({
+        path: `users/${user.uid}/applications`,
+        operation: 'create',
+        requestResourceData: { schemeName: name }
+      }));
+    });
   };
 
   const handleVote = (name: string) => {

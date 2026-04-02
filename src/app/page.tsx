@@ -1,7 +1,7 @@
 
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Navbar } from "@/components/navbar"
 import { Hero } from "@/components/hero"
 import { SchemeBrowser } from "@/components/scheme-browser"
@@ -15,16 +15,29 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { ShieldCheck, User as UserIcon, Lock, Chrome, Github, ArrowRight, UserCheck } from "lucide-react"
 import Link from "next/link"
-import { useUser, useAuth } from "@/firebase"
-import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth"
+import { useUser, useAuth, useFirestore } from "@/firebase"
+import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, User } from "firebase/auth"
+import { setDoc, doc, serverTimestamp } from "firebase/firestore"
 import { toast } from "@/hooks/use-toast"
 
 export default function Home() {
   const { user, loading: authLoading } = useUser()
   const auth = useAuth()
+  const db = useFirestore()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isSigningIn, setIsSigningIn] = useState(false)
+
+  const syncProfile = async (u: User) => {
+    const userRef = doc(db, "users", u.uid);
+    await setDoc(userRef, {
+      uid: u.uid,
+      displayName: u.displayName || "Citizen Node",
+      email: u.email,
+      photoURL: u.photoURL,
+      createdAt: serverTimestamp(),
+    }, { merge: true });
+  }
 
   const handleAuthorize = async () => {
     if (!email || !password) {
@@ -33,7 +46,8 @@ export default function Home() {
     }
     setIsSigningIn(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      await syncProfile(result.user);
       toast({ title: "Authorized", description: "Identity node synchronized." });
     } catch (error: any) {
       toast({ title: "Authorization Failed", description: error.message, variant: "destructive" });
@@ -45,7 +59,8 @@ export default function Home() {
   const handleGoogleSignIn = async () => {
     const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      await syncProfile(result.user);
       toast({ title: "Authorized", description: "Google node synchronized." });
     } catch (error: any) {
       toast({ title: "Authorization Failed", description: error.message, variant: "destructive" });
@@ -53,11 +68,7 @@ export default function Home() {
   }
 
   const handleGuestEntry = () => {
-    // For MVP, we can treat a specific "guest" state or just allow browsing
-    // But since we want "A to Z Flow", we prefer auth.
-    // For now, let's allow a temporary authorized state or just show a warning.
     toast({ title: "Guest Access", description: "Limited observational protocol enabled." });
-    // In a real app, you might use a guest account or local state.
   }
 
   if (authLoading) {

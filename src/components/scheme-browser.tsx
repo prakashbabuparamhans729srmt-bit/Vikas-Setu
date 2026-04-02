@@ -120,13 +120,6 @@ export function SchemeBrowser() {
     });
   };
 
-  const handleVote = (name: string) => {
-    toast({
-      title: "Public Vote Recorded",
-      description: `Support vector for ${name} increased.`,
-    });
-  }
-
   return (
     <div id="schemes" className="container mx-auto px-4 py-32 space-y-16">
       <div className="max-w-4xl mx-auto space-y-8 text-center">
@@ -147,9 +140,6 @@ export function SchemeBrowser() {
           <Button size="lg" className="h-14 bg-primary text-black font-black hover:bg-primary/80 gap-3 px-8 cyan-glow rounded-2xl">
             <Search className="h-6 w-6" /> {t('search_btn')}
           </Button>
-          <Button size="lg" variant="outline" className="h-14 gap-3 hidden sm:flex border-border hover:bg-muted rounded-2xl" onClick={() => toast({ title: "Filters Optimized", description: "Advanced search parameters applied." })}>
-            <Filter className="h-6 w-6" /> {t('filter_btn')}
-          </Button>
         </div>
       </div>
 
@@ -166,10 +156,7 @@ export function SchemeBrowser() {
                 {categories.map((cat) => (
                   <button
                     key={cat.name}
-                    onClick={() => {
-                      setActiveCategory(cat.name);
-                      toast({ title: "Filter Node Activated", description: `Showing ${cat.name} protocols.` });
-                    }}
+                    onClick={() => setActiveCategory(cat.name)}
                     className={`w-full flex items-center justify-between p-4 rounded-2xl text-sm font-bold transition-all duration-300 ${
                       activeCategory === cat.name 
                       ? 'bg-primary text-black shadow-lg shadow-primary/20 scale-105' 
@@ -186,32 +173,6 @@ export function SchemeBrowser() {
                   </button>
                 ))}
               </nav>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-background border-primary/20 rounded-[2rem] overflow-hidden relative group">
-            <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <CardHeader className="border-b border-border">
-              <CardTitle className="text-sm font-black flex items-center gap-3 text-primary tracking-widest uppercase">
-                🚀 TRENDING NODES
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6 p-6">
-              {trendingSchemes.map((scheme, i) => (
-                <div key={i} className="flex items-center justify-between group/item cursor-pointer" onClick={() => handleVote(scheme.name)}>
-                  <div className="space-y-1">
-                    <p className="text-sm font-black group-hover/item:text-primary transition-colors">{scheme.name}</p>
-                    <div className="flex items-center gap-3 text-[10px] text-muted-foreground font-bold uppercase tracking-widest">
-                      <span className="flex items-center gap-1"><ThumbsUp className="w-3 h-3 text-primary" /> {scheme.votes}</span>
-                      <span>•</span>
-                      <span>{scheme.type}</span>
-                    </div>
-                  </div>
-                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-[10px] font-black text-muted-foreground border border-border group-hover/item:border-primary/50 group-hover/item:text-primary transition-all">
-                    {i+1}
-                  </div>
-                </div>
-              ))}
             </CardContent>
           </Card>
         </aside>
@@ -234,10 +195,6 @@ export function SchemeBrowser() {
                 </CardHeader>
                 <CardContent className="p-8 pt-0 space-y-6 flex-1">
                   <p className="text-sm text-muted-foreground font-medium leading-relaxed line-clamp-3">{scheme.description}</p>
-                  <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-muted-foreground pt-4 border-t border-border">
-                    <span className="flex items-center gap-2"><Star className="w-3 h-3 text-primary fill-primary" /> {scheme.rating} SCORE</span>
-                    <span className="flex items-center gap-2"><Users className="w-3 h-3 text-primary" /> {scheme.users} NODES</span>
-                  </div>
                 </CardContent>
                 <CardFooter className="p-8 pt-0 flex gap-4">
                    <Dialog>
@@ -245,37 +202,15 @@ export function SchemeBrowser() {
                        <Button variant="ghost" size="sm" className="flex-1 text-[10px] font-black uppercase border border-border hover:border-primary hover:bg-transparent rounded-xl">DETAILS</Button>
                      </DialogTrigger>
                      <DialogContent className="bg-background/95 backdrop-blur-3xl border-primary/20 rounded-[2.5rem] max-w-2xl overflow-hidden">
-                       <div className="absolute top-0 left-0 w-full h-1 flex">
-                         <div className="flex-1 bg-primary" />
-                         <div className="flex-1 bg-white" />
-                         <div className="flex-1 bg-secondary" />
-                       </div>
                        <DialogHeader className="pt-6">
                          <div className="flex items-center gap-2 mb-2">
                            <Badge className="bg-primary/10 text-primary border-primary/20 uppercase text-[8px] tracking-widest font-black">{scheme.type} NODE</Badge>
-                           <Badge variant="outline" className="border-border text-[8px] uppercase tracking-widest font-black">{scheme.tags[0]}</Badge>
                          </div>
                          <DialogTitle className="text-3xl font-black uppercase tracking-tighter text-primary">{scheme.name}</DialogTitle>
                          <DialogDescription className="text-foreground/80 font-medium leading-relaxed mt-4">
                            {scheme.details}
                          </DialogDescription>
                        </DialogHeader>
-                       <div className="grid grid-cols-2 gap-4 my-6">
-                         <div className="bg-muted/50 p-4 rounded-2xl border border-border space-y-1">
-                           <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Public Rating</p>
-                           <div className="flex items-center gap-2">
-                             <Star className="w-4 h-4 text-primary fill-primary" />
-                             <span className="text-xl font-black">{scheme.rating} / 5.0</span>
-                           </div>
-                         </div>
-                         <div className="bg-muted/50 p-4 rounded-2xl border border-border space-y-1">
-                           <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Impact Reach</p>
-                           <div className="flex items-center gap-2">
-                             <Users className="w-4 h-4 text-primary" />
-                             <span className="text-xl font-black">{scheme.users} Beneficiaries</span>
-                           </div>
-                         </div>
-                       </div>
                        <DialogFooter className="mt-8">
                          <Button 
                             disabled={isApplying === scheme.id}

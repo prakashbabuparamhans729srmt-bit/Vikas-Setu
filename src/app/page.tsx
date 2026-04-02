@@ -1,7 +1,7 @@
 
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Navbar } from "@/components/navbar"
 import { Hero } from "@/components/hero"
 import { SchemeBrowser } from "@/components/scheme-browser"
@@ -29,6 +29,7 @@ export default function Home() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isSigningIn, setIsSigningIn] = useState(false)
+  const [isGuest, setIsGuest] = useState(false)
 
   const syncProfile = (u: User) => {
     const userRef = doc(db, "users", u.uid);
@@ -38,7 +39,7 @@ export default function Home() {
       email: u.email,
       photoURL: u.photoURL,
       lastActive: serverTimestamp(),
-      createdAt: serverTimestamp(), // Will be merged if already exists
+      createdAt: serverTimestamp(),
     }, { merge: true }).catch(async (e) => {
       errorEmitter.emit('permission-error', new FirestorePermissionError({
         path: userRef.path,
@@ -77,6 +78,7 @@ export default function Home() {
   }
 
   const handleGuestEntry = () => {
+    setIsGuest(true);
     toast({ title: "Guest Access", description: "Limited observational protocol enabled. Sign in for full features." });
   }
 
@@ -88,7 +90,7 @@ export default function Home() {
     )
   }
 
-  if (!user) {
+  if (!user && !isGuest) {
     return (
       <div className="min-h-screen bg-[#070707] flex items-center justify-center p-4 relative overflow-hidden">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[120px] animate-pulse" />

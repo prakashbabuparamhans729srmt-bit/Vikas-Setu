@@ -5,10 +5,11 @@ import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebas
 import { collection, query, orderBy } from "firebase/firestore"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { FileText, Clock, CheckCircle, AlertCircle, Search } from "lucide-react"
+import { FileText, Clock, Search } from "lucide-react"
 import { redirect } from "next/navigation"
+import { cn } from "@/lib/utils"
 
 export default function MyApplicationsPage() {
   const { user, loading: authLoading } = useUser()
@@ -31,7 +32,7 @@ export default function MyApplicationsPage() {
     <div className="min-h-screen flex flex-col bg-[#070707]">
       <Navbar />
       <main className="flex-1 container mx-auto px-4 py-20 max-w-5xl space-y-12">
-        <div className="space-y-4">
+        <div className="space-y-4 text-center md:text-left">
           <Badge className="bg-primary/10 text-primary border-primary/20 px-4 py-1 uppercase font-black text-[10px] tracking-widest">
             LIVE REGISTRY
           </Badge>
@@ -88,8 +89,4 @@ export default function MyApplicationsPage() {
       <Footer />
     </div>
   )
-}
-
-function cn(...inputs: any[]) {
-  return inputs.filter(Boolean).join(' ');
 }

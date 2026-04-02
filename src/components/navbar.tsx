@@ -20,14 +20,6 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { toast } from "@/hooks/use-toast"
 import { useAuth, useUser } from "@/firebase"
 import { signOut } from "firebase/auth"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -42,17 +34,11 @@ export function Navbar() {
     { name: t('nav_rai'), id: 'feedback', href: '/#feedback' },
   ]
 
-  const handleJoinGrowth = () => {
-    toast({
-      title: "Protocol Initialized",
-      description: "Redirecting to the National Growth Registry...",
-    })
-  }
-
   const handleSignOut = async () => {
     try {
       await signOut(auth);
       toast({ title: "Disconnected", description: "Identity node offline." });
+      window.location.reload(); // Refresh to trigger login guard
     } catch (error: any) {
       toast({ title: "Error", description: "Failed to disconnect node.", variant: "destructive" });
     }
@@ -167,11 +153,11 @@ export function Navbar() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="flex gap-2 border-white/10 hover:border-primary/50 hover:bg-primary/10 text-white font-black uppercase tracking-widest text-[10px] h-10 px-6 rounded-xl">
-                <User className="h-4 w-4 interactive-icon" /> {user?.displayName?.split(' ')[0] || t('login')}
+                <User className="h-4 w-4 interactive-icon" /> {user?.displayName?.split(' ')[0] || "CITIZEN"}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-[#14181B] border-white/10 backdrop-blur-xl rounded-2xl p-2">
-              {user && (
+              {user ? (
                 <>
                   <DropdownMenuItem asChild className="cursor-pointer rounded-xl font-black uppercase text-[10px] tracking-widest py-3 px-4 text-white">
                     <Link href="/my-applications" className="flex items-center">
@@ -179,11 +165,17 @@ export function Navbar() {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-white/5" />
+                  <DropdownMenuItem onClick={handleSignOut} className="text-secondary hover:bg-secondary/10 cursor-pointer rounded-xl font-black uppercase text-[10px] tracking-widest py-3 px-4">
+                    <LogOut className="w-4 h-4 mr-2" /> DISCONNECT NODE
+                  </DropdownMenuItem>
                 </>
+              ) : (
+                <DropdownMenuItem asChild className="cursor-pointer rounded-xl font-black uppercase text-[10px] tracking-widest py-3 px-4 text-white">
+                  <Link href="/" className="flex items-center">
+                    <User className="w-4 h-4 mr-2" /> AUTHORIZE NODE
+                  </Link>
+                </DropdownMenuItem>
               )}
-              <DropdownMenuItem onClick={handleSignOut} className="text-secondary hover:bg-secondary/10 cursor-pointer rounded-xl font-black uppercase text-[10px] tracking-widest py-3 px-4">
-                <LogOut className="w-4 h-4 mr-2" /> DISCONNECT NODE
-              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

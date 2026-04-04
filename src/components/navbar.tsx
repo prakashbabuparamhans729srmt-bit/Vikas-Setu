@@ -2,7 +2,7 @@
 "use client"
 
 import Link from "next/link"
-import { User, Menu, X, Bell, Globe, Check, Settings, Sparkles, LogOut, LayoutDashboard, FileText } from "lucide-react"
+import { User, Bell, Globe, Check, Settings, Sparkles, LogOut, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
@@ -17,15 +17,15 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { toast } from "@/hooks/use-toast"
+import { useToast } from "@/hooks/use-toast"
 import { useAuth, useUser } from "@/firebase"
 import { signOut } from "firebase/auth"
 
 export function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { t, language, setLanguage } = useLanguage()
   const auth = useAuth()
   const { user } = useUser()
+  const { toast } = useToast()
 
   const navItems = [
     { name: t('nav_home'), id: 'home', href: '/' },
@@ -38,7 +38,7 @@ export function Navbar() {
     try {
       await signOut(auth);
       toast({ title: "Disconnected", description: "Identity node offline." });
-      window.location.reload(); 
+      window.location.href = "/";
     } catch (error: any) {
       toast({ title: "Error", description: "Failed to disconnect node.", variant: "destructive" });
     }

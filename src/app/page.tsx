@@ -1,7 +1,7 @@
 
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Navbar } from "@/components/navbar"
 import { Hero } from "@/components/hero"
 import { SchemeBrowser } from "@/components/scheme-browser"
@@ -18,7 +18,7 @@ import Link from "next/link"
 import { useUser, useAuth, useFirestore } from "@/firebase"
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, User } from "firebase/auth"
 import { setDoc, doc, serverTimestamp } from "firebase/firestore"
-import { toast } from "@/hooks/use-toast"
+import { useToast } from "@/hooks/use-toast"
 import { errorEmitter } from "@/firebase/error-emitter"
 import { FirestorePermissionError } from "@/firebase/errors"
 
@@ -26,12 +26,14 @@ export default function Home() {
   const { user, loading: authLoading } = useUser()
   const auth = useAuth()
   const db = useFirestore()
+  const { toast } = useToast()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isSigningIn, setIsSigningIn] = useState(false)
   const [isGuest, setIsGuest] = useState(false)
 
   const syncProfile = (u: User) => {
+    if (!db) return;
     const userRef = doc(db, "users", u.uid);
     setDoc(userRef, {
       uid: u.uid,
@@ -101,9 +103,9 @@ export default function Home() {
         <Card className="w-full max-w-md bg-[#14181B]/80 backdrop-blur-2xl border-white/5 shadow-2xl rounded-[2.5rem] relative z-10 overflow-hidden">
           {/* Top Tricolor Accent */}
           <div className="absolute top-0 left-0 w-full h-1 flex">
-            <div className="flex-1 bg-primary" />
+            <div className="flex-1 bg-[#F71F26]" />
             <div className="flex-1 bg-white" />
-            <div className="flex-1 bg-secondary" />
+            <div className="flex-1 bg-[#07F1D6]" />
           </div>
 
           <CardHeader className="pt-12 pb-8 text-center space-y-4">
@@ -202,7 +204,7 @@ export default function Home() {
         <ImpactDashboard />
         <section className="py-24 bg-primary relative overflow-hidden">
            <div className="container mx-auto px-4 relative z-10 text-center space-y-8">
-              <h2 className="text-4xl md:text-6xl font-black font-headline text-white tracking-tighter uppercase italic text-black">
+              <h2 className="text-4xl md:text-6xl font-black font-headline text-black tracking-tighter uppercase italic">
                  Be the Catalyst for Change.
               </h2>
               <p className="text-xl text-black/80 font-medium max-w-2xl mx-auto">

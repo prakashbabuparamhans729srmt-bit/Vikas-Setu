@@ -1,18 +1,18 @@
 
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState } from "react"
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
-import { Send, MessageSquare, Quote, Star, Users, BrainCircuit, Sparkles, CheckCircle2 } from "lucide-react"
+import { Send, MessageSquare, Quote, Star, BrainCircuit } from "lucide-react"
 import { useLanguage } from "@/context/language-context"
-import { toast } from "@/hooks/use-toast"
+import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
-import { useFirestore, useUser, useCollection } from "@/firebase"
+import { useFirestore, useUser, useCollection, useMemoFirebase } from "@/firebase"
 import { collection, addDoc, serverTimestamp, setDoc, doc, query, orderBy, limit } from "firebase/firestore"
 import { errorEmitter } from "@/firebase/error-emitter"
 import { FirestorePermissionError } from "@/firebase/errors"
@@ -21,11 +21,13 @@ export function FeedbackSection() {
   const { t } = useLanguage()
   const { user } = useUser()
   const db = useFirestore()
+  const { toast } = useToast()
   const [feedback, setFeedback] = useState("")
   const [isSending, setIsSending] = useState(false)
   const [pollValue, setPollValue] = useState("yes")
 
-  const feedbackQuery = useMemo(() => {
+  const feedbackQuery = useMemoFirebase(() => {
+    if (!db) return null;
     return query(collection(db, "feedback"), orderBy("timestamp", "desc"), limit(10));
   }, [db]);
   const { data: feedbackItems, loading: feedbackLoading } = useCollection(feedbackQuery);
@@ -35,6 +37,7 @@ export function FeedbackSection() {
       toast({ title: "Auth Required", description: "Log in to synchronize your opinion node.", variant: "destructive" });
       return;
     }
+    if (!db) return;
     const voteRef = doc(db, "polls", "day-poll", "votes", user.uid);
     setDoc(voteRef, {
       optionId: pollValue,
@@ -57,6 +60,7 @@ export function FeedbackSection() {
       toast({ title: "Auth Required", description: "Connect your node to share feedback.", variant: "destructive" });
       return;
     }
+    if (!db) return;
     setIsSending(true)
     
     const feedbackRef = collection(db, "feedback");

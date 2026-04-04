@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from "react"
@@ -16,6 +15,7 @@ import { useFirestore, useUser, useCollection, useMemoFirebase } from "@/firebas
 import { collection, addDoc, serverTimestamp, setDoc, doc, query, orderBy, limit } from "firebase/firestore"
 import { errorEmitter } from "@/firebase/error-emitter"
 import { FirestorePermissionError } from "@/firebase/errors"
+import { addDocumentNonBlocking, setDocumentNonBlocking } from "@/firebase/non-blocking-updates"
 
 export function FeedbackSection() {
   const { t } = useLanguage()
@@ -28,7 +28,6 @@ export function FeedbackSection() {
 
   const feedbackQuery = useMemoFirebase(() => {
     if (!db) return null;
-    // Updated path to schemeFeedback from backend.json
     return query(collection(db, "schemeFeedback"), orderBy("createdAt", "desc"), limit(10));
   }, [db]);
   const { data: feedbackItems, isLoading: feedbackLoading } = useCollection(feedbackQuery);
@@ -39,22 +38,17 @@ export function FeedbackSection() {
       return;
     }
     if (!db) return;
-    // Updated path to userProfiles pollVotes
+    
+    // Aligned with backend.json: userProfiles/{userId}/pollVotes/{pollVoteId}
     const voteRef = doc(db, "userProfiles", user.uid, "pollVotes", "day-poll");
-    setDoc(voteRef, {
+    setDocumentNonBlocking(voteRef, {
       id: "day-poll",
       pollOptionId: pollValue,
       userId: user.uid,
       createdAt: serverTimestamp()
-    }, { merge: true }).then(() => {
-      toast({ title: "Vote Synchronized", description: "Opinion node registered." });
-    }).catch(async (e) => {
-      errorEmitter.emit('permission-error', new FirestorePermissionError({
-        path: voteRef.path,
-        operation: 'write',
-        requestResourceData: { pollOptionId: pollValue }
-      }));
-    });
+    }, { merge: true });
+
+    toast({ title: "Vote Synchronized", description: "Opinion node registered." });
   }
 
   const handleSendFeedback = () => {
@@ -68,23 +62,18 @@ export function FeedbackSection() {
     
     // Aligned with schemeFeedback schema in backend.json
     const feedbackRef = collection(db, "schemeFeedback");
-    addDoc(feedbackRef, {
-      schemeId: "general", // General feedback node
+    addDocumentNonBlocking(feedbackRef, {
+      schemeId: "general", // Using 'general' for non-scheme-specific feedback
       userId: user.uid,
       comment: feedback,
       createdAt: serverTimestamp(),
-      isApproved: false // Admin will moderate
+      isApproved: false // Moderation required
     }).then(() => {
       setIsSending(false)
       setFeedback("")
       toast({ title: "Feedback Logged", description: "Your data node has been added to the stream for moderation." });
-    }).catch(async (e) => {
+    }).catch(() => {
       setIsSending(false)
-      errorEmitter.emit('permission-error', new FirestorePermissionError({
-        path: 'schemeFeedback',
-        operation: 'create',
-        requestResourceData: { comment: feedback }
-      }));
     });
   }
 

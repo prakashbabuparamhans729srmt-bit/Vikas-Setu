@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo } from "react"
@@ -91,6 +90,7 @@ export function SchemeBrowser() {
     if (!db) return;
     
     setIsApplying(id);
+    // Persisting to userProfiles/{uid}/applications subcollection as per firestore rules
     const appRef = collection(db, "userProfiles", user.uid, "applications");
     
     addDocumentNonBlocking(appRef, {
@@ -100,7 +100,7 @@ export function SchemeBrowser() {
       timestamp: serverTimestamp()
     });
 
-    // We don't wait for the promise to resolve to keep it snappy
+    // Provide immediate optimistic feedback
     setTimeout(() => {
       setIsApplying(null);
       toast({

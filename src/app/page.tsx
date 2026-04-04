@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from "react";
@@ -34,11 +33,11 @@ export default function Home() {
   const syncProfile = (u: User) => {
     if (!db) return;
     const userRef = doc(db, "userProfiles", u.uid);
+    // Aligning with UserProfile schema in backend.json
     setDocumentNonBlocking(userRef, {
       id: u.uid,
       displayName: u.displayName || "Citizen Node",
-      email: u.email,
-      stateId: "IN-DL",
+      stateId: "IN-DL", // Defaulting to Delhi as a seed
       city: "New Delhi",
       createdAt: serverTimestamp(),
     }, { merge: true });

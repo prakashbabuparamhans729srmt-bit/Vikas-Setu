@@ -6,15 +6,25 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
+import { Input } from "@/components/ui/input"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
-import { Send, MessageSquare, Quote, BrainCircuit } from "lucide-react"
+import { Send, MessageSquare, Quote, BrainCircuit, Lightbulb, Plus } from "lucide-react"
 import { useLanguage } from "@/context/language-context"
 import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
 import { useFirestore, useUser, useCollection, useMemoFirebase } from "@/firebase"
 import { collection, serverTimestamp, doc, query, orderBy, limit } from "firebase/firestore"
 import { addDocumentNonBlocking, setDocumentNonBlocking } from "@/firebase/non-blocking-updates"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog"
 
 export function FeedbackSection() {
   const { t } = useLanguage()
@@ -24,6 +34,11 @@ export function FeedbackSection() {
   const [feedback, setFeedback] = useState("")
   const [isSending, setIsSending] = useState(false)
   const [pollValue, setPollValue] = useState("yes")
+
+  // Idea Submission State
+  const [ideaTitle, setIdeaTitle] = useState("")
+  const [ideaDesc, setIdeaDesc] = useState("")
+  const [isSubmittingIdea, setIsSubmittingIdea] = useState(false)
 
   const feedbackQuery = useMemoFirebase(() => {
     if (!db) return null;
@@ -69,7 +84,6 @@ export function FeedbackSection() {
         isApproved: true 
       });
       
-      // Delay for UI effect
       setTimeout(() => {
         setIsSending(false)
         setFeedback("")
@@ -80,12 +94,86 @@ export function FeedbackSection() {
     }
   }
 
+  const handleSubmitIdea = async () => {
+    if (!ideaTitle.trim() || !ideaDesc.trim()) return;
+    if (!user) {
+      toast({ title: "Auth Required", description: "Node authentication required for innovation proposals.", variant: "destructive" });
+      return;
+    }
+    if (!db) return;
+    setIsSubmittingIdea(true);
+
+    try {
+      const ideasRef = collection(db, "publicIdeas");
+      addDocumentNonBlocking(ideasRef, {
+        userId: user.uid,
+        title: ideaTitle,
+        description: ideaDesc,
+        createdAt: serverTimestamp(),
+        isApproved: true
+      });
+
+      setTimeout(() => {
+        setIsSubmittingIdea(false);
+        setIdeaTitle("");
+        setIdeaDesc("");
+        toast({ title: "Innovation Logged", description: "Your idea node has been pushed to the national registry." });
+      }, 800);
+    } catch (error) {
+      setIsSubmittingIdea(false);
+    }
+  }
+
   return (
     <section id="feedback" className="py-32 bg-[#0a0a0a]">
       <div className="container mx-auto px-4 space-y-20">
         <div className="text-center space-y-6">
           <Badge className="bg-primary text-black px-6 py-2 text-xs font-black uppercase tracking-[0.3em] rounded-full">CITIZEN FEEDBACK LOOP</Badge>
-          <h2 className="text-5xl font-black font-headline text-white tracking-tighter uppercase">{t('section_feedback_title')}</h2>
+          <div className="flex flex-col md:flex-row items-center justify-center gap-6">
+            <h2 className="text-5xl font-black font-headline text-white tracking-tighter uppercase">{t('section_feedback_title')}</h2>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button className="bg-secondary hover:bg-white text-white hover:text-black font-black uppercase tracking-widest px-8 rounded-2xl h-14 cyan-glow flex items-center gap-3">
+                  <Lightbulb className="w-6 h-6 animate-pulse" /> {t('propose_title')}
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="bg-[#14181B] border-secondary/20 rounded-[2.5rem] shadow-2xl max-w-lg">
+                <DialogHeader>
+                  <DialogTitle className="text-3xl font-black uppercase text-white tracking-tighter italic">Propose <span className="text-secondary">Innovation</span> Node</DialogTitle>
+                  <DialogDescription className="text-white/40 font-medium">Broadcast your architectural ideas for a better Bharat.</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-6 py-6">
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">Idea Title</Label>
+                    <Input 
+                      value={ideaTitle}
+                      onChange={(e) => setIdeaTitle(e.target.value)}
+                      placeholder="e.g., Rural Solar Mesh Grid" 
+                      className="bg-black/40 border-white/5 rounded-xl h-12 text-white"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">Detailed Protocol</Label>
+                    <Textarea 
+                      value={ideaDesc}
+                      onChange={(e) => setIdeaDesc(e.target.value)}
+                      placeholder="Describe the impact and implementation..." 
+                      className="bg-black/40 border-white/5 rounded-2xl min-h-[120px] text-white"
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button 
+                    onClick={handleSubmitIdea}
+                    disabled={isSubmittingIdea || !ideaTitle.trim() || !ideaDesc.trim()}
+                    className="w-full h-14 bg-secondary text-white font-black uppercase tracking-widest rounded-2xl hover:scale-105 transition-all"
+                  >
+                    {isSubmittingIdea ? "SYNCING NODE..." : t('submit_idea')}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
           <p className="text-white/40 max-w-2xl mx-auto font-medium">Your pulse shapes the national trajectory. Every node contributes.</p>
         </div>
 

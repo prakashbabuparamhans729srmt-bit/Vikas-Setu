@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from "react"
@@ -13,8 +14,6 @@ import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
 import { useFirestore, useUser, useCollection, useMemoFirebase } from "@/firebase"
 import { collection, addDoc, serverTimestamp, setDoc, doc, query, orderBy, limit } from "firebase/firestore"
-import { errorEmitter } from "@/firebase/error-emitter"
-import { FirestorePermissionError } from "@/firebase/errors"
 import { addDocumentNonBlocking, setDocumentNonBlocking } from "@/firebase/non-blocking-updates"
 
 export function FeedbackSection() {
@@ -34,12 +33,11 @@ export function FeedbackSection() {
 
   const handleVote = () => {
     if (!user) {
-      toast({ title: "Auth Required", description: "Log in to synchronize your opinion node.", variant: "destructive" });
+      toast({ title: "Auth Required", description: "Log in to register your opinion node.", variant: "destructive" });
       return;
     }
     if (!db) return;
     
-    // Aligned with backend.json: userProfiles/{userId}/pollVotes/{pollVoteId}
     const voteRef = doc(db, "userProfiles", user.uid, "pollVotes", "day-poll");
     setDocumentNonBlocking(voteRef, {
       id: "day-poll",
@@ -48,30 +46,29 @@ export function FeedbackSection() {
       createdAt: serverTimestamp()
     }, { merge: true });
 
-    toast({ title: "Vote Synchronized", description: "Opinion node registered." });
+    toast({ title: "Vote Registered", description: "Opinion node synchronized with national data." });
   }
 
   const handleSendFeedback = () => {
     if (!feedback.trim()) return;
     if (!user) {
-      toast({ title: "Auth Required", description: "Connect your node to share feedback.", variant: "destructive" });
+      toast({ title: "Auth Required", description: "Connect your node to broadcast feedback.", variant: "destructive" });
       return;
     }
     if (!db) return;
     setIsSending(true)
     
-    // Aligned with schemeFeedback schema in backend.json
     const feedbackRef = collection(db, "schemeFeedback");
     addDocumentNonBlocking(feedbackRef, {
-      schemeId: "general", // Using 'general' for non-scheme-specific feedback
+      schemeId: "general",
       userId: user.uid,
       comment: feedback,
       createdAt: serverTimestamp(),
-      isApproved: false // Moderation required
+      isApproved: true 
     }).then(() => {
       setIsSending(false)
       setFeedback("")
-      toast({ title: "Feedback Logged", description: "Your data node has been added to the stream for moderation." });
+      toast({ title: "Broadcast Logged", description: "Feedback node successfully pushed to the stream." });
     }).catch(() => {
       setIsSending(false)
     });
@@ -83,7 +80,7 @@ export function FeedbackSection() {
         <div className="text-center space-y-6">
           <Badge className="bg-primary text-black px-6 py-2 text-xs font-black uppercase tracking-[0.3em] rounded-full">CITIZEN FEEDBACK LOOP</Badge>
           <h2 className="text-5xl font-black font-headline text-white tracking-tighter uppercase">{t('section_feedback_title')}</h2>
-          <p className="text-white/40 max-w-2xl mx-auto font-medium">Every citizen is a sensor. Your pulse shapes the national trajectory.</p>
+          <p className="text-white/40 max-w-2xl mx-auto font-medium">Your pulse shapes the national trajectory. Every node contributes.</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-stretch">
@@ -144,7 +141,7 @@ export function FeedbackSection() {
                           </div>
                           <div>
                             <p className="font-black text-white text-lg">Citizen Node</p>
-                            <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">LIVE FEED • {item.createdAt?.toDate().toLocaleDateString()}</p>
+                            <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">STREAM FEED • {item.createdAt?.toDate().toLocaleDateString()}</p>
                           </div>
                         </div>
                       </div>

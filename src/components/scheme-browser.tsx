@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo } from "react"
@@ -68,7 +69,7 @@ export function SchemeBrowser() {
 
   const handleVoiceSearch = () => {
     if (!('webkitSpeechRecognition' in window)) {
-      toast({ variant: "destructive", title: "Protocol Error", description: "Voice recognition not supported." });
+      toast({ variant: "destructive", title: "Protocol Refused", description: "Voice recognition engine not supported in this browser." });
       return;
     }
     const recognition = new (window as any).webkitSpeechRecognition();
@@ -77,20 +78,19 @@ export function SchemeBrowser() {
     recognition.onresult = (event: any) => {
       const text = event.results[0][0].transcript;
       setSearchQuery(text);
-      toast({ title: "Voice Input Captured", description: `Query: "${text}"` });
+      toast({ title: "Input Captured", description: `Audio Node: "${text}"` });
     };
     recognition.start();
   };
 
   const handleApply = (id: number, name: string) => {
     if (!user) {
-      toast({ title: "Auth Required", description: "Please authorize your node to apply.", variant: "destructive" });
+      toast({ title: "Auth Required", description: "Identity synchronization needed for application.", variant: "destructive" });
       return;
     }
     if (!db) return;
     
     setIsApplying(id);
-    // Persisting to userProfiles/{uid}/applications subcollection as per firestore rules
     const appRef = collection(db, "userProfiles", user.uid, "applications");
     
     addDocumentNonBlocking(appRef, {
@@ -98,16 +98,17 @@ export function SchemeBrowser() {
       schemeName: name,
       status: "Submitted",
       timestamp: serverTimestamp()
+    }).then(() => {
+        setTimeout(() => {
+            setIsApplying(null);
+            toast({
+              title: "Intent Synchronized",
+              description: `Application for ${name} has been logged in the national vault.`,
+            });
+          }, 800);
+    }).catch(() => {
+        setIsApplying(null);
     });
-
-    // Provide immediate optimistic feedback
-    setTimeout(() => {
-      setIsApplying(null);
-      toast({
-        title: "Application Logged",
-        description: `Your intent for ${name} has been synchronized with the national infrastructure.`,
-      });
-    }, 500);
   };
 
   return (

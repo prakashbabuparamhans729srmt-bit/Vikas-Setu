@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from "react";
@@ -33,11 +34,10 @@ export default function Home() {
   const syncProfile = (u: User) => {
     if (!db) return;
     const userRef = doc(db, "userProfiles", u.uid);
-    // Aligning with UserProfile schema in backend.json
     setDocumentNonBlocking(userRef, {
       id: u.uid,
       displayName: u.displayName || "Citizen Node",
-      stateId: "IN-DL", // Defaulting to Delhi as a seed
+      stateId: "IN-DL",
       city: "New Delhi",
       createdAt: serverTimestamp(),
     }, { merge: true });
@@ -45,16 +45,16 @@ export default function Home() {
 
   const handleAuthorize = async () => {
     if (!email || !password) {
-      toast({ title: "Validation Error", description: "Email and Password are required.", variant: "destructive" });
+      toast({ title: "Input Required", description: "Identity credentials are missing.", variant: "destructive" });
       return;
     }
     setIsSigningIn(true);
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
       syncProfile(result.user);
-      toast({ title: "Authorized", description: "Identity node synchronized with Vikas Setu Core." });
+      toast({ title: "Authorized", description: "Citizen Node successfully synced with Vikas Setu Core." });
     } catch (error: any) {
-      toast({ title: "Authorization Failed", description: error.message, variant: "destructive" });
+      toast({ title: "Protocol Refused", description: error.message, variant: "destructive" });
     } finally {
       setIsSigningIn(false);
     }
@@ -65,15 +65,15 @@ export default function Home() {
     try {
       const result = await signInWithPopup(auth, provider);
       syncProfile(result.user);
-      toast({ title: "Authorized", description: "Google node synchronized with Vikas Setu Core." });
+      toast({ title: "Authorized", description: "Google Auth successfully synced." });
     } catch (error: any) {
-      toast({ title: "Authorization Failed", description: error.message, variant: "destructive" });
+      toast({ title: "Handshake Failed", description: error.message, variant: "destructive" });
     }
   }
 
   const handleGuestEntry = () => {
     setIsGuest(true);
-    toast({ title: "Guest Access", description: "Limited observational protocol enabled. Apply features restricted." });
+    toast({ title: "Guest Mode", description: "Limited observational protocol enabled. Application features restricted." });
   }
 
   if (authLoading) {
@@ -87,15 +87,11 @@ export default function Home() {
   if (!user && !isGuest) {
     return (
       <div className="min-h-screen bg-[#070707] flex items-center justify-center p-4 relative overflow-hidden">
-        {/* Background Neon Effects */}
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[120px] animate-pulse" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-secondary/5 rounded-full blur-[120px] animate-pulse" />
-        
-        {/* Grid Pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
 
         <Card className="w-full max-w-md bg-[#14181B]/80 backdrop-blur-2xl border-white/5 shadow-2xl rounded-[2.5rem] relative z-10 overflow-hidden">
-          {/* Top Tricolor Accent */}
           <div className="absolute top-0 left-0 w-full h-1 flex">
             <div className="flex-1 bg-[#F71F26]" />
             <div className="flex-1 bg-white" />

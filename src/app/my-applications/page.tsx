@@ -12,7 +12,7 @@ import { redirect } from "next/navigation"
 import { cn } from "@/lib/utils"
 
 export default function MyApplicationsPage() {
-  const { user, isUserLoading: authLoading } = useUser()
+  const { user, loading: authLoading } = useUser()
   const db = useFirestore()
 
   const applicationsQuery = useMemoFirebase(() => {

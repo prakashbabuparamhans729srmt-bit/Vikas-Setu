@@ -8,12 +8,12 @@ import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
-import { Send, MessageSquare, Quote, Star, BrainCircuit } from "lucide-react"
+import { Send, MessageSquare, Quote, BrainCircuit } from "lucide-react"
 import { useLanguage } from "@/context/language-context"
 import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
 import { useFirestore, useUser, useCollection, useMemoFirebase } from "@/firebase"
-import { collection, addDoc, serverTimestamp, setDoc, doc, query, orderBy, limit } from "firebase/firestore"
+import { collection, serverTimestamp, doc, query, orderBy, limit } from "firebase/firestore"
 import { addDocumentNonBlocking, setDocumentNonBlocking } from "@/firebase/non-blocking-updates"
 
 export function FeedbackSection() {
@@ -49,7 +49,7 @@ export function FeedbackSection() {
     toast({ title: "Vote Registered", description: "Opinion node synchronized with national data." });
   }
 
-  const handleSendFeedback = () => {
+  const handleSendFeedback = async () => {
     if (!feedback.trim()) return;
     if (!user) {
       toast({ title: "Auth Required", description: "Connect your node to broadcast feedback.", variant: "destructive" });
@@ -58,20 +58,22 @@ export function FeedbackSection() {
     if (!db) return;
     setIsSending(true)
     
-    const feedbackRef = collection(db, "schemeFeedback");
-    addDocumentNonBlocking(feedbackRef, {
-      schemeId: "general",
-      userId: user.uid,
-      comment: feedback,
-      createdAt: serverTimestamp(),
-      isApproved: true 
-    }).then(() => {
+    try {
+      const feedbackRef = collection(db, "schemeFeedback");
+      await addDocumentNonBlocking(feedbackRef, {
+        schemeId: "general",
+        userId: user.uid,
+        userName: user.displayName || "Citizen Node",
+        comment: feedback,
+        createdAt: serverTimestamp(),
+        isApproved: true 
+      });
       setIsSending(false)
       setFeedback("")
       toast({ title: "Broadcast Logged", description: "Feedback node successfully pushed to the stream." });
-    }).catch(() => {
+    } catch (error) {
       setIsSending(false)
-    });
+    }
   }
 
   return (
@@ -137,10 +139,10 @@ export function FeedbackSection() {
                       <div className="flex justify-between items-start">
                         <div className="flex items-center gap-4">
                           <div className="w-14 h-14 rounded-2xl bg-primary text-black flex items-center justify-center text-xl font-black shadow-[0_0_20px_rgba(7,241,214,0.3)]">
-                            {item.userId?.charAt(0) || "C"}
+                            {(item.userName || item.userId || "C").charAt(0)}
                           </div>
                           <div>
-                            <p className="font-black text-white text-lg">Citizen Node</p>
+                            <p className="font-black text-white text-lg">{item.userName || "Citizen Node"}</p>
                             <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">STREAM FEED • {item.createdAt?.toDate().toLocaleDateString()}</p>
                           </div>
                         </div>

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo } from "react"
@@ -90,7 +91,7 @@ export function SchemeBrowser() {
     if (!db) return;
     
     setIsApplying(id);
-    const appId = `app-${id}-${Date.now()}`; // Unique ID per application
+    const appId = `app-${id}-${Date.now()}`; 
     const appRef = doc(db, "userProfiles", user.uid, "applications", appId);
     
     setDocumentNonBlocking(appRef, {

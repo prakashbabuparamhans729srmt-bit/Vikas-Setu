@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase"
@@ -7,9 +6,10 @@ import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { FileText, Clock, Search } from "lucide-react"
+import { FileText, Clock, Search, ArrowRight } from "lucide-react"
 import { redirect } from "next/navigation"
 import { cn } from "@/lib/utils"
+import Link from "next/link"
 
 export default function MyApplicationsPage() {
   const { user, isUserLoading } = useUser()
@@ -78,7 +78,7 @@ export default function MyApplicationsPage() {
                     )}>
                       {app.status}
                     </Badge>
-                    <p className="text-[8px] font-black text-white/20 uppercase tracking-[0.2em]">Transaction: {app.id.slice(0, 8)}...</p>
+                    <p className="text-[8px] font-black text-white/20 uppercase tracking-[0.2em]">Transaction: {app.id.slice(0, 12)}...</p>
                   </div>
                 </CardContent>
               </Card>
@@ -86,9 +86,14 @@ export default function MyApplicationsPage() {
           ) : (
             <div className="py-32 text-center bg-white/[0.02] border border-dashed border-white/5 rounded-[3rem] space-y-6">
               <Search className="w-16 h-16 text-white/10 mx-auto" />
-              <div className="space-y-2">
+              <div className="space-y-4">
                 <p className="text-2xl font-black text-white/40 uppercase tracking-tighter">No Applications Registered</p>
                 <p className="text-xs text-white/20 font-medium uppercase tracking-widest">Your node has not yet initialized any resource requests.</p>
+                <Link href="/#schemes">
+                  <Button className="bg-primary text-black font-black uppercase tracking-widest h-12 px-8 rounded-xl mt-4">
+                    EXPLORE SCHEMES <ArrowRight className="ml-2 w-4 h-4" />
+                  </Button>
+                </Link>
               </div>
             </div>
           )}

@@ -11,8 +11,8 @@ import { useLanguage } from "@/context/language-context"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 import { useFirestore, useUser } from "@/firebase"
-import { collection, serverTimestamp } from "firebase/firestore"
-import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates"
+import { collection, serverTimestamp, doc } from "firebase/firestore"
+import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates"
 import {
   Dialog,
   DialogContent,
@@ -91,25 +91,23 @@ export function SchemeBrowser() {
     if (!db) return;
     
     setIsApplying(id);
-    const appRef = collection(db, "userProfiles", user.uid, "applications");
+    // Create a deterministic ID for the application to prevent duplicates
+    const appRef = doc(db, "userProfiles", user.uid, "applications", `app-${id}`);
     
-    addDocumentNonBlocking(appRef, {
+    setDocumentNonBlocking(appRef, {
       schemeId: String(id),
       schemeName: name,
       status: "Submitted",
       timestamp: serverTimestamp()
-    }).then(() => {
-        setTimeout(() => {
-            setIsApplying(null);
-            toast({
-              title: "Intent Synchronized",
-              description: `Application for ${name} has been logged in the national vault.`,
-            });
-          }, 800);
-    }).catch(() => {
-        setIsApplying(null);
-        toast({ title: "Protocol Failed", description: "Failed to log application in the vault.", variant: "destructive" });
-    });
+    }, { merge: true });
+
+    setTimeout(() => {
+      setIsApplying(null);
+      toast({
+        title: "Intent Synchronized",
+        description: `Application for ${name} has been logged in the national vault.`,
+      });
+    }, 1000);
   };
 
   return (

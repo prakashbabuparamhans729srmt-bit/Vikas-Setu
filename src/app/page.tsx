@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Navbar } from "@/components/navbar";
 import { Hero } from "@/components/hero";
 import { SchemeBrowser } from "@/components/scheme-browser";
@@ -56,14 +56,14 @@ export default function Home() {
       syncProfile(result.user);
       toast({ title: "Authorized", description: "Citizen Node successfully synced with Vikas Setu Core." });
     } catch (error: any) {
-      if (error.code === 'auth/user-not-found') {
-        // If user not found, try to create account (Auto-registration flow)
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+        // Auto-registration flow for new users (for testing simplicity in this MVP)
         try {
           const result = await createUserWithEmailAndPassword(auth, email, password);
           syncProfile(result.user);
           toast({ title: "Node Registered", description: "New Citizen Node created and synchronized." });
         } catch (regError: any) {
-          toast({ title: "Registration Protocol Failed", description: regError.message, variant: "destructive" });
+          toast({ title: "Auth Protocol Failed", description: regError.message, variant: "destructive" });
         }
       } else {
         toast({ title: "Protocol Refused", description: error.message, variant: "destructive" });

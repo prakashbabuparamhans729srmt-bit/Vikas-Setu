@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState } from "react"
@@ -7,8 +8,11 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ThumbsUp, ThumbsDown, TrendingUp, BarChart3, Clock, Globe, Shield, Activity } from "lucide-react"
 import { useLanguage } from "@/context/language-context"
-import { toast } from "@/hooks/use-toast"
+import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
+import { useUser, useFirestore } from "@/firebase"
+import { doc, serverTimestamp } from "firebase/firestore"
+import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates"
 
 const initialSchemes = [
   { id: 1, name: "PM Kisan", state: "National", rating: 4.9, votes: 125, progress: 95 },
@@ -19,10 +23,31 @@ const initialSchemes = [
 
 export function ImpactDashboard() {
   const { t } = useLanguage()
+  const { user } = useUser()
+  const db = useFirestore()
+  const { toast } = useToast()
   const [schemes] = useState(initialSchemes)
   const [activeActions, setActiveActions] = useState<Record<string, 'up' | 'down' | null>>({})
 
   const handleAction = (id: number, type: 'up' | 'down') => {
+    if (!user) {
+      toast({ title: "Authentication Required", description: "Please authorize your node to cast a vote.", variant: "destructive" });
+      return;
+    }
+    if (!db) return;
+
+    const voteType = type === 'up' ? 'upvote' : 'downvote';
+    const voteId = `vote-scheme-${id}`;
+    const voteRef = doc(db, "userProfiles", user.uid, "schemeVotes", voteId);
+
+    setDocumentNonBlocking(voteRef, {
+      id: voteId,
+      schemeId: String(id),
+      userId: user.uid,
+      voteType: voteType,
+      createdAt: serverTimestamp()
+    }, { merge: true });
+
     setActiveActions(prev => ({ ...prev, [id]: prev[id] === type ? null : type }));
     
     toast({

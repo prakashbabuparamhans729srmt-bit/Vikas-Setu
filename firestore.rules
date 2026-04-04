@@ -15,6 +15,7 @@ service cloud.firestore {
       return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
     }
 
+    // User Profiles and Subcollections
     match /userProfiles/{userId} {
       allow get: if true;
       allow list: if isAdmin();
@@ -28,25 +29,64 @@ service cloud.firestore {
       match /schemeRatings/{ratingId} {
         allow read, create, update, delete: if isOwner(userId);
       }
+      
       match /schemeVotes/{voteId} {
         allow read, create, update, delete: if isOwner(userId);
       }
+      
       match /pollVotes/{voteId} {
         allow read, create, update, delete: if isOwner(userId);
       }
     }
 
+    // Scheme Feedback (Mixed Public/Private)
     match /schemeFeedback/{feedbackId} {
-      allow read: if true;
+      allow read: if true; // Publicly readable for the stream
       allow create: if isSignedIn();
-      allow update, delete: if (resource.data.userId == request.auth.uid) || isAdmin();
+      allow update, delete: if isOwner(resource.data.userId) || isAdmin();
     }
 
-    match /polls/{pollId} {
+    // Public Ideas
+    match /publicIdeas/{publicIdeaId} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if isOwner(resource.data.userId) || isAdmin();
+    }
+
+    // Static Collections (Schemes, States, Categories)
+    match /schemes/{schemeId} {
       allow read: if true;
       allow write: if isAdmin();
     }
 
+    match /states/{stateId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Polls and Options
+    match /polls/{pollId} {
+      allow read: if true;
+      allow write: if isAdmin();
+      
+      match /pollOptions/{optionId} {
+        allow read: if true;
+        allow write: if isAdmin();
+      }
+    }
+
+    // National Snapshots
+    match /nationalProgressSnapshots/{snapshotId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Admin Roles (Existence check)
     match /roles_admin/{userId} {
       allow get: if isSignedIn();
     }

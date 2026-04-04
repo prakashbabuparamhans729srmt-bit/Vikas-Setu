@@ -17,7 +17,6 @@ export default function MyApplicationsPage() {
 
   const applicationsQuery = useMemoFirebase(() => {
     if (!db || !user) return null;
-    // Updated path to match userProfiles subcollection
     return query(
       collection(db, "userProfiles", user.uid, "applications"),
       orderBy("timestamp", "desc")

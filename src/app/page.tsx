@@ -22,7 +22,7 @@ import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Home() {
-  const { user, loading: authLoading } = useUser();
+  const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const db = useFirestore();
   const { toast } = useToast();
@@ -77,7 +77,7 @@ export default function Home() {
     toast({ title: "Guest Mode", description: "Limited observational protocol enabled. Application features restricted." });
   }
 
-  if (authLoading) {
+  if (isUserLoading) {
     return (
       <div className="min-h-screen bg-[#070707] flex items-center justify-center">
         <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
@@ -196,7 +196,6 @@ export default function Home() {
         <FeedbackSection />
         <ImpactDashboard />
         
-        {/* Call to Action Section */}
         <section className="py-24 bg-primary relative overflow-hidden">
            <div className="container mx-auto px-4 relative z-10 text-center space-y-8">
               <h2 className="text-4xl md:text-6xl font-black font-headline text-black tracking-tighter uppercase italic">

@@ -15,7 +15,6 @@ export default function MyApplicationsPage() {
   const { user, isUserLoading } = useUser()
   const db = useFirestore()
 
-  // National Progress Vault Registry Query
   const applicationsQuery = useMemoFirebase(() => {
     if (!db || !user) return null;
     return query(

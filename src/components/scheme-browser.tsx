@@ -11,7 +11,7 @@ import { useLanguage } from "@/context/language-context"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 import { useFirestore, useUser } from "@/firebase"
-import { collection, serverTimestamp, doc } from "firebase/firestore"
+import { collection, serverTimestamp } from "firebase/firestore"
 import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates"
 import {
   Dialog,
@@ -93,7 +93,6 @@ export function SchemeBrowser() {
     setIsApplying(id);
     const appRef = collection(db, "userProfiles", user.uid, "applications");
     
-    // Resource Application Registry Protocol (Non-Blocking)
     addDocumentNonBlocking(appRef, {
       schemeId: String(id),
       schemeName: name,
@@ -127,9 +126,9 @@ export function SchemeBrowser() {
               placeholder={t('placeholder_search')}
             />
           </div>
-          <Button onClick={handleVoiceSearch} variant="ghost" size="icon" className={cn("h-14 w-14 rounded-2xl", isListening && "text-secondary animate-pulse")}>
-            {isListening ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6 text-primary interactive-icon" />}
-          </Button>
+          <button onClick={handleVoiceSearch} className={cn("h-14 w-14 rounded-2xl flex items-center justify-center transition-all", isListening ? "text-secondary animate-pulse" : "text-primary hover:bg-white/5")}>
+            {isListening ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
+          </button>
           <Button size="lg" className="h-14 bg-primary text-black font-black hover:bg-primary/80 gap-3 px-8 cyan-glow rounded-2xl">
             <Search className="h-6 w-6" /> {t('search_btn')}
           </Button>

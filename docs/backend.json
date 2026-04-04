@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "UserProfile": {
@@ -34,6 +35,32 @@
         "stateId",
         "createdAt"
       ]
+    },
+    "SchemeApplication": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "SchemeApplication",
+      "type": "object",
+      "description": "Represents a citizen's application for a specific government scheme, tracked in their personal vault.",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "schemeId": {
+          "type": "string"
+        },
+        "schemeName": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["Submitted", "Processing", "Approved", "Rejected"]
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["schemeId", "schemeName", "status", "timestamp"]
     },
     "State": {
       "$schema": "http://json-schema.org/draft-07/schema#",
@@ -479,7 +506,8 @@
   "auth": {
     "providers": [
       "password",
-      "anonymous"
+      "anonymous",
+      "google.com"
     ]
   },
   "firestore": {
@@ -491,11 +519,31 @@
           "schema": {
             "$ref": "#/backend/entities/UserProfile"
           },
-          "description": "Stores user profile information. Access is restricted such that users can only read/write their own profiles. Includes the userId in the path for direct ownership checks. Public display name and location details are readable by others.",
+          "description": "Stores user profile information.",
           "params": [
             {
               "name": "userId",
-              "description": "The unique identifier of the user, matching request.auth.uid."
+              "description": "The unique identifier of the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/userProfiles/{userId}/applications/{appId}",
+        "definition": {
+          "entityName": "SchemeApplication",
+          "schema": {
+            "$ref": "#/backend/entities/SchemeApplication"
+          },
+          "description": "User specific scheme applications.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "Owner of the application."
+            },
+            {
+              "name": "appId",
+              "description": "Application ID."
             }
           ]
         }
@@ -507,27 +555,11 @@
           "schema": {
             "$ref": "#/backend/entities/State"
           },
-          "description": "Contains static, publicly readable data about Indian states/union territories, including development percentages. Managed by administrators. Fully public read for all authenticated and unauthenticated users.",
+          "description": "Indian states static data.",
           "params": [
             {
               "name": "stateId",
               "description": "The unique identifier for the State."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/categories/{categoryId}",
-        "definition": {
-          "entityName": "Category",
-          "schema": {
-            "$ref": "#/backend/entities/Category"
-          },
-          "description": "Stores static, publicly readable categories for government schemes. Managed by administrators. Fully public read for all authenticated and unauthenticated users.",
-          "params": [
-            {
-              "name": "categoryId",
-              "description": "The unique identifier for the Category."
             }
           ]
         }
@@ -539,51 +571,11 @@
           "schema": {
             "$ref": "#/backend/entities/Scheme"
           },
-          "description": "Holds details about government schemes (central and state). This collection is publicly readable by all users. Aggregated metrics (upvotes, downvotes, average rating) are denormalized and stored here. Admin-only write access.",
+          "description": "Details about government schemes.",
           "params": [
             {
               "name": "schemeId",
               "description": "The unique identifier for the Scheme."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/userProfiles/{userId}/schemeRatings/{schemeRatingId}",
-        "definition": {
-          "entityName": "SchemeRating",
-          "schema": {
-            "$ref": "#/backend/entities/SchemeRating"
-          },
-          "description": "Stores individual user ratings for schemes. Located as a subcollection under the user's profile for explicit path-based ownership, simplifying authorization rules to `request.auth.uid == userId`. Only the submitting user can create/read/update/delete their own rating. The schemeId and userId are also fields for querying ease (e.g., getting all ratings by a user or for a scheme via collection group queries).",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user who submitted the rating, matching request.auth.uid."
-            },
-            {
-              "name": "schemeRatingId",
-              "description": "The unique identifier for the SchemeRating document."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/userProfiles/{userId}/schemeVotes/{schemeVoteId}",
-        "definition": {
-          "entityName": "SchemeVote",
-          "schema": {
-            "$ref": "#/backend/entities/SchemeVote"
-          },
-          "description": "Records individual user upvotes/downvotes for schemes. Stored as a subcollection under the user's profile for path-based ownership, simplifying authorization. Only the submitting user can create/read/update/delete their own vote. The schemeId and userId are also fields for querying ease.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user who submitted the vote, matching request.auth.uid."
-            },
-            {
-              "name": "schemeVoteId",
-              "description": "The unique identifier for the SchemeVote document."
             }
           ]
         }
@@ -595,63 +587,11 @@
           "schema": {
             "$ref": "#/backend/entities/SchemeFeedback"
           },
-          "description": "Contains textual feedback from users on schemes. Documents include denormalized 'userId' for ownership checks and 'isApproved' for public visibility. Users can create/read/update/delete their own feedback. Public can only read approved feedback. Admins can manage all feedback and toggle 'isApproved'.",
+          "description": "Public feedback on schemes.",
           "params": [
             {
               "name": "schemeFeedbackId",
-              "description": "The unique identifier for the SchemeFeedback document."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/publicIdeas/{publicIdeaId}",
-        "definition": {
-          "entityName": "PublicIdea",
-          "schema": {
-            "$ref": "#/backend/entities/PublicIdea"
-          },
-          "description": "Stores new ideas submitted by users for government initiatives. Documents include denormalized 'userId' for ownership checks and 'isApproved' for public visibility. Users can create/read/update/delete their own ideas. Public can only read approved ideas. Admins can manage all ideas and toggle 'isApproved'.",
-          "params": [
-            {
-              "name": "publicIdeaId",
-              "description": "The unique identifier for the PublicIdea document."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/polls/{pollId}",
-        "definition": {
-          "entityName": "Poll",
-          "schema": {
-            "$ref": "#/backend/entities/Poll"
-          },
-          "description": "Manages public opinion polls, including questions and status. Publicly readable for active or closed polls. Admin-only write access. Uses 'status' field for explicit state modeling.",
-          "params": [
-            {
-              "name": "pollId",
-              "description": "The unique identifier for the Poll."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/polls/{pollId}/pollOptions/{pollOptionId}",
-        "definition": {
-          "entityName": "PollOption",
-          "schema": {
-            "$ref": "#/backend/entities/PollOption"
-          },
-          "description": "Represents options for a specific poll. Denormalizes 'pollStatus' from the parent Poll document to ensure Authorization Independence, allowing rules to check public readability without a 'get()' call. Publicly readable for options belonging to active or closed polls. Admin-only write access. Total votes are aggregated and denormalized here.",
-          "params": [
-            {
-              "name": "pollId",
-              "description": "The unique identifier of the parent Poll."
-            },
-            {
-              "name": "pollOptionId",
-              "description": "The unique identifier for the PollOption document."
+              "description": "The unique identifier for the feedback."
             }
           ]
         }
@@ -663,52 +603,20 @@
           "schema": {
             "$ref": "#/backend/entities/PollVote"
           },
-          "description": "Records individual user votes for poll options. Stored as a subcollection under the user's profile for path-based ownership. Only the submitting user can create/read/update/delete their own vote. The pollOptionId and userId are also fields for querying ease.",
+          "description": "Individual poll votes.",
           "params": [
             {
               "name": "userId",
-              "description": "The unique identifier of the user who cast the vote, matching request.auth.uid."
+              "description": "User ID."
             },
             {
               "name": "pollVoteId",
-              "description": "The unique identifier for the PollVote document."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/nationalProgressSnapshots/{snapshotId}",
-        "definition": {
-          "entityName": "NationalProgressSnapshot",
-          "schema": {
-            "$ref": "#/backend/entities/NationalProgressSnapshot"
-          },
-          "description": "Stores historical data for national development progress by year. This collection is publicly readable by all users. Admin-only write access.",
-          "params": [
-            {
-              "name": "snapshotId",
-              "description": "The unique identifier for the NationalProgressSnapshot document."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/roles_admin/{userId}",
-        "definition": {
-          "entityName": "AdminRole",
-          "schema": {
-            "$ref": "#/backend/entities/UserProfile"
-          },
-          "description": "A dedicated collection for storing administrator roles. The existence of a document at `/roles_admin/{request.auth.uid}` grants administrative privileges, adhering to the DBAC principle and 'existence over content' for role management.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user who holds the administrator role."
+              "description": "Vote ID."
             }
           ]
         }
       }
     ],
-    "reasoning": "The Firestore structure is designed with a strong emphasis on Authorization Independence and adherence to Query As Permissions (QAPs) to ensure robust security rules and efficient data access. \n\n**Authorization Independence:**\n1.  **Path-Based Ownership:** For user-specific data such as `SchemeRating`, `SchemeVote`, and `PollVote`, a hierarchical path structure (`/userProfiles/{userId}/...`) is used. This directly embeds the `userId` in the document path, allowing security rules to atomically check `request.auth.uid == userId` without needing `get()` operations on parent documents or the document itself to verify ownership. This design enables atomic operations and simplifies rule logic.\n2.  **Denormalized Authorization Context:** For `PollOption` documents, which inherently depend on the status of their parent `Poll` for public readability, the `pollStatus` (e.g., 'active', 'closed') is denormalized and stored directly within each `PollOption` document. This eliminates the need for `get()` calls to the parent `Poll` document within security rules, thus ensuring Authorization Independence for `PollOption` access.\n3.  **In-Document Authorization Fields:** For collections like `SchemeFeedback` and `PublicIdea`, which have mixed public (approved) and private (user-owned or unapproved) access, key authorization fields such as `userId` and `isApproved` are directly included in each document. This allows security rules to evaluate access permissions based on the document's own data (`resource.data.userId` and `resource.data.isApproved`) without relying on related documents.\n4.  **DBAC (Database Access Control) for Roles:** Admin roles are implemented using an 'existence over content' model in a dedicated collection (`/roles_admin/{userId}`). A security rule can check for the existence of `get(/databases/$(database)/documents/roles_admin/$(request.auth.uid))` to grant administrative privileges, avoiding custom claims and complex role structures.\n\n**Query As Permissions (QAPs):**\n1.  **Structural Segregation:** Publicly accessible, read-only data (e.g., `State`, `Category`, `Scheme`, `Poll`, `NationalProgressSnapshot`) are placed in top-level collections. Security rules for these collections are straightforward (e.g., `allow read: if true;` or `if resource.data.status == 'active';`), enabling clients to perform `list` queries without rules filtering the results. The rules simply define what *can* be read based on the document's inherent properties, aligning with QAPs.\n2.  **User-Specific Subcollections:** The hierarchical paths (`/userProfiles/{userId}/schemeRatings`, `/userProfiles/{userId}/schemeVotes`, `/userProfiles/{userId}/pollVotes`) inherently enforce QAPs for user-owned data. A user can only `list` documents within their own `/userProfiles/{request.auth.uid}/` path, as this path is authenticated by the `request.auth.uid`, effectively allowing `list` queries without exposing other users' private data.\n3.  **Explicit Client-Side Filtering:** For collections with mixed access (e.g., `SchemeFeedback`, `PublicIdea`), the design mandates that clients explicitly filter by the `isApproved` field when requesting public data (e.g., `where('isApproved', '==', true)`) and by `userId` for their own submissions. The security rules will then validate these explicit filters, preventing situations where rules implicitly filter results and ensuring that any `list` operation requested by the client already adheres to the desired security posture.\n\nThis architecture minimizes rule complexity, enhances debuggability, and provides a clear separation of concerns for data access, supporting the scalability and security needs of the 'Vikas Setu' application."
+    "reasoning": "The structure uses path-based ownership for user data and top-level collections for shared/public data."
   }
 }

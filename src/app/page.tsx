@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Navbar } from "@/components/navbar";
 import { Hero } from "@/components/hero";
 import { SchemeBrowser } from "@/components/scheme-browser";
@@ -55,7 +55,7 @@ export default function Home() {
       syncProfile(result.user);
       toast({ title: "Authorized", description: "Citizen Node successfully synced with Vikas Setu Core." });
     } catch (error: any) {
-      if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/invalid-email') {
         try {
           const result = await createUserWithEmailAndPassword(auth, email, password);
           syncProfile(result.user);
@@ -104,9 +104,9 @@ export default function Home() {
 
         <Card className="w-full max-w-md bg-[#14181B]/80 backdrop-blur-2xl border-white/5 shadow-2xl rounded-[2.5rem] relative z-10 overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-1 flex">
-            <div className="flex-1 bg-[#F71F26]" />
+            <div className="flex-1 bg-secondary" />
             <div className="flex-1 bg-white" />
-            <div className="flex-1 bg-[#07F1D6]" />
+            <div className="flex-1 bg-primary" />
           </div>
 
           <CardHeader className="pt-12 pb-8 text-center space-y-4">

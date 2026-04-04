@@ -11,7 +11,7 @@ import { useLanguage } from "@/context/language-context"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 import { useFirestore, useUser } from "@/firebase"
-import { collection, serverTimestamp, doc } from "firebase/firestore"
+import { serverTimestamp, doc } from "firebase/firestore"
 import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates"
 import {
   Dialog,
@@ -91,9 +91,11 @@ export function SchemeBrowser() {
     if (!db) return;
     
     setIsApplying(id);
-    const appRef = doc(db, "userProfiles", user.uid, "applications", `app-${id}`);
+    const appId = `app-${id}`;
+    const appRef = doc(db, "userProfiles", user.uid, "applications", appId);
     
     setDocumentNonBlocking(appRef, {
+      id: appId,
       schemeId: String(id),
       schemeName: name,
       status: "Submitted",
@@ -106,7 +108,7 @@ export function SchemeBrowser() {
         title: "Intent Synchronized",
         description: `Application for ${name} has been logged in the national vault.`,
       });
-    }, 1000);
+    }, 800);
   };
 
   return (

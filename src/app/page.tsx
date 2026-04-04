@@ -55,7 +55,7 @@ export default function Home() {
       syncProfile(result.user);
       toast({ title: "Authorized", description: "Citizen Node successfully synced with Vikas Setu Core." });
     } catch (error: any) {
-      if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/invalid-email') {
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/invalid-email' || error.code === 'auth/wrong-password') {
         try {
           const result = await createUserWithEmailAndPassword(auth, email, password);
           syncProfile(result.user);

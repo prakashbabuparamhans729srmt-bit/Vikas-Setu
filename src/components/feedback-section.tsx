@@ -68,9 +68,13 @@ export function FeedbackSection() {
         createdAt: serverTimestamp(),
         isApproved: true 
       });
-      setIsSending(false)
-      setFeedback("")
-      toast({ title: "Broadcast Logged", description: "Feedback node successfully pushed to the stream." });
+      
+      // Delay for UI effect
+      setTimeout(() => {
+        setIsSending(false)
+        setFeedback("")
+        toast({ title: "Broadcast Logged", description: "Feedback node successfully pushed to the stream." });
+      }, 500);
     } catch (error) {
       setIsSending(false)
     }
@@ -143,7 +147,7 @@ export function FeedbackSection() {
                           </div>
                           <div>
                             <p className="font-black text-white text-lg">{item.userName || "Citizen Node"}</p>
-                            <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">STREAM FEED • {item.createdAt?.toDate().toLocaleDateString()}</p>
+                            <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">STREAM FEED • {item.createdAt?.toDate?.()?.toLocaleDateString() || "Recent"}</p>
                           </div>
                         </div>
                       </div>

@@ -1,75 +1,714 @@
-
 {
   "entities": {
     "UserProfile": {
-      "title": "User Profile",
-      "description": "Information about the citizen node.",
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserProfile",
       "type": "object",
+      "description": "Represents a user interacting with the application, allowing them to provide feedback, ratings, and votes while maintaining privacy by not storing authentication details.",
       "properties": {
-        "uid": { "type": "string" },
-        "displayName": { "type": "string" },
-        "email": { "type": "string", "format": "email" },
-        "photoURL": { "type": "string" },
-        "createdAt": { "type": "string", "format": "date-time" }
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the UserProfile entity."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The public display name or username chosen by the user."
+        },
+        "stateId": {
+          "type": "string",
+          "description": "Reference to the State where the user is registered or primarily located. (Relationship: State 1:N UserProfile)"
+        },
+        "city": {
+          "type": "string",
+          "description": "The city where the user is primarily located."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the user profile was created.",
+          "format": "date-time"
+        }
       },
-      "required": ["uid", "email"]
+      "required": [
+        "id",
+        "displayName",
+        "stateId",
+        "createdAt"
+      ]
     },
-    "Feedback": {
-      "title": "Citizen Feedback",
-      "description": "Real-time feedback stream from citizens.",
+    "State": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "State",
       "type": "object",
+      "description": "Represents an Indian state or union territory, used for categorizing state-specific schemes, user location, and visualizing regional development progress on an interactive map.",
       "properties": {
-        "userName": { "type": "string" },
-        "location": { "type": "string" },
-        "text": { "type": "string" },
-        "rating": { "type": "number" },
-        "timestamp": { "type": "string", "format": "date-time" },
-        "userId": { "type": "string" }
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the State entity (e.g., ISO 3166-2 code or a custom ID)."
+        },
+        "name": {
+          "type": "string",
+          "description": "The official name of the state or union territory (e.g., 'Uttar Pradesh', 'Maharashtra')."
+        },
+        "overallDevelopmentPercentage": {
+          "type": "number",
+          "description": "The current calculated overall development percentage for this state, used for color-coding on the interactive map."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description or additional details about the state's profile or development focus."
+        }
       },
-      "required": ["text", "userId"]
+      "required": [
+        "id",
+        "name",
+        "overallDevelopmentPercentage"
+      ]
+    },
+    "Category": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Category",
+      "type": "object",
+      "description": "Represents a classification for government schemes, enabling users to browse and filter schemes by type or sector (e.g., Agriculture, Education, Health).",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Category entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the category (e.g., 'Kisan Yojana', 'Mahila Yojana', 'Shiksha')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief explanation of what this category of schemes covers."
+        },
+        "iconName": {
+          "type": "string",
+          "description": "A string identifier for an icon associated with this category, used for visual representation in the UI."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description"
+      ]
+    },
+    "Scheme": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Scheme",
+      "type": "object",
+      "description": "Represents a central or state government scheme, detailing its purpose, progress, and aggregated public engagement metrics.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Scheme entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The official, commonly known name of the government scheme."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed explanation of the scheme's objectives, benefits, and eligibility criteria."
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of government body responsible for the scheme ('Central' or 'State')."
+        },
+        "ministry": {
+          "type": "string",
+          "description": "The specific government ministry or department responsible for implementing the scheme."
+        },
+        "stateId": {
+          "type": "string",
+          "description": "Reference to the State if this is a state-specific scheme. This field will be null for central schemes. (Relationship: State 1:N Scheme)"
+        },
+        "targetAudience": {
+          "type": "string",
+          "description": "A description of the primary beneficiaries or demographic targeted by the scheme (e.g., 'Farmers', 'Women', 'Youth', 'Rural Households')."
+        },
+        "targetCompletionYear": {
+          "type": "number",
+          "description": "The target year for the completion or full implementation of the scheme."
+        },
+        "currentProgressPercentage": {
+          "type": "number",
+          "description": "The current calculated percentage of completion or implementation progress for the scheme."
+        },
+        "detailsUrl": {
+          "type": "string",
+          "description": "A URL linking to a more detailed official page, document, or portal about the scheme.",
+          "format": "uri"
+        },
+        "categoryIds": {
+          "type": "array",
+          "description": "References to Categories this scheme belongs to, allowing multi-category classification. (Relationship: Category N:N Scheme)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "totalUpvotes": {
+          "type": "number",
+          "description": "Aggregated count of positive votes (upvotes) received for this scheme from users."
+        },
+        "totalDownvotes": {
+          "type": "number",
+          "description": "Aggregated count of negative votes (downvotes) received for this scheme from users."
+        },
+        "averageRating": {
+          "type": "number",
+          "description": "The calculated average 5-star rating for the scheme, derived from user ratings."
+        },
+        "publishedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the scheme details were first published or made available in the application.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating the last time the scheme's core details were updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "type",
+        "ministry",
+        "currentProgressPercentage",
+        "categoryIds",
+        "totalUpvotes",
+        "totalDownvotes",
+        "averageRating",
+        "publishedAt"
+      ]
+    },
+    "SchemeRating": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "SchemeRating",
+      "type": "object",
+      "description": "Records an individual user's 5-star rating for a specific government scheme, contributing to the scheme's overall average rating.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the SchemeRating entity."
+        },
+        "schemeId": {
+          "type": "string",
+          "description": "Reference to the Scheme that was rated. (Relationship: Scheme 1:N SchemeRating)"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the UserProfile who submitted the rating. (Relationship: UserProfile 1:N SchemeRating)"
+        },
+        "rating": {
+          "type": "number",
+          "description": "The rating value given by the user, on a scale of 1 to 5 stars."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the rating was submitted.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "schemeId",
+        "userId",
+        "rating",
+        "createdAt"
+      ]
+    },
+    "SchemeVote": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "SchemeVote",
+      "type": "object",
+      "description": "Records an individual user's upvote or downvote for a specific government scheme, used for trending and popularity metrics.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the SchemeVote entity."
+        },
+        "schemeId": {
+          "type": "string",
+          "description": "Reference to the Scheme that received the vote. (Relationship: Scheme 1:N SchemeVote)"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the UserProfile who submitted the vote. (Relationship: UserProfile 1:N SchemeVote)"
+        },
+        "voteType": {
+          "type": "string",
+          "description": "The type of vote submitted ('upvote' or 'downvote')."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the vote was submitted.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "schemeId",
+        "userId",
+        "voteType",
+        "createdAt"
+      ]
+    },
+    "SchemeFeedback": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "SchemeFeedback",
+      "type": "object",
+      "description": "Captures textual feedback or comments provided by a user for a specific government scheme, allowing citizens to express their views.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the SchemeFeedback entity."
+        },
+        "schemeId": {
+          "type": "string",
+          "description": "Reference to the Scheme to which the feedback pertains. (Relationship: Scheme 1:N SchemeFeedback)"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the UserProfile who submitted the feedback. (Relationship: UserProfile 1:N SchemeFeedback)"
+        },
+        "comment": {
+          "type": "string",
+          "description": "The textual content of the feedback or comment provided by the user."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the feedback was submitted.",
+          "format": "date-time"
+        },
+        "isApproved": {
+          "type": "boolean",
+          "description": "Indicates whether the feedback has been reviewed and approved by a moderator for public display."
+        }
+      },
+      "required": [
+        "id",
+        "schemeId",
+        "userId",
+        "comment",
+        "createdAt",
+        "isApproved"
+      ]
+    },
+    "PublicIdea": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "PublicIdea",
+      "type": "object",
+      "description": "Stores new ideas or suggestions submitted by users for consideration in government initiatives, fostering public participation in policy-making.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the PublicIdea entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the UserProfile who submitted the idea. (Relationship: UserProfile 1:N PublicIdea)"
+        },
+        "title": {
+          "type": "string",
+          "description": "The concise title or main subject of the submitted idea."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed explanation of the proposed idea, its rationale, and potential impact."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the idea was submitted.",
+          "format": "date-time"
+        },
+        "isApproved": {
+          "type": "boolean",
+          "description": "Indicates whether the idea has been reviewed and approved by a moderator for public visibility or government consideration."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "title",
+        "description",
+        "createdAt",
+        "isApproved"
+      ]
+    },
+    "Poll": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Poll",
+      "type": "object",
+      "description": "Represents a public opinion poll, typically featured as a 'Poll of the Day', to gather citizen's views on current topics.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Poll entity."
+        },
+        "question": {
+          "type": "string",
+          "description": "The main question posed in the poll to the public."
+        },
+        "description": {
+          "type": "string",
+          "description": "An optional longer description or context providing background for the poll question."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current lifecycle status of the poll (e.g., 'active', 'closed', 'draft')."
+        },
+        "publishedAt": {
+          "type": "string",
+          "description": "Timestamp when the poll was made active and visible for public voting.",
+          "format": "date-time"
+        },
+        "closedAt": {
+          "type": "string",
+          "description": "Timestamp when the poll was closed and no longer accepting votes.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "question",
+        "status",
+        "publishedAt"
+      ]
+    },
+    "PollOption": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "PollOption",
+      "type": "object",
+      "description": "Represents a single answer option available for a specific public opinion poll.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the PollOption entity."
+        },
+        "pollId": {
+          "type": "string",
+          "description": "Reference to the Poll this option belongs to. (Relationship: Poll 1:N PollOption)"
+        },
+        "text": {
+          "type": "string",
+          "description": "The textual content of the poll option (e.g., 'हाँ, बिल्कुल', 'नहीं', 'पता नहीं')."
+        },
+        "displayOrder": {
+          "type": "number",
+          "description": "A numerical value determining the display order of this option relative to other options for the same poll."
+        },
+        "totalVotes": {
+          "type": "number",
+          "description": "Aggregated count of votes received for this specific poll option."
+        }
+      },
+      "required": [
+        "id",
+        "pollId",
+        "text",
+        "displayOrder",
+        "totalVotes"
+      ]
     },
     "PollVote": {
-      "title": "Poll Vote",
-      "description": "Votes recorded for the poll of the day.",
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "PollVote",
       "type": "object",
+      "description": "Records an individual user's vote for a specific option within a poll, ensuring unique votes per user per poll.",
       "properties": {
-        "pollId": { "type": "string" },
-        "optionId": { "type": "string" },
-        "userId": { "type": "string" },
-        "timestamp": { "type": "string", "format": "date-time" }
-      }
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the PollVote entity."
+        },
+        "pollOptionId": {
+          "type": "string",
+          "description": "Reference to the PollOption that was voted for. (Relationship: PollOption 1:N PollVote)"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the UserProfile who cast the vote. (Relationship: UserProfile 1:N PollVote)"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the vote was cast.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "pollOptionId",
+        "userId",
+        "createdAt"
+      ]
     },
-    "SchemeApplication": {
-      "title": "Scheme Application",
-      "description": "Application submitted by a user for a government scheme.",
+    "NationalProgressSnapshot": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "NationalProgressSnapshot",
       "type": "object",
+      "description": "Stores historical snapshots of the overall national development progress by year, providing data for the 'Vikas Gati Tracker' and year-wise comparisons.",
       "properties": {
-        "schemeId": { "type": "number" },
-        "schemeName": { "type": "string" },
-        "status": { "type": "string" },
-        "timestamp": { "type": "string", "format": "date-time" }
-      }
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the NationalProgressSnapshot entity."
+        },
+        "year": {
+          "type": "number",
+          "description": "The calendar year for which this national progress snapshot is recorded (e.g., 2020, 2021)."
+        },
+        "overallDevelopmentPercentage": {
+          "type": "number",
+          "description": "The calculated overall national development percentage for that specific year."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when this snapshot record was created or last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "year",
+        "overallDevelopmentPercentage",
+        "createdAt"
+      ]
     }
   },
   "auth": {
-    "providers": ["google.com", "password"]
+    "providers": [
+      "password",
+      "anonymous"
+    ]
   },
   "firestore": {
-    "/users/{userId}": {
-      "schema": "UserProfile",
-      "description": "Citizen profile data."
-    },
-    "/feedback": {
-      "schema": "Feedback",
-      "description": "Global feedback stream."
-    },
-    "/polls/{pollId}/votes/{userId}": {
-      "schema": "PollVote",
-      "description": "Individual votes for specific polls."
-    },
-    "/users/{userId}/applications/{appId}": {
-      "schema": "SchemeApplication",
-      "description": "User specific scheme applications."
-    }
+    "structure": [
+      {
+        "path": "/userProfiles/{userId}",
+        "definition": {
+          "entityName": "UserProfile",
+          "schema": {
+            "$ref": "#/backend/entities/UserProfile"
+          },
+          "description": "Stores user profile information. Access is restricted such that users can only read/write their own profiles. Includes the userId in the path for direct ownership checks. Public display name and location details are readable by others.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user, matching request.auth.uid."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/states/{stateId}",
+        "definition": {
+          "entityName": "State",
+          "schema": {
+            "$ref": "#/backend/entities/State"
+          },
+          "description": "Contains static, publicly readable data about Indian states/union territories, including development percentages. Managed by administrators. Fully public read for all authenticated and unauthenticated users.",
+          "params": [
+            {
+              "name": "stateId",
+              "description": "The unique identifier for the State."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/categories/{categoryId}",
+        "definition": {
+          "entityName": "Category",
+          "schema": {
+            "$ref": "#/backend/entities/Category"
+          },
+          "description": "Stores static, publicly readable categories for government schemes. Managed by administrators. Fully public read for all authenticated and unauthenticated users.",
+          "params": [
+            {
+              "name": "categoryId",
+              "description": "The unique identifier for the Category."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/schemes/{schemeId}",
+        "definition": {
+          "entityName": "Scheme",
+          "schema": {
+            "$ref": "#/backend/entities/Scheme"
+          },
+          "description": "Holds details about government schemes (central and state). This collection is publicly readable by all users. Aggregated metrics (upvotes, downvotes, average rating) are denormalized and stored here. Admin-only write access.",
+          "params": [
+            {
+              "name": "schemeId",
+              "description": "The unique identifier for the Scheme."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/userProfiles/{userId}/schemeRatings/{schemeRatingId}",
+        "definition": {
+          "entityName": "SchemeRating",
+          "schema": {
+            "$ref": "#/backend/entities/SchemeRating"
+          },
+          "description": "Stores individual user ratings for schemes. Located as a subcollection under the user's profile for explicit path-based ownership, simplifying authorization rules to `request.auth.uid == userId`. Only the submitting user can create/read/update/delete their own rating. The schemeId and userId are also fields for querying ease (e.g., getting all ratings by a user or for a scheme via collection group queries).",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user who submitted the rating, matching request.auth.uid."
+            },
+            {
+              "name": "schemeRatingId",
+              "description": "The unique identifier for the SchemeRating document."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/userProfiles/{userId}/schemeVotes/{schemeVoteId}",
+        "definition": {
+          "entityName": "SchemeVote",
+          "schema": {
+            "$ref": "#/backend/entities/SchemeVote"
+          },
+          "description": "Records individual user upvotes/downvotes for schemes. Stored as a subcollection under the user's profile for path-based ownership, simplifying authorization. Only the submitting user can create/read/update/delete their own vote. The schemeId and userId are also fields for querying ease.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user who submitted the vote, matching request.auth.uid."
+            },
+            {
+              "name": "schemeVoteId",
+              "description": "The unique identifier for the SchemeVote document."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/schemeFeedback/{schemeFeedbackId}",
+        "definition": {
+          "entityName": "SchemeFeedback",
+          "schema": {
+            "$ref": "#/backend/entities/SchemeFeedback"
+          },
+          "description": "Contains textual feedback from users on schemes. Documents include denormalized 'userId' for ownership checks and 'isApproved' for public visibility. Users can create/read/update/delete their own feedback. Public can only read approved feedback. Admins can manage all feedback and toggle 'isApproved'.",
+          "params": [
+            {
+              "name": "schemeFeedbackId",
+              "description": "The unique identifier for the SchemeFeedback document."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/publicIdeas/{publicIdeaId}",
+        "definition": {
+          "entityName": "PublicIdea",
+          "schema": {
+            "$ref": "#/backend/entities/PublicIdea"
+          },
+          "description": "Stores new ideas submitted by users for government initiatives. Documents include denormalized 'userId' for ownership checks and 'isApproved' for public visibility. Users can create/read/update/delete their own ideas. Public can only read approved ideas. Admins can manage all ideas and toggle 'isApproved'.",
+          "params": [
+            {
+              "name": "publicIdeaId",
+              "description": "The unique identifier for the PublicIdea document."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/polls/{pollId}",
+        "definition": {
+          "entityName": "Poll",
+          "schema": {
+            "$ref": "#/backend/entities/Poll"
+          },
+          "description": "Manages public opinion polls, including questions and status. Publicly readable for active or closed polls. Admin-only write access. Uses 'status' field for explicit state modeling.",
+          "params": [
+            {
+              "name": "pollId",
+              "description": "The unique identifier for the Poll."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/polls/{pollId}/pollOptions/{pollOptionId}",
+        "definition": {
+          "entityName": "PollOption",
+          "schema": {
+            "$ref": "#/backend/entities/PollOption"
+          },
+          "description": "Represents options for a specific poll. Denormalizes 'pollStatus' from the parent Poll document to ensure Authorization Independence, allowing rules to check public readability without a 'get()' call. Publicly readable for options belonging to active or closed polls. Admin-only write access. Total votes are aggregated and denormalized here.",
+          "params": [
+            {
+              "name": "pollId",
+              "description": "The unique identifier of the parent Poll."
+            },
+            {
+              "name": "pollOptionId",
+              "description": "The unique identifier for the PollOption document."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/userProfiles/{userId}/pollVotes/{pollVoteId}",
+        "definition": {
+          "entityName": "PollVote",
+          "schema": {
+            "$ref": "#/backend/entities/PollVote"
+          },
+          "description": "Records individual user votes for poll options. Stored as a subcollection under the user's profile for path-based ownership. Only the submitting user can create/read/update/delete their own vote. The pollOptionId and userId are also fields for querying ease.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user who cast the vote, matching request.auth.uid."
+            },
+            {
+              "name": "pollVoteId",
+              "description": "The unique identifier for the PollVote document."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/nationalProgressSnapshots/{snapshotId}",
+        "definition": {
+          "entityName": "NationalProgressSnapshot",
+          "schema": {
+            "$ref": "#/backend/entities/NationalProgressSnapshot"
+          },
+          "description": "Stores historical data for national development progress by year. This collection is publicly readable by all users. Admin-only write access.",
+          "params": [
+            {
+              "name": "snapshotId",
+              "description": "The unique identifier for the NationalProgressSnapshot document."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/roles_admin/{userId}",
+        "definition": {
+          "entityName": "AdminRole",
+          "schema": {
+            "$ref": "#/backend/entities/UserProfile"
+          },
+          "description": "A dedicated collection for storing administrator roles. The existence of a document at `/roles_admin/{request.auth.uid}` grants administrative privileges, adhering to the DBAC principle and 'existence over content' for role management.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user who holds the administrator role."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed with a strong emphasis on Authorization Independence and adherence to Query As Permissions (QAPs) to ensure robust security rules and efficient data access. \n\n**Authorization Independence:**\n1.  **Path-Based Ownership:** For user-specific data such as `SchemeRating`, `SchemeVote`, and `PollVote`, a hierarchical path structure (`/userProfiles/{userId}/...`) is used. This directly embeds the `userId` in the document path, allowing security rules to atomically check `request.auth.uid == userId` without needing `get()` operations on parent documents or the document itself to verify ownership. This design enables atomic operations and simplifies rule logic.\n2.  **Denormalized Authorization Context:** For `PollOption` documents, which inherently depend on the status of their parent `Poll` for public readability, the `pollStatus` (e.g., 'active', 'closed') is denormalized and stored directly within each `PollOption` document. This eliminates the need for `get()` calls to the parent `Poll` document within security rules, thus ensuring Authorization Independence for `PollOption` access.\n3.  **In-Document Authorization Fields:** For collections like `SchemeFeedback` and `PublicIdea`, which have mixed public (approved) and private (user-owned or unapproved) access, key authorization fields such as `userId` and `isApproved` are directly included in each document. This allows security rules to evaluate access permissions based on the document's own data (`resource.data.userId` and `resource.data.isApproved`) without relying on related documents.\n4.  **DBAC (Database Access Control) for Roles:** Admin roles are implemented using an 'existence over content' model in a dedicated collection (`/roles_admin/{userId}`). A security rule can check for the existence of `get(/databases/$(database)/documents/roles_admin/$(request.auth.uid))` to grant administrative privileges, avoiding custom claims and complex role structures.\n\n**Query As Permissions (QAPs):**\n1.  **Structural Segregation:** Publicly accessible, read-only data (e.g., `State`, `Category`, `Scheme`, `Poll`, `NationalProgressSnapshot`) are placed in top-level collections. Security rules for these collections are straightforward (e.g., `allow read: if true;` or `if resource.data.status == 'active';`), enabling clients to perform `list` queries without rules filtering the results. The rules simply define what *can* be read based on the document's inherent properties, aligning with QAPs.\n2.  **User-Specific Subcollections:** The hierarchical paths (`/userProfiles/{userId}/schemeRatings`, `/userProfiles/{userId}/schemeVotes`, `/userProfiles/{userId}/pollVotes`) inherently enforce QAPs for user-owned data. A user can only `list` documents within their own `/userProfiles/{request.auth.uid}/` path, as this path is authenticated by the `request.auth.uid`, effectively allowing `list` queries without exposing other users' private data.\n3.  **Explicit Client-Side Filtering:** For collections with mixed access (e.g., `SchemeFeedback`, `PublicIdea`), the design mandates that clients explicitly filter by the `isApproved` field when requesting public data (e.g., `where('isApproved', '==', true)`) and by `userId` for their own submissions. The security rules will then validate these explicit filters, preventing situations where rules implicitly filter results and ensuring that any `list` operation requested by the client already adheres to the desired security posture.\n\nThis architecture minimizes rule complexity, enhances debuggability, and provides a clear separation of concerns for data access, supporting the scalability and security needs of the 'Vikas Setu' application."
   }
 }

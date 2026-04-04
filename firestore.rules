@@ -22,7 +22,7 @@ service cloud.firestore {
       allow create, update: if isOwner(userId);
       allow delete: if isAdmin();
 
-      // Applications Vault (Registry)
+      // Scheme Applications Tracking
       match /applications/{appId} {
         allow read, create, update, delete: if isOwner(userId);
       }

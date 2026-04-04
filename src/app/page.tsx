@@ -16,7 +16,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { ShieldCheck, User as UserIcon, Lock, Chrome, Github, ArrowRight, UserCheck } from "lucide-react";
 import Link from "next/link";
 import { useUser, useAuth, useFirestore } from "@/firebase";
-import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, User } from "firebase/auth";
+import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, User, createUserWithEmailAndPassword } from "firebase/auth";
 import { serverTimestamp, doc } from "firebase/firestore";
 import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { useToast } from "@/hooks/use-toast";
@@ -51,11 +51,23 @@ export default function Home() {
     }
     setIsSigningIn(true);
     try {
+      // First try to sign in
       const result = await signInWithEmailAndPassword(auth, email, password);
       syncProfile(result.user);
       toast({ title: "Authorized", description: "Citizen Node successfully synced with Vikas Setu Core." });
     } catch (error: any) {
-      toast({ title: "Protocol Refused", description: error.message, variant: "destructive" });
+      if (error.code === 'auth/user-not-found') {
+        // If user not found, try to create account (Auto-registration flow)
+        try {
+          const result = await createUserWithEmailAndPassword(auth, email, password);
+          syncProfile(result.user);
+          toast({ title: "Node Registered", description: "New Citizen Node created and synchronized." });
+        } catch (regError: any) {
+          toast({ title: "Registration Protocol Failed", description: regError.message, variant: "destructive" });
+        }
+      } else {
+        toast({ title: "Protocol Refused", description: error.message, variant: "destructive" });
+      }
     } finally {
       setIsSigningIn(false);
     }

@@ -60,7 +60,7 @@ export function FeedbackSection() {
     
     try {
       const feedbackRef = collection(db, "schemeFeedback");
-      await addDocumentNonBlocking(feedbackRef, {
+      addDocumentNonBlocking(feedbackRef, {
         schemeId: "general",
         userId: user.uid,
         userName: user.displayName || "Citizen Node",

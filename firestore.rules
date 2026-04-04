@@ -5,32 +5,6 @@
  * This ruleset implements a robust security model for the Vikas Setu application, a platform for 
  * tracking government schemes and fostering citizen engagement. It prioritizes "Authorization 
  * Independence" to ensure performance and "Query As Permissions" (QAPs) for secure data listing.
- * 
- * DATA STRUCTURE:
- * - Public Data: States, Categories, Schemes, and National Progress Snapshots are top-level and 
- *   publicly readable to ensure transparency.
- * - User-Owned Data: Profiles, Ratings, Votes, and Poll participations are nested under 
- *   `/userProfiles/{userId}/` for strict path-based ownership.
- * - Moderated Content: Feedback and Ideas are top-level with mixed access based on 
- *   an 'isApproved' flag or ownership.
- * - Administrative Control: Admin privileges are granted via the existence of a document 
- *   in the `/roles_admin/` collection.
- * 
- * KEY SECURITY DECISIONS:
- * 1. Path-Based Ownership: User-specific subcollections rely on the path `{userId}` matching 
- *    the authenticated UID, avoiding expensive lookups.
- * 2. Denormalization for Authorization: Critical state (like `pollStatus` in `PollOption`) 
- *    is denormalized onto child documents to allow for single-document authorization checks.
- * 3. Database Access Control (DBAC): Admin roles are determined by the presence of a document 
- *    in a dedicated admin collection, ensuring a clean separation of concerns.
- * 4. Mixed Visibility: For feedback and ideas, visibility is granted if the content is 
- *    approved by a moderator OR if the requesting user is the original author.
- * 
- * DENORMALIZATION FOR AUTHORIZATION:
- * - SchemeFeedback & PublicIdea: Contain `userId` to allow owners to manage their own 
- *   unapproved submissions without global read access.
- * - PollOptions: Contain `pollStatus` to allow public reads only when the parent poll 
- *   is 'active' or 'closed', without performing a `get()` on the parent Poll document.
  */
 
 rules_version = '2';
@@ -39,50 +13,48 @@ service cloud.firestore {
 
     // --- GLOBAL HELPER FUNCTIONS ---
 
-    /** Checks if the user is authenticated. */
     function isSignedIn() {
       return request.auth != null;
     }
 
-    /** Checks if the authenticated user matches the provided userId. */
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    /** Checks if the user owns the existing document in the database. */
     function isExistingOwner(userIdField) {
       return isSignedIn() && resource != null && resource.data[userIdField] == request.auth.uid;
     }
 
-    /** Checks if the authenticated user is a registered administrator. */
     function isAdmin() {
       return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
     }
 
     // --- COLLECTION RULES ---
 
-    /**
-     * @description Rules for user profiles. Users can only modify their own profiles. Public can view profiles.
-     * @path /userProfiles/{userId}
-     * @allow (get) Any user can view a profile. (write) Authenticated user matching the ID can create/update.
-     * @deny (list) Listing all users is prohibited to prevent scraping.
-     * @principle Path-based ownership for writes; structural privacy for listing.
-     */
     match /userProfiles/{userId} {
       allow get: if true;
       allow list: if false;
       allow create: if isOwner(userId) && request.resource.data.id == userId;
       allow update: if isOwner(userId) && request.resource.data.id == resource.data.id;
       allow delete: if isAdmin();
+
+      // User's private application subcollection
+      match /applications/{appId} {
+        allow read, create, update, delete: if isOwner(userId);
+      }
+      
+      // User's interactions nested for performance
+      match /schemeRatings/{ratingId} {
+        allow read, create, update, delete: if isOwner(userId);
+      }
+      match /schemeVotes/{voteId} {
+        allow read, create, update, delete: if isOwner(userId);
+      }
+      match /pollVotes/{voteId} {
+        allow read, create, update, delete: if isOwner(userId);
+      }
     }
 
-    /**
-     * @description Publicly readable lookup data managed by administrators.
-     * @path /states/{stateId}, /categories/{categoryId}, /schemes/{schemeId}, /nationalProgressSnapshots/{snapshotId}
-     * @allow (read) Anyone can read. (write) Only administrators.
-     * @deny (write) Any non-admin user.
-     * @principle Public read with admin-only writes for authoritative data.
-     */
     match /states/{stateId} {
       allow read: if true;
       allow create, update, delete: if isAdmin();
@@ -100,30 +72,6 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin();
     }
 
-    /**
-     * @description User-specific interactions (Ratings, Votes) nested for performance.
-     * @path /userProfiles/{userId}/schemeRatings/{id}, /userProfiles/{userId}/schemeVotes/{id}, /userProfiles/{userId}/pollVotes/{id}
-     * @allow (all) The owner of the parent profile can perform any operation.
-     * @deny (all) Any user who is not the owner of the path.
-     * @principle Strict path-based ownership for high-performance atomic authorization.
-     */
-    match /userProfiles/{userId}/schemeRatings/{ratingId} {
-      allow read, create, update, delete: if isOwner(userId);
-    }
-    match /userProfiles/{userId}/schemeVotes/{voteId} {
-      allow read, create, update, delete: if isOwner(userId);
-    }
-    match /userProfiles/{userId}/pollVotes/{voteId} {
-      allow read, create, update, delete: if isOwner(userId);
-    }
-
-    /**
-     * @description Public feedback on schemes. Owners manage their own; public sees approved.
-     * @path /schemeFeedback/{schemeFeedbackId}
-     * @allow (read) Author OR if isApproved is true. (create) Signed in user setting themselves as author.
-     * @deny (update/delete) Non-owners or changing the userId field.
-     * @principle Mixed visibility using in-document ownership and approval flags.
-     */
     match /schemeFeedback/{feedbackId} {
       allow get: if resource.data.isApproved == true || isExistingOwner('userId') || isAdmin();
       allow list: if resource.data.isApproved == true || isExistingOwner('userId') || isAdmin();
@@ -132,13 +80,6 @@ service cloud.firestore {
       allow delete: if isExistingOwner('userId') || isAdmin();
     }
 
-    /**
-     * @description Public ideas submitted by citizens. Owners manage their own; public sees approved.
-     * @path /publicIdeas/{publicIdeaId}
-     * @allow (read) Author OR if isApproved is true. (create) Signed in user setting themselves as author.
-     * @deny (update/delete) Non-owners.
-     * @principle Mixed visibility using in-document ownership and approval flags.
-     */
     match /publicIdeas/{ideaId} {
       allow get: if resource.data.isApproved == true || isExistingOwner('userId') || isAdmin();
       allow list: if resource.data.isApproved == true || isExistingOwner('userId') || isAdmin();
@@ -147,37 +88,16 @@ service cloud.firestore {
       allow delete: if isExistingOwner('userId') || isAdmin();
     }
 
-    /**
-     * @description Public opinion polls. Visibility controlled by 'status'.
-     * @path /polls/{pollId}
-     * @allow (read) Anyone if status is 'active' or 'closed'. (write) Admins only.
-     * @deny (read) Public cannot see 'draft' polls.
-     * @principle State-based visibility modeling.
-     */
     match /polls/{pollId} {
       allow read: if resource.data.status in ['active', 'closed'] || isAdmin();
       allow create, update, delete: if isAdmin();
     }
 
-    /**
-     * @description Options for polls. Visibility inherits from parent poll state via denormalization.
-     * @path /polls/{pollId}/pollOptions/{optionId}
-     * @allow (read) Anyone if denormalized pollStatus is 'active' or 'closed'. (write) Admins only.
-     * @deny (read) Public cannot see options for 'draft' polls.
-     * @principle Authorization Independence through data denormalization.
-     */
     match /polls/{pollId}/pollOptions/{optionId} {
       allow read: if resource.data.pollStatus in ['active', 'closed'] || isAdmin();
       allow create, update, delete: if isAdmin();
     }
 
-    /**
-     * @description Administrative roles storage.
-     * @path /roles_admin/{userId}
-     * @allow (get) Signed in users can check if they are admins.
-     * @deny (write) No one can write via rules; managed via console/service account.
-     * @principle DBAC: Existence of document defines the role.
-     */
     match /roles_admin/{userId} {
       allow get: if isSignedIn();
       allow list, create, update, delete: if false;

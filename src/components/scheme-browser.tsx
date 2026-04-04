@@ -1,4 +1,5 @@
-"use client"
+
+'use client';
 
 import { useState, useMemo } from "react"
 import { Input } from "@/components/ui/input"
@@ -37,11 +38,11 @@ const categories = [
 ]
 
 const allSchemes = [
-  { id: 1, name: "PM Kisan Samman Nidhi", type: "Central", description: "Direct income support of ₹6,000 per year to all landholding farmers' families.", details: "The Pradhan Mantri Kisan Samman Nidhi (PM-KISAN) is a Central Sector Scheme with 100% funding from Government of India. Under the scheme an income support of ₹6,000/- per year in three equal installments will be provided to all landholding farmer families.", tags: ["Agriculture", "Direct Benefit"] },
-  { id: 2, name: "Jal Jeevan Mission", type: "Central", description: "Providing safe and adequate drinking water through individual household tap connections by 2024.", details: "Jal Jeevan Mission, is envisioned to provide safe and adequate drinking water through individual household tap connections by 2024 to all rural households in India.", tags: ["Infrastructure", "Water"] },
-  { id: 3, name: "Digital India Mission", type: "Central", description: "Ensuring government services are made available to citizens electronically.", details: "Digital India is a campaign launched by the Government of India in order to ensure that the Government's services are made available to citizens electronically.", tags: ["Technology", "Connectivity"] },
+  { id: 1, name: "PM Kisan Samman Nidhi", type: "Central", description: "Direct income support of ₹6,000 per year to all landholding farmers' families.", details: "The Pradhan Mantri Kisan Samman Nidhi (PM-KISAN) is a Central Sector Scheme with 100% funding from Government of India.", tags: ["Agriculture", "Direct Benefit"] },
+  { id: 2, name: "Jal Jeevan Mission", type: "Central", description: "Providing safe and adequate drinking water through individual household tap connections by 2024.", details: "Jal Jeevan Mission, is envisioned to provide safe and adequate drinking water through individual household tap connections.", tags: ["Infrastructure", "Water"] },
+  { id: 3, name: "Digital India Mission", type: "Central", description: "Ensuring government services are made available to citizens electronically.", details: "Digital India is a campaign launched by the Government of India in order to ensure that services are made available electronically.", tags: ["Technology", "Connectivity"] },
   { id: 4, name: "Ladki Bahin Yojana", type: "Maharashtra", description: "Financial assistance program for women empowerment in Maharashtra.", details: "The Majhi Ladki Bahin Yojana is a flagship scheme of the Maharashtra Government aimed at providing monthly financial assistance to women.", tags: ["Women", "State"] },
-  { id: 5, name: "Ayushman Bharat", type: "Central", description: "World's largest healthcare program providing coverage of ₹5 lakh per family.", details: "Ayushman Bharat - PM-JAY, is a flagship scheme to provide cashless secondary and tertiary care treatment up to ₹5 lakh per family per year.", tags: ["Health", "Insurance"] },
+  { id: 5, name: "Ayushman Bharat", type: "Central", description: "World's largest healthcare program providing coverage of ₹5 lakh per family.", details: "Ayushman Bharat - PM-JAY, is a flagship scheme to provide cashless secondary and tertiary care treatment.", tags: ["Health", "Insurance"] },
   { id: 6, name: "PM Awas Yojana", type: "Central", description: "Housing for All initiative ensuring every family has a pucca house with basic amenities.", details: "Pradhan Mantri Awas Yojana (PMAY) is an initiative by the Government of India in which affordable housing will be provided to the poor.", tags: ["Housing", "Infrastructure"] },
 ]
 
@@ -69,7 +70,7 @@ export function SchemeBrowser() {
 
   const handleVoiceSearch = () => {
     if (!('webkitSpeechRecognition' in window)) {
-      toast({ variant: "destructive", title: "Protocol Error", description: "Voice recognition not supported in this terminal." });
+      toast({ variant: "destructive", title: "Protocol Error", description: "Voice recognition not supported." });
       return;
     }
     const recognition = new (window as any).webkitSpeechRecognition();
@@ -91,10 +92,11 @@ export function SchemeBrowser() {
     if (!db) return;
     
     setIsApplying(id);
-    const appRef = collection(db, "users", user.uid, "applications");
+    // Updated path to userProfiles subcollection
+    const appRef = collection(db, "userProfiles", user.uid, "applications");
     
     addDoc(appRef, {
-      schemeId: id,
+      schemeId: String(id),
       schemeName: name,
       status: "Submitted",
       timestamp: serverTimestamp()
@@ -102,12 +104,12 @@ export function SchemeBrowser() {
       setIsApplying(null);
       toast({
         title: "Application Logged",
-        description: `Your intent for ${name} has been synchronized with the national registry.`,
+        description: `Your intent for ${name} has been synchronized.`,
       });
     }).catch(async (e) => {
       setIsApplying(null);
       errorEmitter.emit('permission-error', new FirestorePermissionError({
-        path: `users/${user.uid}/applications`,
+        path: `userProfiles/${user.uid}/applications`,
         operation: 'create',
         requestResourceData: { schemeName: name }
       }));

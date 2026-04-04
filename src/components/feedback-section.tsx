@@ -1,5 +1,5 @@
 
-"use client"
+'use client';
 
 import { useState } from "react"
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
@@ -28,9 +28,10 @@ export function FeedbackSection() {
 
   const feedbackQuery = useMemoFirebase(() => {
     if (!db) return null;
-    return query(collection(db, "feedback"), orderBy("timestamp", "desc"), limit(10));
+    // Updated path to schemeFeedback from backend.json
+    return query(collection(db, "schemeFeedback"), orderBy("createdAt", "desc"), limit(10));
   }, [db]);
-  const { data: feedbackItems, loading: feedbackLoading } = useCollection(feedbackQuery);
+  const { data: feedbackItems, isLoading: feedbackLoading } = useCollection(feedbackQuery);
 
   const handleVote = () => {
     if (!user) {
@@ -38,18 +39,20 @@ export function FeedbackSection() {
       return;
     }
     if (!db) return;
-    const voteRef = doc(db, "polls", "day-poll", "votes", user.uid);
+    // Updated path to userProfiles pollVotes
+    const voteRef = doc(db, "userProfiles", user.uid, "pollVotes", "day-poll");
     setDoc(voteRef, {
-      optionId: pollValue,
+      id: "day-poll",
+      pollOptionId: pollValue,
       userId: user.uid,
-      timestamp: serverTimestamp()
-    }).then(() => {
+      createdAt: serverTimestamp()
+    }, { merge: true }).then(() => {
       toast({ title: "Vote Synchronized", description: "Opinion node registered." });
     }).catch(async (e) => {
       errorEmitter.emit('permission-error', new FirestorePermissionError({
         path: voteRef.path,
         operation: 'write',
-        requestResourceData: { optionId: pollValue }
+        requestResourceData: { pollOptionId: pollValue }
       }));
     });
   }
@@ -63,24 +66,24 @@ export function FeedbackSection() {
     if (!db) return;
     setIsSending(true)
     
-    const feedbackRef = collection(db, "feedback");
+    // Aligned with schemeFeedback schema in backend.json
+    const feedbackRef = collection(db, "schemeFeedback");
     addDoc(feedbackRef, {
-      userName: user.displayName || "Anonymous Citizen",
-      location: "Bharat",
-      text: feedback,
-      rating: 5,
-      timestamp: serverTimestamp(),
-      userId: user.uid
+      schemeId: "general", // General feedback node
+      userId: user.uid,
+      comment: feedback,
+      createdAt: serverTimestamp(),
+      isApproved: false // Admin will moderate
     }).then(() => {
       setIsSending(false)
       setFeedback("")
-      toast({ title: "Feedback Logged", description: "Your data node has been added to the public stream." });
+      toast({ title: "Feedback Logged", description: "Your data node has been added to the stream for moderation." });
     }).catch(async (e) => {
       setIsSending(false)
       errorEmitter.emit('permission-error', new FirestorePermissionError({
-        path: 'feedback',
+        path: 'schemeFeedback',
         operation: 'create',
-        requestResourceData: { text: feedback }
+        requestResourceData: { comment: feedback }
       }));
     });
   }
@@ -91,7 +94,7 @@ export function FeedbackSection() {
         <div className="text-center space-y-6">
           <Badge className="bg-primary text-black px-6 py-2 text-xs font-black uppercase tracking-[0.3em] rounded-full">CITIZEN FEEDBACK LOOP</Badge>
           <h2 className="text-5xl font-black font-headline text-white tracking-tighter uppercase">{t('section_feedback_title')}</h2>
-          <p className="text-white/40 max-w-2xl mx-auto font-medium">Every citizen is a sensor. Your pulse shapes the national trajectory. Input your data below.</p>
+          <p className="text-white/40 max-w-2xl mx-auto font-medium">Every citizen is a sensor. Your pulse shapes the national trajectory.</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-stretch">
@@ -148,22 +151,17 @@ export function FeedbackSection() {
                       <div className="flex justify-between items-start">
                         <div className="flex items-center gap-4">
                           <div className="w-14 h-14 rounded-2xl bg-primary text-black flex items-center justify-center text-xl font-black shadow-[0_0_20px_rgba(7,241,214,0.3)]">
-                            {item.userName.charAt(0)}
+                            {item.userId?.charAt(0) || "C"}
                           </div>
                           <div>
-                            <p className="font-black text-white text-lg">{item.userName}</p>
-                            <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">{item.location} • LIVE DATA</p>
+                            <p className="font-black text-white text-lg">Citizen Node</p>
+                            <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">LIVE FEED • {item.createdAt?.toDate().toLocaleDateString()}</p>
                           </div>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          {[...Array(5)].map((_, star) => (
-                            <Star key={star} className={`w-4 h-4 interactive-icon ${star < (item.rating || 5) ? 'text-primary fill-primary' : 'text-white/10'}`} />
-                          ))}
                         </div>
                       </div>
                       <div className="relative pl-8">
                         <Quote className="absolute top-0 left-0 w-5 h-5 text-primary/20 interactive-icon" />
-                        <p className="text-white/60 italic font-medium text-lg leading-relaxed group-hover:text-white/90 transition-colors">"{item.text}"</p>
+                        <p className="text-white/60 italic font-medium text-lg leading-relaxed group-hover:text-white/90 transition-colors">"{item.comment}"</p>
                       </div>
                     </div>
                   ))) : (

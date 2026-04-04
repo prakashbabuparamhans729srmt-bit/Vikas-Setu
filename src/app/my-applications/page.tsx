@@ -1,5 +1,5 @@
 
-"use client"
+'use client';
 
 import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase"
 import { collection, query, orderBy } from "firebase/firestore"
@@ -12,21 +12,30 @@ import { redirect } from "next/navigation"
 import { cn } from "@/lib/utils"
 
 export default function MyApplicationsPage() {
-  const { user, loading: authLoading } = useUser()
+  const { user, isUserLoading: authLoading } = useUser()
   const db = useFirestore()
 
   const applicationsQuery = useMemoFirebase(() => {
     if (!db || !user) return null;
+    // Updated path to match userProfiles subcollection
     return query(
-      collection(db, "users", user.uid, "applications"),
+      collection(db, "userProfiles", user.uid, "applications"),
       orderBy("timestamp", "desc")
     );
   }, [db, user]);
 
-  const { data: applications, loading: dataLoading } = useCollection(applicationsQuery);
+  const { data: applications, isLoading: dataLoading } = useCollection(applicationsQuery);
 
-  if (authLoading) return null;
-  if (!user) redirect("/");
+  if (authLoading) return (
+    <div className="min-h-screen bg-[#070707] flex items-center justify-center">
+      <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  );
+  
+  if (!user) {
+    redirect("/");
+    return null;
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-[#070707]">

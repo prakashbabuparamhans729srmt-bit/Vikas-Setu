@@ -24,6 +24,18 @@
       "description": "Digital technology in rural India",
       "imageUrl": "https://picsum.photos/seed/digital/400/300",
       "imageHint": "digital india"
+    },
+    {
+      "id": "scheme-women",
+      "description": "Empowered Indian women in a workspace",
+      "imageUrl": "https://picsum.photos/seed/women-empowerment/400/300",
+      "imageHint": "women empowerment"
+    },
+    {
+      "id": "scheme-health",
+      "description": "Modern healthcare facility in India",
+      "imageUrl": "https://picsum.photos/seed/health-india/400/300",
+      "imageHint": "healthcare india"
     }
   ]
 }

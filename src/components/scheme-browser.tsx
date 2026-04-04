@@ -93,6 +93,7 @@ export function SchemeBrowser() {
     setIsApplying(id);
     const appRef = collection(db, "userProfiles", user.uid, "applications");
     
+    // Resource Application Registry Protocol (Non-Blocking)
     addDocumentNonBlocking(appRef, {
       schemeId: String(id),
       schemeName: name,

@@ -12,9 +12,10 @@ import { redirect } from "next/navigation"
 import { cn } from "@/lib/utils"
 
 export default function MyApplicationsPage() {
-  const { user, loading: authLoading } = useUser()
+  const { user, isUserLoading } = useUser()
   const db = useFirestore()
 
+  // National Progress Vault Registry Query
   const applicationsQuery = useMemoFirebase(() => {
     if (!db || !user) return null;
     return query(
@@ -25,7 +26,7 @@ export default function MyApplicationsPage() {
 
   const { data: applications, isLoading: dataLoading } = useCollection(applicationsQuery);
 
-  if (authLoading) return (
+  if (isUserLoading) return (
     <div className="min-h-screen bg-[#070707] flex items-center justify-center">
       <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
     </div>

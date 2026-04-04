@@ -31,6 +31,7 @@ export default function Home() {
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [isGuest, setIsGuest] = useState(false);
 
+  // Identity Node Synchronization Protocol
   const syncProfile = (u: User) => {
     if (!db) return;
     const userRef = doc(db, "userProfiles", u.uid);
@@ -87,11 +88,13 @@ export default function Home() {
   if (!user && !isGuest) {
     return (
       <div className="min-h-screen bg-[#070707] flex items-center justify-center p-4 relative overflow-hidden">
+        {/* Background Neon Effects */}
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[120px] animate-pulse" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-secondary/5 rounded-full blur-[120px] animate-pulse" />
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
 
         <Card className="w-full max-w-md bg-[#14181B]/80 backdrop-blur-2xl border-white/5 shadow-2xl rounded-[2.5rem] relative z-10 overflow-hidden">
+          {/* Top Tricolor Accent */}
           <div className="absolute top-0 left-0 w-full h-1 flex">
             <div className="flex-1 bg-[#F71F26]" />
             <div className="flex-1 bg-white" />
@@ -192,6 +195,8 @@ export default function Home() {
         <SchemeBrowser />
         <FeedbackSection />
         <ImpactDashboard />
+        
+        {/* Call to Action Section */}
         <section className="py-24 bg-primary relative overflow-hidden">
            <div className="container mx-auto px-4 relative z-10 text-center space-y-8">
               <h2 className="text-4xl md:text-6xl font-black font-headline text-black tracking-tighter uppercase italic">

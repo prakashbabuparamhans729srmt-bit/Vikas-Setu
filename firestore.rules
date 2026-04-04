@@ -22,10 +22,12 @@ service cloud.firestore {
       allow create, update: if isOwner(userId);
       allow delete: if isAdmin();
 
+      // Applications Vault (Registry)
       match /applications/{appId} {
         allow read, create, update, delete: if isOwner(userId);
       }
       
+      // Personal Ratings and Votes
       match /schemeRatings/{ratingId} {
         allow read, create, update, delete: if isOwner(userId);
       }
@@ -46,14 +48,14 @@ service cloud.firestore {
       allow update, delete: if isOwner(resource.data.userId) || isAdmin();
     }
 
-    // Public Ideas
+    // Public Ideas (Innovation Proposals)
     match /publicIdeas/{publicIdeaId} {
       allow read: if true;
       allow create: if isSignedIn();
       allow update, delete: if isOwner(resource.data.userId) || isAdmin();
     }
 
-    // Static Collections
+    // Global Static Collections
     match /schemes/{schemeId} {
       allow read: if true;
       allow write: if isAdmin();
@@ -69,7 +71,7 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // Polls
+    // Polls Engine
     match /polls/{pollId} {
       allow read: if true;
       allow write: if isAdmin();
@@ -86,7 +88,7 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // Admin Roles
+    // Admin Roles Registry
     match /roles_admin/{userId} {
       allow get: if isSignedIn();
     }

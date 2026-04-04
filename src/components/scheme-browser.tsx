@@ -108,6 +108,7 @@ export function SchemeBrowser() {
           }, 800);
     }).catch(() => {
         setIsApplying(null);
+        toast({ title: "Protocol Failed", description: "Failed to log application in the vault.", variant: "destructive" });
     });
   };
 
@@ -177,6 +178,7 @@ export function SchemeBrowser() {
                     src={`https://picsum.photos/seed/scheme-${scheme.id}/600/400`} 
                     className="w-full h-full object-cover opacity-60 grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700" 
                     alt={scheme.name}
+                    data-ai-hint="indian government"
                   />
                   <Badge className="absolute top-4 right-4 bg-background/80 border border-border text-foreground backdrop-blur-md uppercase text-[10px] font-black tracking-widest">{scheme.type}</Badge>
                   <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-60" />

@@ -34,13 +34,12 @@ export default function Home() {
 
   const syncProfile = (u: User) => {
     if (!db) return;
-    // Updated path to match backend.json userProfiles
     const userRef = doc(db, "userProfiles", u.uid);
     setDoc(userRef, {
       id: u.uid,
       displayName: u.displayName || "Citizen Node",
       email: u.email,
-      stateId: "IN-DL", // Defaulting to Delhi for sync
+      stateId: "IN-DL",
       city: "New Delhi",
       createdAt: serverTimestamp(),
     }, { merge: true }).catch(async (e) => {
@@ -82,7 +81,7 @@ export default function Home() {
 
   const handleGuestEntry = () => {
     setIsGuest(true);
-    toast({ title: "Guest Access", description: "Limited observational protocol enabled. Sign in for full features." });
+    toast({ title: "Guest Access", description: "Limited observational protocol enabled." });
   }
 
   if (authLoading) {

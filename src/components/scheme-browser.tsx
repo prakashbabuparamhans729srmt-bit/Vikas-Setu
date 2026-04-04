@@ -92,7 +92,6 @@ export function SchemeBrowser() {
     if (!db) return;
     
     setIsApplying(id);
-    // Updated path to userProfiles subcollection
     const appRef = collection(db, "userProfiles", user.uid, "applications");
     
     addDoc(appRef, {

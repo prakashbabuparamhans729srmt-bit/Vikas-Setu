@@ -1,17 +1,7 @@
-/**
- * VIKAS SETU - FIRESTORE SECURITY RULES
- * 
- * CORE PHILOSOPHY:
- * This ruleset implements a robust security model for the Vikas Setu application, a platform for 
- * tracking government schemes and fostering citizen engagement. It prioritizes "Authorization 
- * Independence" to ensure performance and "Query As Permissions" (QAPs) for secure data listing.
- */
 
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // --- GLOBAL HELPER FUNCTIONS ---
 
     function isSignedIn() {
       return request.auth != null;
@@ -21,29 +11,20 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    function isExistingOwner(userIdField) {
-      return isSignedIn() && resource != null && resource.data[userIdField] == request.auth.uid;
-    }
-
     function isAdmin() {
       return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
     }
 
-    // --- COLLECTION RULES ---
-
     match /userProfiles/{userId} {
       allow get: if true;
-      allow list: if false;
-      allow create: if isOwner(userId) && request.resource.data.id == userId;
-      allow update: if isOwner(userId) && request.resource.data.id == resource.data.id;
+      allow list: if isAdmin();
+      allow create, update: if isOwner(userId);
       allow delete: if isAdmin();
 
-      // User's private application subcollection
       match /applications/{appId} {
         allow read, create, update, delete: if isOwner(userId);
       }
       
-      // User's interactions nested for performance
       match /schemeRatings/{ratingId} {
         allow read, create, update, delete: if isOwner(userId);
       }
@@ -55,52 +36,19 @@ service cloud.firestore {
       }
     }
 
-    match /states/{stateId} {
-      allow read: if true;
-      allow create, update, delete: if isAdmin();
-    }
-    match /categories/{categoryId} {
-      allow read: if true;
-      allow create, update, delete: if isAdmin();
-    }
-    match /schemes/{schemeId} {
-      allow read: if true;
-      allow create, update, delete: if isAdmin();
-    }
-    match /nationalProgressSnapshots/{snapshotId} {
-      allow read: if true;
-      allow create, update, delete: if isAdmin();
-    }
-
     match /schemeFeedback/{feedbackId} {
-      allow get: if resource.data.isApproved == true || isExistingOwner('userId') || isAdmin();
-      allow list: if resource.data.isApproved == true || isExistingOwner('userId') || isAdmin();
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update: if (isExistingOwner('userId') && request.resource.data.userId == resource.data.userId) || isAdmin();
-      allow delete: if isExistingOwner('userId') || isAdmin();
-    }
-
-    match /publicIdeas/{ideaId} {
-      allow get: if resource.data.isApproved == true || isExistingOwner('userId') || isAdmin();
-      allow list: if resource.data.isApproved == true || isExistingOwner('userId') || isAdmin();
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update: if (isExistingOwner('userId') && request.resource.data.userId == resource.data.userId) || isAdmin();
-      allow delete: if isExistingOwner('userId') || isAdmin();
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if (resource.data.userId == request.auth.uid) || isAdmin();
     }
 
     match /polls/{pollId} {
-      allow read: if resource.data.status in ['active', 'closed'] || isAdmin();
-      allow create, update, delete: if isAdmin();
-    }
-
-    match /polls/{pollId}/pollOptions/{optionId} {
-      allow read: if resource.data.pollStatus in ['active', 'closed'] || isAdmin();
-      allow create, update, delete: if isAdmin();
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
     match /roles_admin/{userId} {
       allow get: if isSignedIn();
-      allow list, create, update, delete: if false;
     }
   }
 }

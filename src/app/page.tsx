@@ -17,10 +17,9 @@ import { ShieldCheck, User as UserIcon, Lock, Chrome, Github, ArrowRight, UserCh
 import Link from "next/link";
 import { useUser, useAuth, useFirestore } from "@/firebase";
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, User } from "firebase/auth";
-import { setDoc, doc, serverTimestamp } from "firebase/firestore";
+import { serverTimestamp, doc } from "firebase/firestore";
+import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { useToast } from "@/hooks/use-toast";
-import { errorEmitter } from "@/firebase/error-emitter";
-import { FirestorePermissionError } from "@/firebase/errors";
 
 export default function Home() {
   const { user, loading: authLoading } = useUser();
@@ -35,20 +34,14 @@ export default function Home() {
   const syncProfile = (u: User) => {
     if (!db) return;
     const userRef = doc(db, "userProfiles", u.uid);
-    setDoc(userRef, {
+    setDocumentNonBlocking(userRef, {
       id: u.uid,
       displayName: u.displayName || "Citizen Node",
       email: u.email,
       stateId: "IN-DL",
       city: "New Delhi",
       createdAt: serverTimestamp(),
-    }, { merge: true }).catch(async (e) => {
-      errorEmitter.emit('permission-error', new FirestorePermissionError({
-        path: userRef.path,
-        operation: 'write',
-        requestResourceData: { id: u.uid }
-      }));
-    });
+    }, { merge: true });
   }
 
   const handleAuthorize = async () => {
@@ -60,7 +53,7 @@ export default function Home() {
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
       syncProfile(result.user);
-      toast({ title: "Authorized", description: "Identity node synchronized." });
+      toast({ title: "Authorized", description: "Identity node synchronized with Vikas Setu Core." });
     } catch (error: any) {
       toast({ title: "Authorization Failed", description: error.message, variant: "destructive" });
     } finally {
@@ -73,7 +66,7 @@ export default function Home() {
     try {
       const result = await signInWithPopup(auth, provider);
       syncProfile(result.user);
-      toast({ title: "Authorized", description: "Google node synchronized." });
+      toast({ title: "Authorized", description: "Google node synchronized with Vikas Setu Core." });
     } catch (error: any) {
       toast({ title: "Authorization Failed", description: error.message, variant: "destructive" });
     }
@@ -81,7 +74,7 @@ export default function Home() {
 
   const handleGuestEntry = () => {
     setIsGuest(true);
-    toast({ title: "Guest Access", description: "Limited observational protocol enabled." });
+    toast({ title: "Guest Access", description: "Limited observational protocol enabled. Apply features restricted." });
   }
 
   if (authLoading) {

@@ -11,9 +11,8 @@ import { useLanguage } from "@/context/language-context"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 import { useFirestore, useUser } from "@/firebase"
-import { collection, addDoc, serverTimestamp } from "firebase/firestore"
-import { errorEmitter } from "@/firebase/error-emitter"
-import { FirestorePermissionError } from "@/firebase/errors"
+import { collection, serverTimestamp, doc } from "firebase/firestore"
+import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates"
 import {
   Dialog,
   DialogContent,
@@ -94,25 +93,21 @@ export function SchemeBrowser() {
     setIsApplying(id);
     const appRef = collection(db, "userProfiles", user.uid, "applications");
     
-    addDoc(appRef, {
+    addDocumentNonBlocking(appRef, {
       schemeId: String(id),
       schemeName: name,
       status: "Submitted",
       timestamp: serverTimestamp()
-    }).then(() => {
+    });
+
+    // We don't wait for the promise to resolve to keep it snappy
+    setTimeout(() => {
       setIsApplying(null);
       toast({
         title: "Application Logged",
-        description: `Your intent for ${name} has been synchronized.`,
+        description: `Your intent for ${name} has been synchronized with the national infrastructure.`,
       });
-    }).catch(async (e) => {
-      setIsApplying(null);
-      errorEmitter.emit('permission-error', new FirestorePermissionError({
-        path: `userProfiles/${user.uid}/applications`,
-        operation: 'create',
-        requestResourceData: { schemeName: name }
-      }));
-    });
+    }, 500);
   };
 
   return (

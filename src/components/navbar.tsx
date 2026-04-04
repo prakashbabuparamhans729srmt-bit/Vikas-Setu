@@ -1,13 +1,13 @@
 
-"use client"
+'use client';
 
-import Link from "next/link"
-import { User, Bell, Globe, Check, Settings, Sparkles, LogOut, FileText } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { useState } from "react"
-import { cn } from "@/lib/utils"
-import { useLanguage } from "@/context/language-context"
-import { LANGUAGES } from "@/lib/translations"
+import Link from "next/link";
+import { User, Bell, Globe, Check, Settings, Sparkles, LogOut, FileText } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
+import { useLanguage } from "@/context/language-context";
+import { LANGUAGES } from "@/lib/translations";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,17 +15,17 @@ import {
   DropdownMenuTrigger,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { useToast } from "@/hooks/use-toast"
-import { useAuth, useUser } from "@/firebase"
-import { signOut } from "firebase/auth"
+} from "@/components/ui/dropdown-menu";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth, useUser } from "@/firebase";
+import { signOut } from "firebase/auth";
 
 export function Navbar() {
-  const { t, language, setLanguage } = useLanguage()
-  const auth = useAuth()
-  const { user } = useUser()
-  const { toast } = useToast()
+  const { t, language, setLanguage } = useLanguage();
+  const auth = useAuth();
+  const { user } = useUser();
+  const { toast } = useToast();
 
   const navItems = [
     { name: t('nav_home'), id: 'home', href: '/' },

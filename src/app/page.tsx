@@ -1,36 +1,36 @@
 
-"use client"
+'use client';
 
-import { useState } from "react"
-import { Navbar } from "@/components/navbar"
-import { Hero } from "@/components/hero"
-import { SchemeBrowser } from "@/components/scheme-browser"
-import { FeedbackSection } from "@/components/feedback-section"
-import { IndiaMap } from "@/components/india-map"
-import { ImpactDashboard } from "@/components/impact-dashboard"
-import { Footer } from "@/components/footer"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { ShieldCheck, User as UserIcon, Lock, Chrome, Github, ArrowRight, UserCheck } from "lucide-react"
-import Link from "next/link"
-import { useUser, useAuth, useFirestore } from "@/firebase"
-import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, User } from "firebase/auth"
-import { setDoc, doc, serverTimestamp } from "firebase/firestore"
-import { useToast } from "@/hooks/use-toast"
-import { errorEmitter } from "@/firebase/error-emitter"
-import { FirestorePermissionError } from "@/firebase/errors"
+import { useState } from "react";
+import { Navbar } from "@/components/navbar";
+import { Hero } from "@/components/hero";
+import { SchemeBrowser } from "@/components/scheme-browser";
+import { FeedbackSection } from "@/components/feedback-section";
+import { IndiaMap } from "@/components/india-map";
+import { ImpactDashboard } from "@/components/impact-dashboard";
+import { Footer } from "@/components/footer";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { ShieldCheck, User as UserIcon, Lock, Chrome, Github, ArrowRight, UserCheck } from "lucide-react";
+import Link from "next/link";
+import { useUser, useAuth, useFirestore } from "@/firebase";
+import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, User } from "firebase/auth";
+import { setDoc, doc, serverTimestamp } from "firebase/firestore";
+import { useToast } from "@/hooks/use-toast";
+import { errorEmitter } from "@/firebase/error-emitter";
+import { FirestorePermissionError } from "@/firebase/errors";
 
 export default function Home() {
-  const { user, loading: authLoading } = useUser()
-  const auth = useAuth()
-  const db = useFirestore()
-  const { toast } = useToast()
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [isSigningIn, setIsSigningIn] = useState(false)
-  const [isGuest, setIsGuest] = useState(false)
+  const { user, loading: authLoading } = useUser();
+  const auth = useAuth();
+  const db = useFirestore();
+  const { toast } = useToast();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isSigningIn, setIsSigningIn] = useState(false);
+  const [isGuest, setIsGuest] = useState(false);
 
   const syncProfile = (u: User) => {
     if (!db) return;

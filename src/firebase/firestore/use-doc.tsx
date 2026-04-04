@@ -20,6 +20,7 @@ export function useDoc<T = DocumentData>(docRef: DocumentReference<T> | null) {
   useEffect(() => {
     if (!docRef) {
       setLoading(false);
+      setData(null);
       return;
     }
 

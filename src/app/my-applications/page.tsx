@@ -66,7 +66,7 @@ export default function MyApplicationsPage() {
                     <div>
                       <h3 className="text-xl font-black text-white uppercase tracking-tighter group-hover:text-primary transition-colors">{app.schemeName}</h3>
                       <p className="text-xs text-white/40 font-bold uppercase tracking-widest flex items-center gap-2 mt-1">
-                        <Clock className="w-3 h-3" /> Submitted: {app.timestamp?.toDate().toLocaleDateString()}
+                        <Clock className="w-3 h-3" /> Submitted: {app.timestamp?.toDate()?.toLocaleDateString() || "Processing..."}
                       </p>
                     </div>
                   </div>

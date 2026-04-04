@@ -91,7 +91,6 @@ export function SchemeBrowser() {
     if (!db) return;
     
     setIsApplying(id);
-    // Create a deterministic ID for the application to prevent duplicates
     const appRef = doc(db, "userProfiles", user.uid, "applications", `app-${id}`);
     
     setDocumentNonBlocking(appRef, {

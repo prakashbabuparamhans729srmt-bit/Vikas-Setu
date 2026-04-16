@@ -110,6 +110,7 @@ export function SchemeBrowser() {
       id: appId,
       schemeId: id,
       schemeName: name,
+      userId: user.uid,
       status: "Submitted",
       timestamp: serverTimestamp()
     }, { merge: true });

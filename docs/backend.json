@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "UserProfile": {
@@ -34,6 +35,21 @@
         "stateId",
         "createdAt"
       ]
+    },
+    "SchemeApplication": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "SchemeApplication",
+      "type": "object",
+      "description": "Records a user's intent to apply for a specific government scheme, stored in their personal registry for tracking.",
+      "properties": {
+        "id": { "type": "string" },
+        "schemeId": { "type": "string" },
+        "schemeName": { "type": "string" },
+        "userId": { "type": "string" },
+        "status": { "type": "string", "enum": ["Submitted", "Processing", "Verified", "Rejected"] },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "schemeId", "schemeName", "userId", "status", "timestamp"]
     },
     "State": {
       "$schema": "http://json-schema.org/draft-07/schema#",
@@ -479,7 +495,8 @@
   "auth": {
     "providers": [
       "password",
-      "anonymous"
+      "anonymous",
+      "google.com"
     ]
   },
   "firestore": {
@@ -497,6 +514,20 @@
               "name": "userId",
               "description": "The unique identifier of the user, matching request.auth.uid."
             }
+          ]
+        }
+      },
+      {
+        "path": "/userProfiles/{userId}/applications/{applicationId}",
+        "definition": {
+          "entityName": "SchemeApplication",
+          "schema": {
+            "$ref": "#/backend/entities/SchemeApplication"
+          },
+          "description": "Stores individual scheme applications for a user.",
+          "params": [
+            { "name": "userId", "description": "The user ID." },
+            { "name": "applicationId", "description": "The app ID." }
           ]
         }
       },
@@ -708,7 +739,6 @@
           ]
         }
       }
-    ],
-    "reasoning": "The Firestore structure is designed with a strong emphasis on Authorization Independence and adherence to Query As Permissions (QAPs) to ensure robust security rules and efficient data access. \n\n**Authorization Independence:**\n1.  **Path-Based Ownership:** For user-specific data such as `SchemeRating`, `SchemeVote`, and `PollVote`, a hierarchical path structure (`/userProfiles/{userId}/...`) is used. This directly embeds the `userId` in the document path, allowing security rules to atomically check `request.auth.uid == userId` without needing `get()` operations on parent documents or the document itself to verify ownership. This design enables atomic operations and simplifies rule logic.\n2.  **Denormalized Authorization Context:** For `PollOption` documents, which inherently depend on the status of their parent `Poll` for public readability, the `pollStatus` (e.g., 'active', 'closed') is denormalized and stored directly within each `PollOption` document. This eliminates the need for `get()` calls to the parent `Poll` document within security rules, thus ensuring Authorization Independence for `PollOption` access.\n3.  **In-Document Authorization Fields:** For collections like `SchemeFeedback` and `PublicIdea`, which have mixed public (approved) and private (user-owned or unapproved) access, key authorization fields such as `userId` and `isApproved` are directly included in each document. This allows security rules to evaluate access permissions based on the document's own data (`resource.data.userId` and `resource.data.isApproved`) without relying on related documents.\n4.  **DBAC (Database Access Control) for Roles:** Admin roles are implemented using an 'existence over content' model in a dedicated collection (`/roles_admin/{userId}`). A security rule can check for the existence of `get(/databases/$(database)/documents/roles_admin/$(request.auth.uid))` to grant administrative privileges, avoiding custom claims and complex role structures.\n\n**Query As Permissions (QAPs):**\n1.  **Structural Segregation:** Publicly accessible, read-only data (e.g., `State`, `Category`, `Scheme`, `Poll`, `NationalProgressSnapshot`) are placed in top-level collections. Security rules for these collections are straightforward (e.g., `allow read: if true;` or `if resource.data.status == 'active';`), enabling clients to perform `list` queries without rules filtering the results. The rules simply define what *can* be read based on the document's inherent properties, aligning with QAPs.\n2.  **User-Specific Subcollections:** The hierarchical paths (`/userProfiles/{userId}/schemeRatings`, `/userProfiles/{userId}/schemeVotes`, `/userProfiles/{userId}/pollVotes`) inherently enforce QAPs for user-owned data. A user can only `list` documents within their own `/userProfiles/{request.auth.uid}/` path, as this path is authenticated by the `request.auth.uid`, effectively allowing `list` queries without exposing other users' private data.\n3.  **Explicit Client-Side Filtering:** For collections with mixed access (e.g., `SchemeFeedback`, `PublicIdea`), the design mandates that clients explicitly filter by the `isApproved` field when requesting public data (e.g., `where('isApproved', '==', true)`) and by `userId` for their own submissions. The security rules will then validate these explicit filters, preventing situations where rules implicitly filter results and ensuring that any `list` operation requested by the client already adheres to the desired security posture.\n\nThis architecture minimizes rule complexity, enhances debuggability, and provides a clear separation of concerns for data access, supporting the scalability and security needs of the 'Vikas Setu' application."
+    ]
   }
 }

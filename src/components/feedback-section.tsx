@@ -26,6 +26,11 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 
+/**
+ * @fileOverview जनता की राय (Citizen Pulse)
+ * नागरिक यहाँ पोल में भाग ले सकते हैं, फीडबैक दे सकते हैं और नए इनोवेशन प्रस्ताव सबमिट कर सकते हैं।
+ */
+
 export function FeedbackSection() {
   const { t } = useLanguage()
   const { user } = useUser()

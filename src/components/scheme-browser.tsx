@@ -23,6 +23,11 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 
+/**
+ * @fileOverview योजना ब्राउज़र (Scheme Browser)
+ * नागरिक यहाँ सभी उपलब्ध सरकारी योजनाओं को खोज और आवेदन (Apply) कर सकते हैं।
+ */
+
 const categories = [
   { name: "All Yojanaye", count: 5300, icon: "✅" },
   { name: "Central Sarkar", count: 1200, icon: "🏛️" },

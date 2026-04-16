@@ -13,6 +13,11 @@ import { redirect } from "next/navigation"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 
+/**
+ * @fileOverview नेशनल रजिस्ट्री ट्रैकिंग (National Registry Tracking)
+ * यहाँ नागरिक अपने 'ग्रोथ वॉल्ट' में जमा किए गए सभी योजना आवेदनों को देख सकते हैं।
+ */
+
 export default function MyApplicationsPage() {
   const { user, isUserLoading } = useUser()
   const db = useFirestore()

@@ -15,7 +15,7 @@ import Link from "next/link"
 
 /**
  * @fileOverview नेशनल रजिस्ट्री ट्रैकिंग (National Registry Tracking)
- * यहाँ नागरिक अपने 'ग्रोथ वॉल्ट' में जमा किए गए सभी योजना आवेदनों को देख सकते हैं।
+ * यह 'A to Z' फ्लो का Tracking बिंदु है।
  */
 
 export default function MyApplicationsPage() {
@@ -106,7 +106,6 @@ export default function MyApplicationsPage() {
           )}
         </div>
 
-        {/* Security Info Card */}
         <Card className="mt-12 bg-primary/5 border-primary/20 rounded-[2.5rem] border-dashed">
             <CardContent className="p-10 flex items-start gap-6">
                 <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20">

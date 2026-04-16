@@ -24,8 +24,8 @@ import {
 } from "@/components/ui/dialog"
 
 /**
- * @fileOverview योजना ब्राउज़र (Scheme Browser)
- * नागरिक यहाँ सभी उपलब्ध सरकारी योजनाओं को खोज और आवेदन (Apply) कर सकते हैं।
+ * @fileOverview योजना ब्राउज़र (Scheme Discovery Hub)
+ * यह 'A to Z' फ्लो का Discovery और Application बिंदु है।
  */
 
 const categories = [
@@ -43,7 +43,7 @@ const categories = [
 
 const fallbackSchemes = [
   { id: "1", name: "PM Kisan Samman Nidhi", type: "Central", description: "Direct income support of ₹6,000 per year to all landholding farmers' families.", details: "The Pradhan Mantri Kisan Samman Nidhi (PM-KISAN) is a Central Sector Scheme with 100% funding from Government of India.", tags: ["Agriculture", "Direct Benefit"] },
-  { id: "2", name: "Jल Jeevan Mission", type: "Central", description: "Providing safe and adequate drinking water through individual household tap connections by 2024.", details: "Jal Jeevan Mission, is envisioned to provide safe and adequate drinking water through individual household tap connections.", tags: ["Infrastructure", "Water"] },
+  { id: "2", name: "Jal Jeevan Mission", type: "Central", description: "Providing safe and adequate drinking water through individual household tap connections by 2024.", details: "Jal Jeevan Mission, is envisioned to provide safe and adequate drinking water through individual household tap connections.", tags: ["Infrastructure", "Water"] },
   { id: "3", name: "Digital India Mission", type: "Central", description: "Ensuring government services are made available to citizens electronically.", details: "Digital India is a campaign launched by the Government of India in order to ensure that services are made available electronically.", tags: ["Technology", "Connectivity"] },
   { id: "4", name: "Ladki Bahin Yojana", type: "Maharashtra", description: "Financial assistance program for women empowerment in Maharashtra.", details: "The Majhi Ladki Bahin Yojana is a flagship scheme of the Maharashtra Government aimed at providing monthly financial assistance to women.", tags: ["Women", "State"] },
   { id: "5", name: "Ayushman Bharat", type: "Central", description: "World's largest healthcare program providing coverage of ₹5 lakh per family.", details: "Ayushman Bharat - PM-JAY, is a flagship scheme to provide cashless secondary and tertiary care treatment.", tags: ["Health", "Insurance"] },
@@ -295,21 +295,6 @@ export function SchemeBrowser() {
                   </CardFooter>
                 </Card>
               ))}
-            </div>
-          )}
-          
-          {displaySchemes.length === 0 && !schemesLoading && (
-            <div className="py-40 text-center space-y-6 bg-white/[0.02] border border-dashed border-white/10 rounded-[4rem]">
-               <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mx-auto border border-white/10">
-                  <Search className="w-10 h-10 text-white/20" />
-               </div>
-               <div className="space-y-2">
-                 <p className="text-2xl font-black text-white/40 uppercase tracking-tighter">No Resource Nodes Detected</p>
-                 <p className="text-xs text-white/20 font-black uppercase tracking-widest">Adjust your filters or query protocol to find relevant schemes.</p>
-                 <Button variant="ghost" onClick={() => {setSearchQuery(""); setActiveCategory("All Yojanaye")}} className="mt-4 text-primary font-black uppercase text-[10px] tracking-widest hover:bg-primary/5">
-                    RESET SEARCH PROTOCOL
-                 </Button>
-               </div>
             </div>
           )}
         </div>

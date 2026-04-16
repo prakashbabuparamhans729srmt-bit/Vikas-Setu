@@ -20,6 +20,10 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth, useUser } from "@/firebase";
 import { signOut } from "firebase/auth";
 
+/**
+ * @fileOverview विकास सेतु नेविगेशन टर्मिनल (A to Z Navigation Terminal)
+ */
+
 export function Navbar() {
   const { t, language, setLanguage } = useLanguage();
   const auth = useAuth();

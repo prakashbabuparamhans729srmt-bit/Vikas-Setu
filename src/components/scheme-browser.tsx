@@ -28,7 +28,7 @@ import {
  * यह 'A to Z' फ्लो का Discovery और Application बिंदु है।
  */
 
-const categories = [
+const staticCategories = [
   { name: "All Yojanaye", count: 5300, icon: "✅" },
   { name: "Central Sarkar", count: 1200, icon: "🏛️" },
   { name: "State Sarkar", count: 4100, icon: "🗺️" },
@@ -65,6 +65,22 @@ export function SchemeBrowser() {
     return query(collection(db, "schemes"), orderBy("publishedAt", "desc"));
   }, [db]);
   const { data: dbSchemes, isLoading: schemesLoading } = useCollection(schemesQuery);
+
+  const categoriesQuery = useMemoFirebase(() => {
+    if (!db) return null;
+    return query(collection(db, "categories"), orderBy("name", "asc"));
+  }, [db]);
+  const { data: dbCategories } = useCollection(categoriesQuery);
+
+  const categories = useMemo(() => {
+    if (dbCategories && dbCategories.length > 0) {
+      return [
+        { name: "All Yojanaye", count: (dbSchemes?.length || 0), icon: "✅" },
+        ...dbCategories.map(c => ({ name: c.name, count: 0, icon: c.iconName || "📦" }))
+      ];
+    }
+    return staticCategories;
+  }, [dbCategories, dbSchemes]);
 
   const displaySchemes = useMemo(() => {
     const base = (dbSchemes && dbSchemes.length > 0) ? dbSchemes : fallbackSchemes;
@@ -106,7 +122,6 @@ export function SchemeBrowser() {
     const appId = `app-${id}-${Date.now()}`; 
     const appRef = doc(db, "userProfiles", user.uid, "applications", appId);
     
-    // Applying A to Z flow: Recording the application in the national vault
     setDocumentNonBlocking(appRef, {
       id: appId,
       schemeId: id,
@@ -187,7 +202,7 @@ export function SchemeBrowser() {
                       {cat.name}
                     </span>
                     <Badge variant={activeCategory === cat.name ? "secondary" : "outline"} className="rounded-xl border-white/10 bg-black/20 text-[8px] px-3">
-                      {cat.count}
+                      {cat.count > 0 ? cat.count : 'LIVE'}
                     </Badge>
                   </button>
                 ))}

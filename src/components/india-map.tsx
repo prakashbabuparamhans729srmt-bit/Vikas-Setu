@@ -1,10 +1,13 @@
+
 "use client"
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Map, Layers, Target, Compass, Sparkles, Zap } from "lucide-react"
-import { toast } from "@/hooks/use-toast"
+import { useToast } from "@/hooks/use-toast"
+import { useFirestore, useCollection, useMemoFirebase } from "@/firebase"
+import { collection, query, orderBy } from "firebase/firestore"
 import {
   Dialog,
   DialogContent,
@@ -14,16 +17,27 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 
-const stateData = [
-  { name: "Maharashtra", completion: 98, status: "High" },
-  { name: "Uttar Pradesh", completion: 92, status: "High" },
-  { name: "Jammu & Kashmir", completion: 85, status: "Medium-High" },
-  { name: "Tamil Nadu", completion: 78, status: "Medium-High" },
-  { name: "Gujarat", completion: 74, status: "Medium" },
-  { name: "Bihar", completion: 23, status: "Critical" },
+const fallbackStateData = [
+  { name: "Maharashtra", overallDevelopmentPercentage: 98, status: "High" },
+  { name: "Uttar Pradesh", overallDevelopmentPercentage: 92, status: "High" },
+  { name: "Jammu & Kashmir", overallDevelopmentPercentage: 85, status: "Medium-High" },
+  { name: "Tamil Nadu", overallDevelopmentPercentage: 78, status: "Medium-High" },
+  { name: "Gujarat", overallDevelopmentPercentage: 74, status: "Medium" },
+  { name: "Bihar", overallDevelopmentPercentage: 23, status: "Critical" },
 ]
 
 export function IndiaMap() {
+  const { toast } = useToast()
+  const db = useFirestore()
+
+  const statesQuery = useMemoFirebase(() => {
+    if (!db) return null;
+    return query(collection(db, "states"), orderBy("overallDevelopmentPercentage", "desc"));
+  }, [db]);
+
+  const { data: dbStates, isLoading } = useCollection(statesQuery);
+  const displayStates = (dbStates && dbStates.length > 0) ? dbStates : fallbackStateData;
+
   const handleStateClick = (name: string) => {
     toast({
       title: `${name} Node Analysis`,
@@ -117,22 +131,22 @@ export function IndiaMap() {
                <Badge className="bg-primary/10 text-primary border-primary/20 uppercase font-black text-[8px] tracking-widest">LIVE 24/7</Badge>
             </div>
 
-            {stateData.map((state) => (
+            {displayStates.map((state: any) => (
               <div key={state.name} className="space-y-3 group cursor-pointer" onClick={() => handleStateClick(state.name)}>
                 <div className="flex justify-between items-center font-black">
                   <span className="flex items-center gap-3 text-white/60 group-hover:text-primary transition-colors text-[10px] uppercase tracking-widest">
-                    <span className={`w-3 h-3 rounded-full ${state.completion > 80 ? 'bg-primary shadow-[0_0_10px_#07f1d6]' : state.completion > 50 ? 'bg-white/20' : 'bg-secondary'}`} />
+                    <span className={`w-3 h-3 rounded-full ${state.overallDevelopmentPercentage > 80 ? 'bg-primary shadow-[0_0_10px_#07f1d6]' : state.overallDevelopmentPercentage > 50 ? 'bg-white/20' : 'bg-secondary'}`} />
                     {state.name}
                   </span>
-                  <span className="text-[10px] font-black text-white">{state.completion}%</span>
+                  <span className="text-[10px] font-black text-white">{state.overallDevelopmentPercentage}%</span>
                 </div>
                 <div className="relative h-2 w-full bg-white/5 rounded-full overflow-hidden">
                    <div 
                     className={`absolute inset-y-0 left-0 transition-all duration-1000 ease-out rounded-full ${
-                      state.completion > 80 ? 'bg-primary cyan-glow' : 
-                      state.completion > 50 ? 'bg-white/40' : 'bg-secondary'
+                      state.overallDevelopmentPercentage > 80 ? 'bg-primary cyan-glow' : 
+                      state.overallDevelopmentPercentage > 50 ? 'bg-white/40' : 'bg-secondary'
                     }`}
-                    style={{ width: `${state.completion}%` }}
+                    style={{ width: `${state.overallDevelopmentPercentage}%` }}
                   />
                 </div>
               </div>

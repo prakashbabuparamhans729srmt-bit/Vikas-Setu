@@ -10,15 +10,15 @@ import { ThumbsUp, ThumbsDown, TrendingUp, BarChart3, Clock, Globe, Shield, Acti
 import { useLanguage } from "@/context/language-context"
 import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
-import { useUser, useFirestore } from "@/firebase"
-import { doc, serverTimestamp } from "firebase/firestore"
+import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase"
+import { doc, serverTimestamp, collection, query, orderBy, limit } from "firebase/firestore"
 import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates"
 
-const initialSchemes = [
-  { id: 1, name: "PM Kisan", state: "National", rating: 4.9, votes: 125, progress: 95 },
-  { id: 2, name: "Rythu Bharosa", state: "Telangana", rating: 4.8, votes: 89, progress: 92 },
-  { id: 3, name: "Majhi Ladki Bahin", state: "Maharashtra", rating: 4.5, votes: 210, progress: 88 },
-  { id: 4, name: "Ayushman Bharat", state: "National", rating: 4.4, votes: 450, progress: 76 },
+const fallbackSchemes = [
+  { id: "1", name: "PM Kisan", state: "National", averageRating: 4.9, totalUpvotes: 125, currentProgressPercentage: 95 },
+  { id: "2", name: "Rythu Bharosa", state: "Telangana", averageRating: 4.8, totalUpvotes: 89, currentProgressPercentage: 92 },
+  { id: "3", name: "Majhi Ladki Bahin", state: "Maharashtra", averageRating: 4.5, totalUpvotes: 210, currentProgressPercentage: 88 },
+  { id: "4", name: "Ayushman Bharat", state: "National", averageRating: 4.4, totalUpvotes: 450, currentProgressPercentage: 76 },
 ]
 
 export function ImpactDashboard() {
@@ -26,10 +26,17 @@ export function ImpactDashboard() {
   const { user } = useUser()
   const db = useFirestore()
   const { toast } = useToast()
-  const [schemes] = useState(initialSchemes)
   const [activeActions, setActiveActions] = useState<Record<string, 'up' | 'down' | null>>({})
 
-  const handleAction = (id: number, type: 'up' | 'down') => {
+  const topSchemesQuery = useMemoFirebase(() => {
+    if (!db) return null;
+    return query(collection(db, "schemes"), orderBy("averageRating", "desc"), limit(5));
+  }, [db]);
+
+  const { data: dbSchemes, isLoading } = useCollection(topSchemesQuery);
+  const displaySchemes = (dbSchemes && dbSchemes.length > 0) ? dbSchemes : fallbackSchemes;
+
+  const handleAction = (id: string, type: 'up' | 'down') => {
     if (!user) {
       toast({ title: "Authentication Required", description: "Please authorize your node to cast a vote.", variant: "destructive" });
       return;
@@ -160,21 +167,21 @@ export function ImpactDashboard() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {schemes.map((scheme) => (
-                  <TableRow key={scheme.name} className="border-white/5 hover:bg-primary/[0.03] transition-all cursor-pointer group">
+                {displaySchemes.map((scheme: any) => (
+                  <TableRow key={scheme.id} className="border-white/5 hover:bg-primary/[0.03] transition-all cursor-pointer group">
                     <TableCell className="p-8 font-black text-2xl text-white group-hover:text-primary transition-colors tracking-tighter uppercase">{scheme.name}</TableCell>
                     <TableCell className="p-8">
-                      <Badge variant="outline" className="border-white/10 text-white/60 font-black uppercase tracking-widest text-[8px]">{scheme.state}</Badge>
+                      <Badge variant="outline" className="border-white/10 text-white/60 font-black uppercase tracking-widest text-[8px]">{scheme.ministry || scheme.state || 'National'}</Badge>
                     </TableCell>
                     <TableCell className="p-8">
                       <div className="flex items-center gap-4 font-black">
-                        <span className="text-primary text-xl">★ {scheme.rating}</span>
+                        <span className="text-primary text-xl">★ {scheme.averageRating || 0}</span>
                         <div className="hidden sm:flex h-1.5 w-24 bg-white/5 rounded-full overflow-hidden">
-                          <div className="h-full bg-primary cyan-glow" style={{ width: `${scheme.rating * 20}%` }} />
+                          <div className="h-full bg-primary cyan-glow" style={{ width: `${(scheme.averageRating || 0) * 20}%` }} />
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="p-8 text-center text-white/40 font-black uppercase tracking-widest text-[10px]">{scheme.votes}k INTERACTIONS</TableCell>
+                    <TableCell className="p-8 text-center text-white/40 font-black uppercase tracking-widest text-[10px]">{scheme.totalUpvotes || 0}k INTERACTIONS</TableCell>
                     <TableCell className="p-8 text-right">
                       <div className="flex justify-end gap-3">
                         <Button 

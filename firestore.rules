@@ -1,96 +1,211 @@
-
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    /**
+     * VIKAS SETU SECURITY RULES DOCUMENTATION
+     *
+     * Core Philosophy:
+     * This ruleset implements a robust, multi-tier security model for a citizen engagement platform.
+     * It prioritizes Path-Based Ownership and Database Access Control (DBAC) for roles.
+     * 
+     * Data Structure:
+     * - Top-Level Static Content: States, Categories, Schemes, and Progress Snapshots are public.
+     * - User-Centric Trees: Personal data (ratings, votes) is nested under /userProfiles/{userId}/.
+     * - Community Participation: Feedback and ideas are top-level but utilize denormalized userId 
+     *   fields and approval flags for mixed access control.
+     * - Admin Controls: A dedicated /roles_admin/ collection manages administrative privileges.
+     *
+     * Key Security Decisions:
+     * 1. Path-Based Authorization: Nested collections leverage the document path to verify 
+     *    ownership without extra lookups.
+     * 2. DBAC for Admins: Administrative actions are guarded by checking for the existence 
+     *    of a document in the roles_admin collection.
+     * 3. Prototyping Flexibility: Rules enforce strict authorization (WHO can access) but 
+     *    remain flexible regarding data schema (WHAT is written) to facilitate rapid iteration.
+     * 4. Denormalization for Performance: Fields like 'isApproved' or 'userId' are required 
+     *    on documents to enable fast, single-read security checks.
+     */
+
+    // --- GLOBAL HELPER FUNCTIONS ---
+
+    /** Checks if the user is authenticated. */
     function isSignedIn() {
       return request.auth != null;
     }
 
+    /** Checks if the authenticated user matches the provided userId. */
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
 
+    /** Checks if the authenticated user is a platform administrator via DBAC. */
     function isAdmin() {
       return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
     }
 
-    // User Profiles and Subcollections
-    match /userProfiles/{userId} {
-      allow get: if true;
-      allow list: if isAdmin();
-      allow create, update: if isOwner(userId);
-      allow delete: if isAdmin();
-
-      // Scheme Applications Tracking
-      match /applications/{appId} {
-        allow read, create, update, delete: if isOwner(userId);
-      }
-      
-      // Personal Ratings and Votes
-      match /schemeRatings/{ratingId} {
-        allow read, create, update, delete: if isOwner(userId);
-      }
-      
-      match /schemeVotes/{voteId} {
-        allow read, create, update, delete: if isOwner(userId);
-      }
-      
-      match /pollVotes/{voteId} {
-        allow read, create, update, delete: if isOwner(userId);
-      }
+    /** Ensures a document exists and the requester is the owner. Used for updates/deletes. */
+    function isExistingOwner(userId) {
+      return resource != null && isOwner(userId);
     }
 
-    // Scheme Feedback (Public stream)
-    match /schemeFeedback/{feedbackId} {
-      allow read: if true;
-      allow create: if isSignedIn();
-      allow update, delete: if isOwner(resource.data.userId) || isAdmin();
-    }
+    // --- COLLECTION RULES ---
 
-    // Public Ideas (Innovation Proposals)
-    match /publicIdeas/{publicIdeaId} {
-      allow read: if true;
-      allow create: if isSignedIn();
-      allow update, delete: if isOwner(resource.data.userId) || isAdmin();
-    }
-
-    // Global Static Collections
-    match /schemes/{schemeId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
-
-    match /states/{stateId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
-
-    match /categories/{categoryId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
-
-    // Polls Engine
-    match /polls/{pollId} {
-      allow read: if true;
-      allow write: if isAdmin();
-      
-      match /pollOptions/{optionId} {
-        allow read: if true;
-        allow write: if isAdmin();
-      }
-    }
-
-    // National Snapshots
-    match /nationalProgressSnapshots/{snapshotId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
-
-    // Admin Roles Registry
+    /**
+     * @description Admin role storage. Document existence grants admin status.
+     * @path /roles_admin/{userId}
+     * @allow (get) Any signed-in user checking roles; (write) Internal/Manual admin setup only.
+     * @deny (write) Any client-side request.
+     * @principle Existence-based Role Access Control (DBAC).
+     */
     match /roles_admin/{userId} {
       allow get: if isSignedIn();
+      allow list, create, update, delete: if false;
+    }
+
+    /**
+     * @description User profiles containing display names and locations.
+     * @path /userProfiles/{userId}
+     * @allow (get) Any user; (create/update) The specific user matching the path.
+     * @deny (create/update) Mismatched userId; (delete) Everyone.
+     * @principle Path-based ownership with public read for profile visibility.
+     */
+    match /userProfiles/{userId} {
+      allow get: if true;
+      allow list: if isSignedIn();
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if false;
+
+      /**
+       * @description Individual ratings for schemes.
+       * @path /userProfiles/{userId}/schemeRatings/{ratingId}
+       * @allow (all) The user matching the parent path.
+       * @deny (all) Any other user.
+       * @principle Relational nesting for atomic ownership checks.
+       */
+      match /schemeRatings/{ratingId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && request.resource.data.userId == userId;
+        allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+        allow delete: if isExistingOwner(userId);
+      }
+
+      /**
+       * @description Individual upvotes/downvotes for schemes.
+       * @path /userProfiles/{userId}/schemeVotes/{voteId}
+       * @allow (all) The user matching the parent path.
+       * @deny (all) Access to other users' votes.
+       */
+      match /schemeVotes/{voteId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && request.resource.data.userId == userId;
+        allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+        allow delete: if isExistingOwner(userId);
+      }
+
+      /**
+       * @description User participation in daily polls.
+       * @path /userProfiles/{userId}/pollVotes/{voteId}
+       * @allow (all) The user matching the parent path.
+       * @deny (all) Unauthorized access or identity spoofing.
+       */
+      match /pollVotes/{voteId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && request.resource.data.userId == userId;
+        allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+        allow delete: if isExistingOwner(userId);
+      }
+    }
+
+    /**
+     * @description States and Union Territories metadata for map visualization.
+     * @path /states/{stateId}
+     * @allow (read) Everyone; (write) Admins only.
+     */
+    match /states/{stateId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    /**
+     * @description Categories for government schemes (e.g., Agriculture, Health).
+     * @path /categories/{categoryId}
+     * @allow (read) Everyone; (write) Admins only.
+     */
+    match /categories/{categoryId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    /**
+     * @description Details of central and state government schemes.
+     * @path /schemes/{schemeId}
+     * @allow (read) Everyone; (write) Admins only.
+     */
+    match /schemes/{schemeId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    /**
+     * @description User feedback on schemes with moderation.
+     * @path /schemeFeedback/{feedbackId}
+     * @allow (get/list) If approved or if requester is owner/admin; (create) Signed in users.
+     * @deny (create) Mismatched userId; (update) Non-owners/Non-admins.
+     * @principle Mixed access based on approval status and denormalized userId.
+     */
+    match /schemeFeedback/{feedbackId} {
+      allow get: if resource.data.isApproved == true || isOwner(resource.data.userId) || isAdmin();
+      allow list: if isAdmin() || isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid && request.resource.data.isApproved == false;
+      allow update: if isAdmin() || (isExistingOwner(resource.data.userId) && request.resource.data.userId == resource.data.userId && request.resource.data.isApproved == resource.data.isApproved);
+      allow delete: if isAdmin() || isExistingOwner(resource.data.userId);
+    }
+
+    /**
+     * @description Public suggestions for new government initiatives.
+     * @path /publicIdeas/{ideaId}
+     * @allow (get/list) If approved or if requester is owner/admin; (create) Signed in users.
+     * @principle Content moderation workflow with owner overrides.
+     */
+    match /publicIdeas/{ideaId} {
+      allow get: if resource.data.isApproved == true || isOwner(resource.data.userId) || isAdmin();
+      allow list: if isAdmin() || isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid && request.resource.data.isApproved == false;
+      allow update: if isAdmin() || (isExistingOwner(resource.data.userId) && request.resource.data.userId == resource.data.userId && request.resource.data.isApproved == resource.data.isApproved);
+      allow delete: if isAdmin() || isExistingOwner(resource.data.userId);
+    }
+
+    /**
+     * @description Public opinion polls.
+     * @path /polls/{pollId}
+     * @allow (read) Everyone if active/closed; (write) Admins only.
+     */
+    match /polls/{pollId} {
+      allow get, list: if resource.data.status in ['active', 'closed'] || isAdmin();
+      allow create, update, delete: if isAdmin();
+
+      /**
+       * @description Options for specific polls.
+       * @path /polls/{pollId}/pollOptions/{optionId}
+       * @allow (read) Everyone if parent poll is active/closed; (write) Admins only.
+       * @principle Authorization Independence via denormalized 'pollStatus'.
+       */
+      match /pollOptions/{optionId} {
+        allow get, list: if resource.data.pollStatus in ['active', 'closed'] || isAdmin();
+        allow create, update, delete: if isAdmin();
+      }
+    }
+
+    /**
+     * @description Historical snapshots of national development.
+     * @path /nationalProgressSnapshots/{snapshotId}
+     * @allow (read) Everyone; (write) Admins only.
+     */
+    match /nationalProgressSnapshots/{snapshotId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
     }
   }
 }

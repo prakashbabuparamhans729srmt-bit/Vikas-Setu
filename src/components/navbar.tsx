@@ -4,7 +4,6 @@
 import Link from "next/link";
 import { User, Bell, Globe, Check, Settings, Sparkles, LogOut, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/language-context";
 import { LANGUAGES } from "@/lib/translations";

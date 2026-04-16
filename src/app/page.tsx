@@ -98,7 +98,6 @@ export default function Home() {
   if (!user && !isGuest) {
     return (
       <div className="min-h-screen bg-[#070707] flex items-center justify-center p-4 relative overflow-hidden font-body">
-        {/* Neon Glows */}
         <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-primary/10 rounded-full blur-[150px] animate-pulse" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-secondary/5 rounded-full blur-[150px] animate-pulse" />
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
@@ -234,7 +233,6 @@ export default function Home() {
                  </Link>
               </div>
            </div>
-           {/* Floating Icons */}
            <div className="absolute top-1/4 left-10 transform -rotate-12 opacity-10 text-[12rem] select-none group-hover:rotate-0 transition-transform duration-1000">🇮🇳</div>
            <div className="absolute bottom-1/4 right-10 transform rotate-12 opacity-10 text-[12rem] select-none group-hover:rotate-0 transition-transform duration-1000">🗳️</div>
         </section>

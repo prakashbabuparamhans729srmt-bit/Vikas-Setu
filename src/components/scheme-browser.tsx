@@ -55,7 +55,6 @@ export function SchemeBrowser() {
   const db = useFirestore()
   const { toast } = useToast()
 
-  // Fetch real schemes from Firestore if available
   const schemesQuery = useMemoFirebase(() => {
     if (!db) return null;
     return query(collection(db, "schemes"), orderBy("publishedAt", "desc"));

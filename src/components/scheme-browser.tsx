@@ -23,6 +23,11 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 
+/**
+ * @fileOverview योजना खोज और डिस्कवरी इंजन (Discovery Engine - B-Y)
+ * नागरिक संसाधनों की खोज और 'A to Z' प्रवाह का डिस्कवरी हिस्सा।
+ */
+
 const staticCategories = [
   { name: "All Yojanaye", count: 5300, icon: "✅" },
   { name: "Central Sarkar", count: 1200, icon: "🏛️" },

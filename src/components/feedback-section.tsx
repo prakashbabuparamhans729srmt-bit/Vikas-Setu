@@ -27,8 +27,8 @@ import {
 } from "@/components/ui/dialog"
 
 /**
- * @fileOverview जनता की राय (Citizen Pulse)
- * यह 'A to Z' फ्लो का Feedback (Janata ki Rai) और Innovation बिंदु है।
+ * @fileOverview नागरिक फीडबैक और पल्स (Citizen Pulse & Feedback)
+ * जनता की राय (Janata ki Rai) और इनोवेशन प्रस्तावों का रीयल-टाइम केंद्र।
  */
 
 export function FeedbackSection() {

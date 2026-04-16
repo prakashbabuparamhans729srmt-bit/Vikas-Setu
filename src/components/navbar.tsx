@@ -22,6 +22,7 @@ import { signOut } from "firebase/auth";
 
 /**
  * @fileOverview विकास सेतु नेविगेशन टर्मिनल (A to Z Navigation Terminal)
+ * पहचान और नेविगेशन का मुख्य केंद्र।
  */
 
 export function Navbar() {

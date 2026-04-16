@@ -14,8 +14,8 @@ import { cn } from "@/lib/utils"
 import Link from "next/link"
 
 /**
- * @fileOverview नेशनल रजिस्ट्री ट्रैकिंग (National Registry Tracking)
- * यह 'A to Z' फ्लो का Tracking (Dashboard) बिंदु है।
+ * @fileOverview नेशनल रजिस्ट्री ट्रैकिंग (National Registry Tracking - Z)
+ * यह 'A to Z' प्रवाह का Tracking (Vault) बिंदु है।
  */
 
 export default function MyApplicationsPage() {
@@ -34,7 +34,7 @@ export default function MyApplicationsPage() {
 
   if (isUserLoading) return (
     <div className="min-h-screen bg-[#070707] flex items-center justify-center">
-      <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin shadow-[0_0_20px_#07f1d6]"></div>
     </div>
   );
   
@@ -67,7 +67,7 @@ export default function MyApplicationsPage() {
               <Card key={app.id} className="bg-[#14181B]/60 border-white/5 rounded-[2rem] overflow-hidden group hover:border-primary/30 transition-all">
                 <CardContent className="p-8 flex flex-col md:flex-row items-center justify-between gap-8">
                   <div className="flex items-center gap-6">
-                    <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20">
+                    <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-sm">
                       <FileText className="w-8 h-8 text-primary" />
                     </div>
                     <div>
@@ -97,7 +97,7 @@ export default function MyApplicationsPage() {
                 <p className="text-2xl font-black text-white/40 uppercase tracking-tighter">No Applications Registered</p>
                 <p className="text-xs text-white/20 font-medium uppercase tracking-widest">Your node has not yet initialized any resource requests.</p>
                 <Link href="/#schemes">
-                  <Button className="bg-primary text-black font-black uppercase tracking-widest h-12 px-8 rounded-xl mt-4">
+                  <Button className="bg-primary text-black font-black uppercase tracking-widest h-12 px-8 rounded-xl mt-4 cyan-glow">
                     EXPLORE SCHEMES <ArrowRight className="ml-2 w-4 h-4" />
                   </Button>
                 </Link>

@@ -23,7 +23,7 @@ import { useToast } from "@/hooks/use-toast";
 
 /**
  * @fileOverview विकास सेतु मुख्य टर्मिनल (Vikas Setu Core Terminal)
- * 'A to Z' प्रवाह का प्रारंभिक बिंदु: Identity Verification.
+ * 'A to Z' प्रवाह का प्रारंभिक बिंदु: Identity Verification (A).
  */
 
 export default function Home() {

@@ -59,6 +59,7 @@ export default function Home() {
       syncProfile(result.user);
       toast({ title: "Authorized", description: "Citizen Node successfully synced with Vikas Setu Core." });
     } catch (error: any) {
+      // Automatic Registration Fallback
       if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/invalid-email' || error.code === 'auth/wrong-password') {
         try {
           const result = await createUserWithEmailAndPassword(auth, email, password);
@@ -226,7 +227,7 @@ export default function Home() {
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-6 pt-6">
                  <Link href="/my-applications">
-                    <button className="h-20 px-12 bg-black text-primary font-black rounded-2xl text-xl hover:scale-105 transition-all shadow-2xl uppercase tracking-widest cyan-glow border-2 border-transparent hover:border-white">
+                    <button className="h-20 px-12 bg-primary text-black font-black rounded-2xl text-xl hover:scale-105 transition-all shadow-2xl uppercase tracking-widest cyan-glow border-2 border-black/10">
                        My Growth Vault
                     </button>
                  </Link>

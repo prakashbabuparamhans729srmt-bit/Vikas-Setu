@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Map, Layers, Target, Compass, Sparkles, Zap } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase"
-import { collection, query, orderBy } from "firebase/firestore"
+import { collection, query, orderBy, limit } from "firebase/firestore"
 import {
   Dialog,
   DialogContent,
@@ -32,10 +32,10 @@ export function IndiaMap() {
 
   const statesQuery = useMemoFirebase(() => {
     if (!db) return null;
-    return query(collection(db, "states"), orderBy("overallDevelopmentPercentage", "desc"));
+    return query(collection(db, "states"), orderBy("overallDevelopmentPercentage", "desc"), limit(6));
   }, [db]);
 
-  const { data: dbStates, isLoading } = useCollection(statesQuery);
+  const { data: dbStates } = useCollection(statesQuery);
   const displayStates = (dbStates && dbStates.length > 0) ? dbStates : fallbackStateData;
 
   const handleStateClick = (name: string) => {

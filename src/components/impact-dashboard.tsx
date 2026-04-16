@@ -29,13 +29,23 @@ export function ImpactDashboard() {
   const { toast } = useToast()
   const [activeActions, setActiveActions] = useState<Record<string, 'up' | 'down' | null>>({})
 
+  // Fetch top rated schemes from Firestore
   const topSchemesQuery = useMemoFirebase(() => {
     if (!db) return null;
     return query(collection(db, "schemes"), orderBy("averageRating", "desc"), limit(5));
   }, [db]);
 
-  const { data: dbSchemes, isLoading } = useCollection(topSchemesQuery);
+  const { data: dbSchemes } = useCollection(topSchemesQuery);
   const displaySchemes = (dbSchemes && dbSchemes.length > 0) ? dbSchemes : fallbackSchemes;
+
+  // Fetch national progress snapshots
+  const snapshotsQuery = useMemoFirebase(() => {
+    if (!db) return null;
+    return query(collection(db, "nationalProgressSnapshots"), orderBy("year", "desc"), limit(4));
+  }, [db]);
+  const { data: snapshots } = useCollection(snapshotsQuery);
+
+  const currentProgress = snapshots?.[0]?.overallDevelopmentPercentage || 68.4;
 
   const handleAction = (id: string, type: 'up' | 'down') => {
     if (!user) {
@@ -83,28 +93,28 @@ export function ImpactDashboard() {
             <CardContent className="p-12 space-y-12">
               <div className="space-y-6">
                 <div className="flex justify-between items-end">
-                  <span className="text-6xl font-black text-white tracking-tighter">68.4% <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em] ml-4">Overall Completion</span></span>
+                  <span className="text-6xl font-black text-white tracking-tighter">{currentProgress}% <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em] ml-4">Overall Completion</span></span>
                   <Badge className="bg-primary text-black font-black px-6 py-2 rounded-xl text-[10px] tracking-widest uppercase">TARGET 2030: 100%</Badge>
                 </div>
                 <div className="relative h-6 w-full bg-white/5 rounded-full overflow-hidden">
-                   <div className="absolute inset-y-0 left-0 bg-primary shadow-[0_0_20px_#07f1d6] transition-all duration-1000 ease-out" style={{ width: '68.4%' }} />
+                   <div className="absolute inset-y-0 left-0 bg-primary shadow-[0_0_20px_#07f1d6] transition-all duration-1000 ease-out" style={{ width: `${currentProgress}%` }} />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
-                {[
-                  { label: "2020-21 FY", val: 70 },
-                  { label: "2021-22 FY", val: 75 },
-                  { label: "2022-23 FY", val: 82, active: true },
-                  { label: "2023-24 LIVE", val: 68, live: true }
-                ].map((stat, i) => (
-                  <div key={i} className="space-y-4 group/stat cursor-pointer" onClick={() => toast({ title: `${stat.label} Snapshot`, description: `Historical completion vector: ${stat.val}%` })}>
+                {(snapshots && snapshots.length > 0 ? snapshots : [
+                  { year: 2021, overallDevelopmentPercentage: 70 },
+                  { year: 2022, overallDevelopmentPercentage: 75 },
+                  { year: 2023, overallDevelopmentPercentage: 82 },
+                  { year: 2024, overallDevelopmentPercentage: 68 }
+                ]).map((stat: any, i) => (
+                  <div key={i} className="space-y-4 group/stat cursor-pointer" onClick={() => toast({ title: `${stat.year} Snapshot`, description: `Historical completion vector: ${stat.overallDevelopmentPercentage}%` })}>
                     <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-[0.2em] text-white/30 group-hover/stat:text-white transition-colors">
-                      <span className="flex items-center gap-3"><Clock className="w-4 h-4 text-primary interactive-icon" /> {stat.label}</span>
-                      <span className={cn("transition-colors", stat.active ? 'text-primary' : stat.live ? 'text-secondary' : '')}>{stat.val}%</span>
+                      <span className="flex items-center gap-3"><Clock className="w-4 h-4 text-primary interactive-icon" /> {stat.year} FY</span>
+                      <span className={cn("transition-colors", i === 0 ? 'text-primary' : '')}>{stat.overallDevelopmentPercentage}%</span>
                     </div>
                     <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
-                       <div className={cn("h-full transition-all duration-700", stat.live ? 'bg-secondary' : stat.active ? 'bg-primary' : 'bg-white/20')} style={{ width: `${stat.val}%` }} />
+                       <div className={cn("h-full transition-all duration-700", i === 0 ? 'bg-primary' : 'bg-white/20')} style={{ width: `${stat.overallDevelopmentPercentage}%` }} />
                     </div>
                   </div>
                 ))}

@@ -85,10 +85,11 @@ export function SchemeBrowser() {
       const matchesCategory = activeCategory === "All Yojanaye" || 
                              (activeCategory === "Central Sarkar" && scheme.type === "Central") ||
                              (activeCategory === "State Sarkar" && scheme.type !== "Central") ||
-                             (scheme.tags?.some((tag: string) => activeCategory.includes(tag)));
+                             (scheme.tags?.some((tag: string) => activeCategory.includes(tag))) ||
+                             (scheme.categoryIds?.some((id: string) => categories.find(c => c.name === activeCategory)));
       return matchesSearch && matchesCategory;
     });
-  }, [dbSchemes, searchQuery, activeCategory]);
+  }, [dbSchemes, searchQuery, activeCategory, categories]);
 
   const handleVoiceSearch = () => {
     if (!('webkitSpeechRecognition' in window)) {

@@ -21,6 +21,11 @@ import { serverTimestamp, doc } from "firebase/firestore";
 import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { useToast } from "@/hooks/use-toast";
 
+/**
+ * @fileOverview विकास सेतु मुख्य टर्मिनल (Vikas Setu Core Terminal)
+ * 'A to Z' प्रवाह का प्रारंभिक बिंदु: Identity Verification.
+ */
+
 export default function Home() {
   const { user, isUserLoading } = useUser();
   const auth = useAuth();

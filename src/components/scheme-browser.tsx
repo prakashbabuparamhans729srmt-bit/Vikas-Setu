@@ -230,7 +230,7 @@ export function SchemeBrowser() {
                       data-ai-hint="india architecture"
                     />
                     <Badge className="absolute top-6 right-6 bg-black/80 border border-white/10 text-white backdrop-blur-md uppercase text-[8px] font-black tracking-widest px-4 py-1.5 rounded-full">
-                      {scheme.type} NODE
+                      {scheme.type || 'National'} NODE
                     </Badge>
                     <div className="absolute inset-0 bg-gradient-to-t from-[#070707] to-transparent opacity-80" />
                   </div>
@@ -246,7 +246,7 @@ export function SchemeBrowser() {
                       {scheme.description}
                     </p>
                     <div className="flex flex-wrap gap-2">
-                       {scheme.tags?.slice(0, 2).map((tag: string) => (
+                       {(scheme.tags || scheme.categoryIds || []).slice(0, 2).map((tag: string) => (
                          <span key={tag} className="text-[8px] font-black uppercase tracking-widest text-primary/60 border border-primary/20 px-3 py-1 rounded-full">#{tag}</span>
                        ))}
                     </div>
@@ -271,7 +271,7 @@ export function SchemeBrowser() {
                                 <ShieldCheck className="w-6 h-6 text-primary" />
                              </div>
                              <Badge className="bg-primary/10 text-primary border-primary/20 uppercase text-[10px] tracking-[0.2em] font-black rounded-full px-6">
-                               {scheme.type} CORE
+                               {scheme.type || 'National'} CORE
                              </Badge>
                            </div>
                            <DialogTitle className="text-4xl font-black uppercase tracking-tighter text-white italic">
@@ -288,7 +288,7 @@ export function SchemeBrowser() {
                             </div>
                             <div className="p-6 rounded-3xl bg-white/5 border border-white/5 space-y-2">
                                <p className="text-[8px] font-black text-secondary uppercase tracking-widest">Registry Hub</p>
-                               <p className="text-white font-black uppercase tracking-tighter">{scheme.type} Government</p>
+                               <p className="text-white font-black uppercase tracking-tighter">{scheme.type || 'Central'} Government</p>
                             </div>
                          </div>
                          <DialogFooter className="p-8 bg-black/40 border-t border-white/5">

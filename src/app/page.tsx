@@ -222,6 +222,7 @@ export default function Home() {
               <h2 className="text-5xl md:text-8xl font-black font-headline text-black tracking-tighter uppercase italic leading-none">
                  Be the Catalyst <br /> for Change.
               </h2>
+              <h1 className="sr-only">Vikas ki Neev, Aapke Hatho Mein</h1>
               <p className="text-xl md:text-2xl text-black/70 font-bold max-w-3xl mx-auto leading-relaxed">
                  Join millions of citizens helping build a stronger, more transparent India. Every vote counts, every idea matters.
               </p>

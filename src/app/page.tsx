@@ -21,11 +21,6 @@ import { serverTimestamp, doc } from "firebase/firestore";
 import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { useToast } from "@/hooks/use-toast";
 
-/**
- * @fileOverview विकास सेतु (Vikas Setu) - मुख्य प्रवेश द्वार।
- * यह पेज 'A to Z' फ्लो का शुरुआती बिंदु (Identity Hub) है।
- */
-
 export default function Home() {
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
@@ -36,7 +31,6 @@ export default function Home() {
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [isGuest, setIsGuest] = useState(false);
 
-  // Identity Node Synchronization Protocol
   const syncProfile = (u: User) => {
     if (!db) return;
     const userRef = doc(db, "userProfiles", u.uid);
@@ -222,7 +216,6 @@ export default function Home() {
               <h2 className="text-5xl md:text-8xl font-black font-headline text-black tracking-tighter uppercase italic leading-none">
                  Be the Catalyst <br /> for Change.
               </h2>
-              <h1 className="sr-only">Vikas ki Neev, Aapke Hatho Mein</h1>
               <p className="text-xl md:text-2xl text-black/70 font-bold max-w-3xl mx-auto leading-relaxed">
                  Join millions of citizens helping build a stronger, more transparent India. Every vote counts, every idea matters.
               </p>

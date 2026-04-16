@@ -23,11 +23,6 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 
-/**
- * @fileOverview योजना ब्राउज़र (Scheme Discovery Hub)
- * यह 'A to Z' फ्लो का Discovery (Browsing) और Application (Applying) बिंदु है।
- */
-
 const staticCategories = [
   { name: "All Yojanaye", count: 5300, icon: "✅" },
   { name: "Central Sarkar", count: 1200, icon: "🏛️" },

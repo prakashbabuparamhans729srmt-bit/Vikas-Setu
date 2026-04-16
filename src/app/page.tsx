@@ -104,7 +104,6 @@ export default function Home() {
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
 
         <Card className="w-full max-w-md bg-[#14181B]/80 backdrop-blur-2xl border-white/5 shadow-2xl rounded-[2.5rem] relative z-10 overflow-hidden">
-          {/* Top Tricolor Accent */}
           <div className="absolute top-0 left-0 w-full h-1 flex">
             <div className="flex-1 bg-secondary" />
             <div className="flex-1 bg-white" />
@@ -215,12 +214,16 @@ export default function Home() {
                  Join millions of citizens helping build a stronger, more transparent India. Every vote counts, every idea matters.
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-4">
-                 <button className="h-14 px-10 bg-black text-primary font-black rounded-xl text-lg hover:scale-105 transition-transform shadow-2xl">
-                    Register Now
-                 </button>
-                 <button className="h-14 px-10 border-2 border-black text-black font-black rounded-xl text-lg hover:bg-black/10 transition-colors">
-                    View FAQ
-                 </button>
+                 <Link href="/my-applications">
+                    <button className="h-14 px-10 bg-black text-primary font-black rounded-xl text-lg hover:scale-105 transition-transform shadow-2xl uppercase">
+                       My Vault
+                    </button>
+                 </Link>
+                 <Link href="/settings">
+                    <button className="h-14 px-10 border-2 border-black text-black font-black rounded-xl text-lg hover:bg-black/10 transition-colors uppercase">
+                       Settings
+                    </button>
+                 </Link>
               </div>
            </div>
            <div className="absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-1/2 opacity-10 text-[10rem] select-none">🇮🇳</div>

@@ -8,7 +8,7 @@ import { Footer } from "@/components/footer"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { FileText, Clock, Search, ArrowRight } from "lucide-react"
+import { FileText, Clock, Search, ArrowRight, ShieldCheck } from "lucide-react"
 import { redirect } from "next/navigation"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
@@ -100,6 +100,19 @@ export default function MyApplicationsPage() {
             </div>
           )}
         </div>
+
+        {/* Security Info Card */}
+        <Card className="mt-12 bg-primary/5 border-primary/20 rounded-[2.5rem] border-dashed">
+            <CardContent className="p-10 flex items-start gap-6">
+                <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20">
+                    <ShieldCheck className="w-8 h-8 text-primary" />
+                </div>
+                <div className="space-y-2">
+                    <h4 className="text-lg font-black uppercase tracking-tighter text-white">Verified Security Protocol</h4>
+                    <p className="text-sm text-white/40 leading-relaxed font-medium">All applications are encrypted with Bharat-Sync technology and linked directly to your digital identity node. Data integrity is guaranteed by national consensus protocols.</p>
+                </div>
+            </CardContent>
+        </Card>
       </main>
       <Footer />
     </div>

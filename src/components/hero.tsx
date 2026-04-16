@@ -1,9 +1,11 @@
+
 "use client"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Star, Users, CheckCircle, ShieldCheck, Zap, TrendingUp } from "lucide-react"
 import { useLanguage } from "@/context/language-context"
+import Link from "next/link"
 
 export function Hero() {
   const { t } = useLanguage()
@@ -49,12 +51,16 @@ export function Hero() {
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-            <Button size="lg" className="h-16 px-10 text-lg font-black gap-3 bg-primary text-black hover:bg-primary/80 cyan-glow hover:scale-105 transition-all rounded-2xl">
-              EXPLORE SCHEMES <ArrowRight className="h-6 w-6 interactive-icon" />
-            </Button>
-            <Button size="lg" variant="outline" className="h-16 px-10 text-lg font-black border-2 border-white/10 hover:bg-white hover:text-black hover:scale-105 transition-all rounded-2xl bg-background text-white">
-              <TrendingUp className="w-6 h-6 mr-2 interactive-icon" /> PROGRESS MAP
-            </Button>
+            <Link href="#schemes" className="w-full sm:w-auto">
+              <Button size="lg" className="h-16 w-full px-10 text-lg font-black gap-3 bg-primary text-black hover:bg-primary/80 cyan-glow hover:scale-105 transition-all rounded-2xl">
+                EXPLORE SCHEMES <ArrowRight className="h-6 w-6 interactive-icon" />
+              </Button>
+            </Link>
+            <Link href="#impact" className="w-full sm:w-auto">
+              <Button size="lg" variant="outline" className="h-16 w-full px-10 text-lg font-black border-2 border-white/10 hover:bg-white hover:text-black hover:scale-105 transition-all rounded-2xl bg-background text-white">
+                <TrendingUp className="w-6 h-6 mr-2 interactive-icon" /> PROGRESS MAP
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

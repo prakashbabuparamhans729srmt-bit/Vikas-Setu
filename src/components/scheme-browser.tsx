@@ -106,6 +106,7 @@ export function SchemeBrowser() {
     const appId = `app-${id}-${Date.now()}`; 
     const appRef = doc(db, "userProfiles", user.uid, "applications", appId);
     
+    // Applying A to Z flow: Recording the application in the national vault
     setDocumentNonBlocking(appRef, {
       id: appId,
       schemeId: id,
@@ -121,7 +122,7 @@ export function SchemeBrowser() {
         title: "Intent Synchronized",
         description: `${name} application logged in the national vault.`,
       });
-    }, 800);
+    }, 1200);
   };
 
   return (

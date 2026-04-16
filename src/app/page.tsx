@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { ShieldCheck, User as UserIcon, Lock, Chrome, Github, ArrowRight, UserCheck } from "lucide-react";
+import { ShieldCheck, User as UserIcon, Lock, Chrome, Github, ArrowRight, UserCheck, Zap } from "lucide-react";
 import Link from "next/link";
 import { useUser, useAuth, useFirestore } from "@/firebase";
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, User, createUserWithEmailAndPassword } from "firebase/auth";
@@ -90,65 +90,65 @@ export default function Home() {
   if (isUserLoading) {
     return (
       <div className="min-h-screen bg-[#070707] flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin shadow-[0_0_20px_#07f1d6]"></div>
       </div>
     )
   }
 
   if (!user && !isGuest) {
     return (
-      <div className="min-h-screen bg-[#070707] flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="min-h-screen bg-[#070707] flex items-center justify-center p-4 relative overflow-hidden font-body">
         {/* Neon Glows */}
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-secondary/5 rounded-full blur-[120px] animate-pulse" />
+        <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-primary/10 rounded-full blur-[150px] animate-pulse" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-secondary/5 rounded-full blur-[150px] animate-pulse" />
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
 
-        <Card className="w-full max-w-md bg-[#14181B]/80 backdrop-blur-2xl border-white/5 shadow-2xl rounded-[2.5rem] relative z-10 overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-1 flex">
+        <Card className="w-full max-w-lg bg-[#14181B]/90 backdrop-blur-3xl border-white/5 shadow-2xl rounded-[3rem] relative z-10 overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1 flex shadow-[0_5px_15px_rgba(7,241,214,0.3)]">
             <div className="flex-1 bg-secondary" />
             <div className="flex-1 bg-white" />
             <div className="flex-1 bg-primary" />
           </div>
 
-          <CardHeader className="pt-12 pb-8 text-center space-y-4">
-            <div className="mx-auto w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 cyan-glow animate-bounce">
-              <ShieldCheck className="w-8 h-8 text-primary" />
+          <CardHeader className="pt-16 pb-10 text-center space-y-6">
+            <div className="mx-auto w-20 h-20 rounded-[2rem] bg-primary/10 flex items-center justify-center border border-primary/20 cyan-glow animate-bounce">
+              <ShieldCheck className="w-10 h-10 text-primary" />
             </div>
             <div className="space-y-2">
-              <CardTitle className="text-4xl font-black font-headline tracking-tighter text-white uppercase">
-                Vikas <span className="text-primary italic">Setu</span>
+              <CardTitle className="text-5xl font-black font-headline tracking-tighter text-white uppercase italic">
+                Vikas <span className="text-primary">Setu</span>
               </CardTitle>
-              <CardDescription className="text-white/40 font-bold uppercase tracking-widest text-[10px]">
+              <CardDescription className="text-white/40 font-black uppercase tracking-[0.4em] text-[10px]">
                 Secure Gateway to Bharat 2.0
               </CardDescription>
             </div>
           </CardHeader>
 
-          <CardContent className="space-y-6 px-10">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-white/60 ml-1">Email Node</Label>
+          <CardContent className="space-y-8 px-12">
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/50 ml-1">Identity Node</Label>
                 <div className="relative group">
-                  <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-primary transition-colors" />
+                  <UserIcon className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 group-focus-within:text-primary transition-all" />
                   <Input 
                     type="email" 
-                    placeholder="name@bharat.gov.in" 
-                    className="pl-12 h-14 bg-black/40 border-white/5 focus:border-primary/50 text-white rounded-2xl transition-all"
+                    placeholder="citizen@bharat.gov.in" 
+                    className="pl-14 h-16 bg-black/40 border-white/5 focus:border-primary/50 text-white rounded-2xl transition-all text-lg font-medium"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
               </div>
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <Label className="text-[10px] font-black uppercase tracking-widest text-white/60 ml-1">Access Protocol</Label>
-                  <Link href="#" className="text-[10px] font-black text-primary uppercase hover:underline">Forgot?</Link>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center px-1">
+                  <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/50">Access Protocol</Label>
+                  <Link href="#" className="text-[10px] font-black text-primary uppercase hover:underline tracking-widest">Restore</Link>
                 </div>
                 <div className="relative group">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-primary transition-colors" />
+                  <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 group-focus-within:text-primary transition-all" />
                   <Input 
                     type="password" 
-                    className="pl-12 h-14 bg-black/40 border-white/5 focus:border-primary/50 text-white rounded-2xl transition-all"
+                    className="pl-14 h-16 bg-black/40 border-white/5 focus:border-primary/50 text-white rounded-2xl transition-all text-lg font-medium"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
@@ -156,36 +156,40 @@ export default function Home() {
               </div>
             </div>
 
-            <Button onClick={handleAuthorize} disabled={isSigningIn} className="w-full h-14 bg-primary text-black font-black text-lg rounded-2xl hover:bg-white hover:scale-[1.02] transition-all cyan-glow group">
-              {isSigningIn ? "AUTHORIZING..." : "AUTHORIZE ACCESS"} <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            <Button 
+              onClick={handleAuthorize} 
+              disabled={isSigningIn} 
+              className="w-full h-16 bg-primary text-black font-black text-xl rounded-[1.5rem] hover:bg-white hover:scale-[1.02] transition-all cyan-glow group uppercase tracking-widest"
+            >
+              {isSigningIn ? "AUTHORIZING..." : "AUTHORIZE ACCESS"} <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-2 transition-transform" />
             </Button>
 
             <div className="relative py-4">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-white/5"></div>
               </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-transparent px-2 text-white/20 font-black tracking-widest">OR CONNECT VIA</span>
+              <div className="relative flex justify-center text-[10px] uppercase font-black tracking-[0.3em]">
+                <span className="bg-[#14181B] px-6 text-white/20">OR CONNECT VIA</span>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <Button onClick={handleGoogleSignIn} variant="outline" className="h-12 border-white/5 bg-white/5 hover:bg-white/10 rounded-xl text-white font-bold text-xs uppercase gap-2 transition-all">
-                <Chrome className="w-4 h-4" /> Google
+              <Button onClick={handleGoogleSignIn} variant="outline" className="h-14 border-white/5 bg-white/5 hover:bg-white/10 hover:border-primary/20 rounded-2xl text-white font-black text-xs uppercase gap-3 transition-all tracking-widest">
+                <Chrome className="w-5 h-5 text-primary" /> Google
               </Button>
-              <Button variant="outline" className="h-12 border-white/5 bg-white/5 hover:bg-white/10 rounded-xl text-white font-bold text-xs uppercase gap-2 transition-all">
-                <Github className="w-4 h-4" /> Github
+              <Button variant="outline" className="h-14 border-white/5 bg-white/5 hover:bg-white/10 hover:border-primary/20 rounded-2xl text-white font-black text-xs uppercase gap-3 transition-all tracking-widest">
+                <Github className="w-5 h-5" /> Github
               </Button>
             </div>
           </CardContent>
 
-          <CardFooter className="flex flex-col gap-6 pb-12 pt-6">
-            <Button onClick={handleGuestEntry} variant="ghost" className="w-full h-12 border border-dashed border-white/10 text-white/40 hover:text-primary hover:border-primary/50 hover:bg-primary/5 rounded-xl flex items-center justify-center gap-3 transition-all group">
-              <UserCheck className="w-5 h-5 group-hover:scale-110 transition-transform" />
-              <span className="text-xs font-black uppercase tracking-widest">Enter as Guest Observer</span>
+          <CardFooter className="flex flex-col gap-8 pb-16 pt-8">
+            <Button onClick={handleGuestEntry} variant="ghost" className="w-full h-14 border border-dashed border-white/10 text-white/30 hover:text-primary hover:border-primary/50 hover:bg-primary/5 rounded-2xl flex items-center justify-center gap-4 transition-all group">
+              <UserCheck className="w-6 h-6 group-hover:scale-125 transition-transform" />
+              <span className="text-xs font-black uppercase tracking-[0.3em]">Enter as Guest Observer</span>
             </Button>
-            <p className="text-sm text-white/40 text-center font-medium">
-              New Citizen? <Link href="#" className="text-primary font-black hover:underline uppercase ml-1">Register Node</Link>
+            <p className="text-sm text-white/30 text-center font-bold">
+              New Citizen? <Link href="#" className="text-primary font-black hover:underline uppercase ml-2 tracking-widest">Register Node</Link>
             </p>
           </CardFooter>
         </Card>
@@ -194,40 +198,45 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen font-body">
       <Navbar />
       <main className="flex-1">
         <Hero />
-        <div className="container mx-auto px-4 -mt-10 relative z-20">
+        <div className="container mx-auto px-4 -mt-16 relative z-20">
            <IndiaMap />
         </div>
         <SchemeBrowser />
         <FeedbackSection />
         <ImpactDashboard />
         
-        <section className="py-24 bg-primary relative overflow-hidden">
-           <div className="container mx-auto px-4 relative z-10 text-center space-y-8">
-              <h2 className="text-4xl md:text-6xl font-black font-headline text-black tracking-tighter uppercase italic text-shadow-glow">
-                 Be the Catalyst for Change.
+        <section className="py-32 bg-primary relative overflow-hidden group">
+           <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20" />
+           <div className="container mx-auto px-4 relative z-10 text-center space-y-10">
+              <div className="inline-flex items-center gap-3 px-6 py-2 bg-black text-primary rounded-full text-[10px] font-black uppercase tracking-[0.4em] mb-4">
+                <Zap className="w-4 h-4 animate-pulse" /> NATION BUILDING PROTOCOL
+              </div>
+              <h2 className="text-5xl md:text-8xl font-black font-headline text-black tracking-tighter uppercase italic leading-none">
+                 Be the Catalyst <br /> for Change.
               </h2>
-              <p className="text-xl text-black/80 font-medium max-w-2xl mx-auto">
+              <p className="text-xl md:text-2xl text-black/70 font-bold max-w-3xl mx-auto leading-relaxed">
                  Join millions of citizens helping build a stronger, more transparent India. Every vote counts, every idea matters.
               </p>
-              <div className="flex flex-col sm:flex-row justify-center gap-4">
+              <div className="flex flex-col sm:flex-row justify-center gap-6 pt-6">
                  <Link href="/my-applications">
-                    <button className="h-14 px-10 bg-black text-primary font-black rounded-xl text-lg hover:scale-105 transition-transform shadow-2xl uppercase">
-                       My Vault
+                    <button className="h-20 px-12 bg-black text-primary font-black rounded-2xl text-xl hover:scale-105 transition-all shadow-2xl uppercase tracking-widest cyan-glow border-2 border-transparent hover:border-white">
+                       My Growth Vault
                     </button>
                  </Link>
                  <Link href="/settings">
-                    <button className="h-14 px-10 border-2 border-black text-black font-black rounded-xl text-lg hover:bg-black/10 transition-colors uppercase">
-                       Settings
+                    <button className="h-20 px-12 border-2 border-black/20 text-black font-black rounded-2xl text-xl hover:bg-black hover:text-primary transition-all uppercase tracking-widest">
+                       Config Settings
                     </button>
                  </Link>
               </div>
            </div>
-           <div className="absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-1/2 opacity-10 text-[10rem] select-none">🇮🇳</div>
-           <div className="absolute top-1/2 right-0 transform -translate-y-1/2 translate-x-1/2 opacity-10 text-[10rem] select-none">🗳️</div>
+           {/* Floating Icons */}
+           <div className="absolute top-1/4 left-10 transform -rotate-12 opacity-10 text-[12rem] select-none group-hover:rotate-0 transition-transform duration-1000">🇮🇳</div>
+           <div className="absolute bottom-1/4 right-10 transform rotate-12 opacity-10 text-[12rem] select-none group-hover:rotate-0 transition-transform duration-1000">🗳️</div>
         </section>
       </main>
       <Footer />

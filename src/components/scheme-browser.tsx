@@ -6,12 +6,12 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
-import { Search, Filter, Mic, MicOff, ArrowUpRight } from "lucide-react"
+import { Search, Filter, Mic, MicOff, ArrowUpRight, Sparkles } from "lucide-react"
 import { useLanguage } from "@/context/language-context"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
-import { useFirestore, useUser } from "@/firebase"
-import { serverTimestamp, doc } from "firebase/firestore"
+import { useFirestore, useUser, useCollection, useMemoFirebase } from "@/firebase"
+import { collection, serverTimestamp, doc, query, orderBy } from "firebase/firestore"
 import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates"
 import {
   Dialog,
@@ -36,40 +36,48 @@ const categories = [
   { name: "Shehri", count: 340, icon: "🏙️" },
 ]
 
-const allSchemes = [
-  { id: 1, name: "PM Kisan Samman Nidhi", type: "Central", description: "Direct income support of ₹6,000 per year to all landholding farmers' families.", details: "The Pradhan Mantri Kisan Samman Nidhi (PM-KISAN) is a Central Sector Scheme with 100% funding from Government of India.", tags: ["Agriculture", "Direct Benefit"] },
-  { id: 2, name: "Jal Jeevan Mission", type: "Central", description: "Providing safe and adequate drinking water through individual household tap connections by 2024.", details: "Jal Jeevan Mission, is envisioned to provide safe and adequate drinking water through individual household tap connections.", tags: ["Infrastructure", "Water"] },
-  { id: 3, name: "Digital India Mission", type: "Central", description: "Ensuring government services are made available to citizens electronically.", details: "Digital India is a campaign launched by the Government of India in order to ensure that services are made available electronically.", tags: ["Technology", "Connectivity"] },
-  { id: 4, name: "Ladki Bahin Yojana", type: "Maharashtra", description: "Financial assistance program for women empowerment in Maharashtra.", details: "The Majhi Ladki Bahin Yojana is a flagship scheme of the Maharashtra Government aimed at providing monthly financial assistance to women.", tags: ["Women", "State"] },
-  { id: 5, name: "Ayushman Bharat", type: "Central", description: "World's largest healthcare program providing coverage of ₹5 lakh per family.", details: "Ayushman Bharat - PM-JAY, is a flagship scheme to provide cashless secondary and tertiary care treatment.", tags: ["Health", "Insurance"] },
-  { id: 6, name: "PM Awas Yojana", type: "Central", description: "Housing for All initiative ensuring every family has a pucca house with basic amenities.", details: "Pradhan Mantri Awas Yojana (PMAY) is an initiative by the Government of India in which affordable housing will be provided to the poor.", tags: ["Housing", "Infrastructure"] },
+const fallbackSchemes = [
+  { id: "1", name: "PM Kisan Samman Nidhi", type: "Central", description: "Direct income support of ₹6,000 per year to all landholding farmers' families.", details: "The Pradhan Mantri Kisan Samman Nidhi (PM-KISAN) is a Central Sector Scheme with 100% funding from Government of India.", tags: ["Agriculture", "Direct Benefit"] },
+  { id: "2", name: "Jal Jeevan Mission", type: "Central", description: "Providing safe and adequate drinking water through individual household tap connections by 2024.", details: "Jal Jeevan Mission, is envisioned to provide safe and adequate drinking water through individual household tap connections.", tags: ["Infrastructure", "Water"] },
+  { id: "3", name: "Digital India Mission", type: "Central", description: "Ensuring government services are made available to citizens electronically.", details: "Digital India is a campaign launched by the Government of India in order to ensure that services are made available electronically.", tags: ["Technology", "Connectivity"] },
+  { id: "4", name: "Ladki Bahin Yojana", type: "Maharashtra", description: "Financial assistance program for women empowerment in Maharashtra.", details: "The Majhi Ladki Bahin Yojana is a flagship scheme of the Maharashtra Government aimed at providing monthly financial assistance to women.", tags: ["Women", "State"] },
+  { id: "5", name: "Ayushman Bharat", type: "Central", description: "World's largest healthcare program providing coverage of ₹5 lakh per family.", details: "Ayushman Bharat - PM-JAY, is a flagship scheme to provide cashless secondary and tertiary care treatment.", tags: ["Health", "Insurance"] },
+  { id: "6", name: "PM Awas Yojana", type: "Central", description: "Housing for All initiative ensuring every family has a pucca house with basic amenities.", details: "Pradhan Mantri Awas Yojana (PMAY) is an initiative by the Government of India in which affordable housing will be provided to the poor.", tags: ["Housing", "Infrastructure"] },
 ]
 
 export function SchemeBrowser() {
   const [activeCategory, setActiveCategory] = useState("All Yojanaye")
   const [searchQuery, setSearchQuery] = useState("")
   const [isListening, setIsListening] = useState(false)
-  const [isApplying, setIsApplying] = useState<number | null>(null)
+  const [isApplying, setIsApplying] = useState<string | null>(null)
   const { t } = useLanguage()
   const { user } = useUser()
   const db = useFirestore()
   const { toast } = useToast()
 
-  const filteredSchemes = useMemo(() => {
-    return allSchemes.filter(scheme => {
+  // Fetch real schemes from Firestore if available
+  const schemesQuery = useMemoFirebase(() => {
+    if (!db) return null;
+    return query(collection(db, "schemes"), orderBy("publishedAt", "desc"));
+  }, [db]);
+  const { data: dbSchemes, isLoading: schemesLoading } = useCollection(schemesQuery);
+
+  const displaySchemes = useMemo(() => {
+    const base = (dbSchemes && dbSchemes.length > 0) ? dbSchemes : fallbackSchemes;
+    return base.filter(scheme => {
       const matchesSearch = scheme.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                            scheme.description.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = activeCategory === "All Yojanaye" || 
                              (activeCategory === "Central Sarkar" && scheme.type === "Central") ||
                              (activeCategory === "State Sarkar" && scheme.type !== "Central") ||
-                             (scheme.tags.some(tag => activeCategory.includes(tag)));
+                             (scheme.tags?.some((tag: string) => activeCategory.includes(tag)));
       return matchesSearch && matchesCategory;
     });
-  }, [searchQuery, activeCategory]);
+  }, [dbSchemes, searchQuery, activeCategory]);
 
   const handleVoiceSearch = () => {
     if (!('webkitSpeechRecognition' in window)) {
-      toast({ variant: "destructive", title: "Protocol Refused", description: "Voice recognition engine not supported in this browser." });
+      toast({ variant: "destructive", title: "Protocol Refused", description: "Voice recognition engine not supported." });
       return;
     }
     const recognition = new (window as any).webkitSpeechRecognition();
@@ -83,7 +91,7 @@ export function SchemeBrowser() {
     recognition.start();
   };
 
-  const handleApply = (id: number, name: string) => {
+  const handleApply = (id: string, name: string) => {
     if (!user) {
       toast({ title: "Auth Required", description: "Identity synchronization needed for application.", variant: "destructive" });
       return;
@@ -96,7 +104,7 @@ export function SchemeBrowser() {
     
     setDocumentNonBlocking(appRef, {
       id: appId,
-      schemeId: String(id),
+      schemeId: id,
       schemeName: name,
       status: "Submitted",
       timestamp: serverTimestamp()
@@ -106,7 +114,7 @@ export function SchemeBrowser() {
       setIsApplying(null);
       toast({
         title: "Intent Synchronized",
-        description: `Application for ${name} has been logged in the national vault.`,
+        description: `${name} application logged in the national vault.`,
       });
     }, 800);
   };
@@ -114,51 +122,65 @@ export function SchemeBrowser() {
   return (
     <div id="schemes" className="container mx-auto px-4 py-32 space-y-16">
       <div className="max-w-4xl mx-auto space-y-8 text-center">
-        <h2 className="text-5xl font-black font-headline tracking-tighter text-foreground uppercase">{t('section_schemes_title')}</h2>
-        <div className="flex gap-4 p-3 bg-card/50 rounded-3xl shadow-2xl border border-border focus-within:border-primary/50 transition-all backdrop-blur-md">
+        <Badge className="bg-primary/10 text-primary border-primary/20 px-6 py-2 rounded-full font-black uppercase tracking-widest text-[10px] animate-pulse">
+           IDENTITY SYNC ACTIVE
+        </Badge>
+        <h2 className="text-5xl md:text-7xl font-black font-headline tracking-tighter text-foreground uppercase italic">
+          {t('section_schemes_title')}
+        </h2>
+        
+        <div className="flex flex-col md:flex-row gap-4 p-3 bg-card/40 rounded-[2.5rem] shadow-2xl border border-white/5 focus-within:border-primary/50 transition-all backdrop-blur-3xl">
           <div className="flex-1 flex items-center gap-3 pl-4">
-            <Search className="w-6 h-6 text-muted-foreground" />
+            <Search className="w-6 h-6 text-primary/40" />
             <Input 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="border-none bg-transparent shadow-none text-xl h-14 focus-visible:ring-0 placeholder:text-muted-foreground/50" 
+              className="border-none bg-transparent shadow-none text-xl h-14 focus-visible:ring-0 placeholder:text-muted-foreground/30 text-white font-medium" 
               placeholder={t('placeholder_search')}
             />
           </div>
-          <button onClick={handleVoiceSearch} className={cn("h-14 w-14 rounded-2xl flex items-center justify-center transition-all", isListening ? "text-secondary animate-pulse" : "text-primary hover:bg-white/5")}>
-            {isListening ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
-          </button>
-          <Button size="lg" className="h-14 bg-primary text-black font-black hover:bg-primary/80 gap-3 px-8 cyan-glow rounded-2xl">
-            <Search className="h-6 w-6" /> {t('search_btn')}
-          </Button>
+          <div className="flex gap-2 p-1">
+            <button 
+              onClick={handleVoiceSearch} 
+              className={cn(
+                "h-14 w-14 rounded-2xl flex items-center justify-center transition-all border border-white/5", 
+                isListening ? "bg-secondary text-white animate-pulse" : "bg-white/5 text-primary hover:bg-primary hover:text-black"
+              )}
+            >
+              {isListening ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
+            </button>
+            <Button size="lg" className="h-14 bg-primary text-black font-black hover:bg-white gap-3 px-8 cyan-glow rounded-2xl uppercase tracking-widest">
+              <Sparkles className="h-5 w-5" /> {t('search_btn')}
+            </Button>
+          </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
         <aside className="lg:col-span-3 space-y-8">
-          <Card className="bg-card border-border rounded-[2rem] overflow-hidden">
-            <CardHeader className="border-b border-border pb-4">
-              <CardTitle className="text-sm font-black flex items-center gap-3 text-muted-foreground tracking-widest uppercase">
-                <Filter className="w-4 h-4 text-primary" /> CATEGORIES
+          <Card className="bg-[#14181B]/60 border-white/5 rounded-[3rem] overflow-hidden backdrop-blur-2xl">
+            <CardHeader className="border-b border-white/5 p-8">
+              <CardTitle className="text-[10px] font-black flex items-center gap-3 text-white/40 tracking-[0.3em] uppercase">
+                <Filter className="w-4 h-4 text-primary" /> CATEGORY REGISTRY
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-3">
-              <nav className="space-y-1.5">
+            <CardContent className="p-4">
+              <nav className="space-y-2">
                 {categories.map((cat) => (
                   <button
                     key={cat.name}
                     onClick={() => setActiveCategory(cat.name)}
-                    className={`w-full flex items-center justify-between p-4 rounded-2xl text-sm font-bold transition-all duration-300 ${
+                    className={`w-full flex items-center justify-between p-5 rounded-2xl text-xs font-black transition-all duration-500 uppercase tracking-widest ${
                       activeCategory === cat.name 
-                      ? 'bg-primary text-black shadow-lg shadow-primary/20 scale-105' 
-                      : 'hover:bg-muted text-muted-foreground hover:text-foreground'
+                      ? 'bg-primary text-black shadow-[0_0_30px_rgba(7,241,214,0.3)] scale-[1.02]' 
+                      : 'hover:bg-white/5 text-white/40 hover:text-white'
                     }`}
                   >
                     <span className="flex items-center gap-4">
-                      <span className="text-xl">{cat.icon}</span>
+                      <span className="text-xl group-hover:scale-125 transition-transform">{cat.icon}</span>
                       {cat.name}
                     </span>
-                    <Badge variant={activeCategory === cat.name ? "secondary" : "outline"} className="rounded-full border-border bg-background/20 text-[10px]">
+                    <Badge variant={activeCategory === cat.name ? "secondary" : "outline"} className="rounded-xl border-white/10 bg-black/20 text-[8px] px-3">
                       {cat.count}
                     </Badge>
                   </button>
@@ -168,65 +190,124 @@ export function SchemeBrowser() {
           </Card>
         </aside>
 
-        <div className="lg:col-span-9 space-y-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-            {filteredSchemes.map((scheme) => (
-              <Card key={scheme.id} className="group glass-card rounded-[2.5rem] border-border hover:border-primary/30 hover:bg-primary/[0.02] transition-all duration-500 cursor-pointer overflow-hidden flex flex-col">
-                <div className="h-48 bg-muted relative overflow-hidden">
-                  <img 
-                    src={`https://picsum.photos/seed/scheme-${scheme.id}/600/400`} 
-                    className="w-full h-full object-cover opacity-60 grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700" 
-                    alt={scheme.name}
-                    data-ai-hint="indian government"
-                  />
-                  <Badge className="absolute top-4 right-4 bg-background/80 border border-border text-foreground backdrop-blur-md uppercase text-[10px] font-black tracking-widest">{scheme.type}</Badge>
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-60" />
-                </div>
-                <CardHeader className="p-8 pb-4">
-                  <CardTitle className="text-xl font-black group-hover:text-primary transition-colors leading-tight uppercase">{scheme.name}</CardTitle>
-                </CardHeader>
-                <CardContent className="p-8 pt-0 space-y-6 flex-1">
-                  <p className="text-sm text-muted-foreground font-medium leading-relaxed line-clamp-3">{scheme.description}</p>
-                </CardContent>
-                <CardFooter className="p-8 pt-0 flex gap-4">
-                   <Dialog>
-                     <DialogTrigger asChild>
-                       <Button variant="ghost" size="sm" className="flex-1 text-[10px] font-black uppercase border border-border hover:border-primary hover:bg-transparent rounded-xl">DETAILS</Button>
-                     </DialogTrigger>
-                     <DialogContent className="bg-background/95 backdrop-blur-3xl border-primary/20 rounded-[2.5rem] max-w-2xl overflow-hidden">
-                       <DialogHeader className="pt-6">
-                         <div className="flex items-center gap-2 mb-2">
-                           <Badge className="bg-primary/10 text-primary border-primary/20 uppercase text-[8px] tracking-widest font-black">{scheme.type} NODE</Badge>
-                         </div>
-                         <DialogTitle className="text-3xl font-black uppercase tracking-tighter text-primary">{scheme.name}</DialogTitle>
-                         <DialogDescription className="text-foreground/80 font-medium leading-relaxed mt-4">
-                           {scheme.details}
-                         </DialogDescription>
-                       </DialogHeader>
-                       <DialogFooter className="mt-8">
-                         <Button 
-                            disabled={isApplying === scheme.id}
-                            onClick={() => handleApply(scheme.id, scheme.name)} 
-                            className="w-full h-14 bg-primary text-black font-black text-lg rounded-2xl hover:scale-[1.02] transition-all cyan-glow uppercase"
-                          >
-                           {isApplying === scheme.id ? "SYNCING..." : "INITIALIZE APPLICATION"} <ArrowUpRight className="ml-2 w-5 h-5" />
+        <div className="lg:col-span-9">
+          {schemesLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+               {[1,2,3,4,5,6].map(i => (
+                 <div key={i} className="h-[450px] rounded-[2.5rem] bg-white/5 animate-pulse border border-white/5" />
+               ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+              {displaySchemes.map((scheme) => (
+                <Card key={scheme.id} className="group glass-card rounded-[2.5rem] border-white/5 hover:border-primary/40 hover:bg-primary/[0.03] transition-all duration-700 cursor-pointer overflow-hidden flex flex-col relative">
+                  <div className="h-52 bg-black relative overflow-hidden">
+                    <img 
+                      src={`https://picsum.photos/seed/scheme-${scheme.id}/600/400`} 
+                      className="w-full h-full object-cover opacity-50 grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-1000" 
+                      alt={scheme.name}
+                      data-ai-hint="india architecture"
+                    />
+                    <Badge className="absolute top-6 right-6 bg-black/80 border border-white/10 text-white backdrop-blur-md uppercase text-[8px] font-black tracking-widest px-4 py-1.5 rounded-full">
+                      {scheme.type} NODE
+                    </Badge>
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#070707] to-transparent opacity-80" />
+                  </div>
+                  
+                  <CardHeader className="p-8 pb-4">
+                    <CardTitle className="text-2xl font-black group-hover:text-primary transition-colors leading-tight uppercase tracking-tighter">
+                      {scheme.name}
+                    </CardTitle>
+                  </CardHeader>
+                  
+                  <CardContent className="p-8 pt-0 space-y-6 flex-1">
+                    <p className="text-sm text-white/40 font-medium leading-relaxed line-clamp-3 italic">
+                      {scheme.description}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                       {scheme.tags?.slice(0, 2).map((tag: string) => (
+                         <span key={tag} className="text-[8px] font-black uppercase tracking-widest text-primary/60 border border-primary/20 px-3 py-1 rounded-full">#{tag}</span>
+                       ))}
+                    </div>
+                  </CardContent>
+                  
+                  <CardFooter className="p-8 pt-0 flex gap-4">
+                     <Dialog>
+                       <DialogTrigger asChild>
+                         <Button variant="ghost" className="flex-1 h-12 text-[10px] font-black uppercase border border-white/10 hover:border-primary hover:bg-primary/5 rounded-2xl transition-all tracking-widest">
+                           PROTOCOLS
                          </Button>
-                       </DialogFooter>
-                     </DialogContent>
-                   </Dialog>
-                   <Button 
-                    disabled={isApplying === scheme.id}
-                    onClick={() => handleApply(scheme.id, scheme.name)}
-                    variant="secondary" 
-                    size="sm" 
-                    className="flex-1 text-[10px] font-black uppercase bg-primary text-black hover:bg-foreground hover:text-background transition-colors rounded-xl"
-                   >
-                     {isApplying === scheme.id ? "SYNCING..." : "APPLY NOW"}
-                   </Button>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
+                       </DialogTrigger>
+                       <DialogContent className="bg-[#14181B]/95 backdrop-blur-3xl border-primary/20 rounded-[3rem] max-w-2xl overflow-hidden shadow-2xl">
+                         <div className="absolute top-0 left-0 w-full h-1 flex">
+                            <div className="flex-1 bg-primary" />
+                            <div className="flex-1 bg-white" />
+                            <div className="flex-1 bg-secondary" />
+                         </div>
+                         <DialogHeader className="pt-10 px-8">
+                           <div className="flex items-center gap-3 mb-4">
+                             <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20">
+                                <Search className="w-6 h-6 text-primary" />
+                             </div>
+                             <Badge className="bg-primary/10 text-primary border-primary/20 uppercase text-[10px] tracking-[0.2em] font-black rounded-full px-6">
+                               {scheme.type} CORE
+                             </Badge>
+                           </div>
+                           <DialogTitle className="text-4xl font-black uppercase tracking-tighter text-white italic">
+                              {scheme.name}
+                           </DialogTitle>
+                           <DialogDescription className="text-white/60 font-medium leading-relaxed mt-6 text-lg">
+                             {scheme.details || scheme.description}
+                           </DialogDescription>
+                         </DialogHeader>
+                         <div className="px-8 py-6 grid grid-cols-2 gap-4">
+                            <div className="p-6 rounded-3xl bg-white/5 border border-white/5 space-y-2">
+                               <p className="text-[8px] font-black text-primary uppercase tracking-widest">Target Sector</p>
+                               <p className="text-white font-black uppercase tracking-tighter">{scheme.tags?.[0] || 'National'}</p>
+                            </div>
+                            <div className="p-6 rounded-3xl bg-white/5 border border-white/5 space-y-2">
+                               <p className="text-[8px] font-black text-secondary uppercase tracking-widest">Registry Hub</p>
+                               <p className="text-white font-black uppercase tracking-tighter">{scheme.type} Government</p>
+                            </div>
+                         </div>
+                         <DialogFooter className="p-8 bg-black/40 border-t border-white/5">
+                           <Button 
+                              disabled={isApplying === String(scheme.id)}
+                              onClick={() => handleApply(String(scheme.id), scheme.name)} 
+                              className="w-full h-16 bg-primary text-black font-black text-xl rounded-2xl hover:bg-white hover:scale-[1.02] transition-all cyan-glow uppercase tracking-widest"
+                            >
+                             {isApplying === String(scheme.id) ? "INITIALIZING SYNC..." : "INITIALIZE APPLICATION"} <ArrowUpRight className="ml-2 w-6 h-6" />
+                           </Button>
+                         </DialogFooter>
+                       </DialogContent>
+                     </Dialog>
+                     <Button 
+                      disabled={isApplying === String(scheme.id)}
+                      onClick={() => handleApply(String(scheme.id), scheme.name)}
+                      className="flex-1 h-12 text-[10px] font-black uppercase bg-primary text-black hover:bg-white transition-all rounded-2xl tracking-widest cyan-glow"
+                     >
+                       {isApplying === String(scheme.id) ? "SYNCING..." : "APPLY NOW"}
+                     </Button>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+          )}
+          
+          {displaySchemes.length === 0 && !schemesLoading && (
+            <div className="py-40 text-center space-y-6 bg-white/[0.02] border border-dashed border-white/10 rounded-[4rem]">
+               <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mx-auto border border-white/10">
+                  <Search className="w-10 h-10 text-white/20" />
+               </div>
+               <div className="space-y-2">
+                 <p className="text-2xl font-black text-white/40 uppercase tracking-tighter">No Resource Nodes Detected</p>
+                 <p className="text-xs text-white/20 font-black uppercase tracking-widest">Adjust your filters or query protocol to find relevant schemes.</p>
+                 <Button variant="ghost" onClick={() => {setSearchQuery(""); setActiveCategory("All Yojanaye")}} className="mt-4 text-primary font-black uppercase text-[10px] tracking-widest hover:bg-primary/5">
+                    RESET SEARCH PROTOCOL
+                 </Button>
+               </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

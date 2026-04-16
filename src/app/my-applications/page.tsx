@@ -15,7 +15,7 @@ import Link from "next/link"
 
 /**
  * @fileOverview नेशनल रजिस्ट्री ट्रैकिंग (National Registry Tracking)
- * यह 'A to Z' फ्लो का Tracking बिंदु है।
+ * यह 'A to Z' फ्लो का Tracking (Dashboard) बिंदु है।
  */
 
 export default function MyApplicationsPage() {

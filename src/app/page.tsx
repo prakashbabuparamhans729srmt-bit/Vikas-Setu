@@ -23,7 +23,7 @@ import { useToast } from "@/hooks/use-toast";
 
 /**
  * @fileOverview विकास सेतु (Vikas Setu) - मुख्य प्रवेश द्वार।
- * यह पेज 'A to Z' फ्लो का शुरुआती बिंदु है।
+ * यह पेज 'A to Z' फ्लो का शुरुआती बिंदु (Identity Hub) है।
  */
 
 export default function Home() {

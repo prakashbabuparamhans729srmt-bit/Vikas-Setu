@@ -28,7 +28,7 @@ import {
 
 /**
  * @fileOverview जनता की राय (Citizen Pulse)
- * नागरिक यहाँ पोल में भाग ले सकते हैं, फीडबैक दे सकते हैं और नए इनोवेशन प्रस्ताव सबमिट कर सकते हैं।
+ * यह 'A to Z' फ्लो का Feedback (Janata ki Rai) और Innovation बिंदु है।
  */
 
 export function FeedbackSection() {

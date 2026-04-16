@@ -25,7 +25,7 @@ import {
 
 /**
  * @fileOverview योजना ब्राउज़र (Scheme Discovery Hub)
- * यह 'A to Z' फ्लो का Discovery और Application बिंदु है।
+ * यह 'A to Z' फ्लो का Discovery (Browsing) और Application (Applying) बिंदु है।
  */
 
 const staticCategories = [

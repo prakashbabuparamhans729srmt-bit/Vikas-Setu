@@ -8,7 +8,7 @@ import { Footer } from "@/components/footer"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { FileText, Clock, Search, ArrowRight, ShieldCheck } from "lucide-react"
+import { FileText, Clock, Search, ArrowRight, ShieldCheck, Activity } from "lucide-react"
 import { redirect } from "next/navigation"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
@@ -49,12 +49,12 @@ export default function MyApplicationsPage() {
       <main className="flex-1 container mx-auto px-4 py-20 max-w-5xl space-y-12">
         <div className="space-y-4 text-center md:text-left">
           <Badge className="bg-primary/10 text-primary border-primary/20 px-4 py-1 uppercase font-black text-[10px] tracking-widest">
-            LIVE REGISTRY
+            LIVE REGISTRY SYNC
           </Badge>
           <h1 className="text-5xl font-black font-headline tracking-tighter text-white uppercase italic">
             Your Growth <span className="text-primary">Vault</span>
           </h1>
-          <p className="text-white/40 font-medium">Tracking your synchronized applications with the national infrastructure.</p>
+          <p className="text-white/40 font-medium">Tracking your synchronized applications with the national digital infrastructure.</p>
         </div>
 
         <div className="grid gap-6">
@@ -80,9 +80,10 @@ export default function MyApplicationsPage() {
                   
                   <div className="flex flex-col items-end gap-3">
                     <Badge className={cn(
-                      "px-6 py-2 rounded-xl font-black uppercase tracking-widest text-[10px]",
+                      "px-6 py-2 rounded-xl font-black uppercase tracking-widest text-[10px] flex items-center gap-2",
                       app.status === "Submitted" ? "bg-white/10 text-white" : "bg-primary text-black"
                     )}>
+                      {app.status === "Submitted" && <Activity className="w-3 h-3 animate-pulse" />}
                       {app.status}
                     </Badge>
                     <p className="text-[8px] font-black text-white/20 uppercase tracking-[0.2em]">Transaction: {app.id.slice(0, 12)}...</p>
@@ -113,7 +114,7 @@ export default function MyApplicationsPage() {
                 </div>
                 <div className="space-y-2">
                     <h4 className="text-lg font-black uppercase tracking-tighter text-white">Verified Security Protocol</h4>
-                    <p className="text-sm text-white/40 leading-relaxed font-medium">All applications are encrypted with Bharat-Sync technology and linked directly to your digital identity node. Data integrity is guaranteed by national consensus protocols.</p>
+                    <p className="text-sm text-white/40 leading-relaxed font-medium">All applications are encrypted with Bharat-Sync technology and linked directly to your digital identity node. Data integrity is guaranteed by national consensus protocols. Your information is only accessible by the relevant department nodes.</p>
                 </div>
             </CardContent>
         </Card>

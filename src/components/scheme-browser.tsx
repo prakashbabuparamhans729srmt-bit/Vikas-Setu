@@ -22,6 +22,7 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog"
+import Link from "next/link"
 
 /**
  * @fileOverview योजना खोज और डिस्कवरी इंजन (Discovery Engine - B-Y)
@@ -137,6 +138,11 @@ export function SchemeBrowser() {
       toast({
         title: "Intent Synchronized",
         description: `${name} application logged in the national vault.`,
+        action: (
+          <Link href="/my-applications">
+            <Button variant="outline" size="sm" className="bg-primary text-black font-black uppercase text-[10px] tracking-widest border-none h-8">View Vault</Button>
+          </Link>
+        )
       });
     }, 1200);
   };

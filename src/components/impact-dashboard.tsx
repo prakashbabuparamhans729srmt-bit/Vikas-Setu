@@ -29,7 +29,6 @@ export function ImpactDashboard() {
   const { toast } = useToast()
   const [activeActions, setActiveActions] = useState<Record<string, 'up' | 'down' | null>>({})
 
-  // Fetch top rated schemes from Firestore
   const topSchemesQuery = useMemoFirebase(() => {
     if (!db) return null;
     return query(collection(db, "schemes"), orderBy("averageRating", "desc"), limit(5));
@@ -38,7 +37,6 @@ export function ImpactDashboard() {
   const { data: dbSchemes } = useCollection(topSchemesQuery);
   const displaySchemes = (dbSchemes && dbSchemes.length > 0) ? dbSchemes : fallbackSchemes;
 
-  // Fetch national progress snapshots
   const snapshotsQuery = useMemoFirebase(() => {
     if (!db) return null;
     return query(collection(db, "nationalProgressSnapshots"), orderBy("year", "desc"), limit(4));

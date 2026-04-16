@@ -65,7 +65,6 @@ export function IndiaMap() {
       </CardHeader>
       <CardContent className="space-y-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Virtual Map Area */}
           <div className="relative aspect-square bg-[#0c0c0c] rounded-[3rem] border border-white/5 shadow-[inset_0_0_50px_rgba(0,0,0,1)] flex items-center justify-center overflow-hidden group">
             <div className="absolute inset-0 bg-primary/5 opacity-30 group-hover:opacity-50 transition-opacity" />
             <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:30px_30px]" />
@@ -115,7 +114,6 @@ export function IndiaMap() {
               </Dialog>
             </div>
             
-            {/* Mock map pulses */}
             <div className="absolute top-1/4 left-1/2 w-4 h-4 bg-primary rounded-full animate-ping" />
             <div className="absolute top-1/2 left-1/3 w-4 h-4 bg-primary rounded-full animate-ping shadow-[0_0_20px_#07f1d6]" />
             <div className="absolute bottom-1/4 right-1/2 w-4 h-4 bg-secondary rounded-full animate-ping" />

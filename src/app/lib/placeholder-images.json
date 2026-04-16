@@ -3,38 +3,38 @@
   "placeholderImages": [
     {
       "id": "hero-india",
-      "description": "Abstract map of India with growth arrows",
-      "imageUrl": "https://picsum.photos/seed/india-growth/1200/600",
+      "description": "Futuristic abstract map of India with growth indicators",
+      "imageUrl": "https://picsum.photos/seed/india-digital/1200/600",
       "imageHint": "india development"
     },
     {
       "id": "scheme-kisan",
-      "description": "A happy Indian farmer in a field",
-      "imageUrl": "https://picsum.photos/seed/farmer/400/300",
+      "description": "Digital agriculture in India",
+      "imageUrl": "https://picsum.photos/seed/farmer-digital/600/400",
       "imageHint": "indian agriculture"
     },
     {
       "id": "scheme-jal",
-      "description": "Fresh water flowing from a tap",
-      "imageUrl": "https://picsum.photos/seed/water/400/300",
+      "description": "Clean water supply infrastructure",
+      "imageUrl": "https://picsum.photos/seed/water-tech/600/400",
       "imageHint": "water supply"
     },
     {
       "id": "scheme-digital",
-      "description": "Digital technology in rural India",
-      "imageUrl": "https://picsum.photos/seed/digital/400/300",
-      "imageHint": "digital india"
+      "description": "Cyber India digital connectivity",
+      "imageUrl": "https://picsum.photos/seed/digital-india-node/600/400",
+      "imageHint": "digital connectivity"
     },
     {
       "id": "scheme-women",
-      "description": "Empowered Indian women in a workspace",
-      "imageUrl": "https://picsum.photos/seed/women-empowerment/400/300",
+      "description": "Empowered Indian women in tech space",
+      "imageUrl": "https://picsum.photos/seed/women-empowerment-node/600/400",
       "imageHint": "women empowerment"
     },
     {
       "id": "scheme-health",
-      "description": "Modern healthcare facility in India",
-      "imageUrl": "https://picsum.photos/seed/health-india/400/300",
+      "description": "Modern medical facility node",
+      "imageUrl": "https://picsum.photos/seed/health-tech-india/600/400",
       "imageHint": "healthcare india"
     }
   ]

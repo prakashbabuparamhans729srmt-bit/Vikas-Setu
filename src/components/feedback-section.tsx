@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
-import { Send, MessageSquare, Quote, BrainCircuit, Lightbulb, Plus } from "lucide-react"
+import { Send, MessageSquare, Quote, BrainCircuit, Lightbulb, Sparkles } from "lucide-react"
 import { useLanguage } from "@/context/language-context"
 import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
@@ -39,6 +39,7 @@ export function FeedbackSection() {
   const [ideaTitle, setIdeaTitle] = useState("")
   const [ideaDesc, setIdeaDesc] = useState("")
   const [isSubmittingIdea, setIsSubmittingIdea] = useState(false)
+  const [isIdeaDialogOpen, setIsIdeaDialogOpen] = useState(false)
 
   const feedbackQuery = useMemoFirebase(() => {
     if (!db) return null;
@@ -84,11 +85,9 @@ export function FeedbackSection() {
         isApproved: true 
       });
       
-      setTimeout(() => {
-        setIsSending(false)
-        setFeedback("")
-        toast({ title: "Broadcast Logged", description: "Feedback node successfully pushed to the stream." });
-      }, 500);
+      setFeedback("")
+      setIsSending(false)
+      toast({ title: "Broadcast Logged", description: "Feedback node successfully pushed to the stream." });
     } catch (error) {
       setIsSending(false)
     }
@@ -113,12 +112,11 @@ export function FeedbackSection() {
         isApproved: true
       });
 
-      setTimeout(() => {
-        setIsSubmittingIdea(false);
-        setIdeaTitle("");
-        setIdeaDesc("");
-        toast({ title: "Innovation Logged", description: "Your idea node has been pushed to the national registry." });
-      }, 800);
+      setIdeaTitle("");
+      setIdeaDesc("");
+      setIsSubmittingIdea(false);
+      setIsIdeaDialogOpen(false);
+      toast({ title: "Innovation Logged", description: "Your idea node has been pushed to the national registry." });
     } catch (error) {
       setIsSubmittingIdea(false);
     }
@@ -130,14 +128,14 @@ export function FeedbackSection() {
         <div className="text-center space-y-6">
           <Badge className="bg-primary text-black px-6 py-2 text-xs font-black uppercase tracking-[0.3em] rounded-full">CITIZEN FEEDBACK LOOP</Badge>
           <div className="flex flex-col md:flex-row items-center justify-center gap-6">
-            <h2 className="text-5xl font-black font-headline text-white tracking-tighter uppercase">{t('section_feedback_title')}</h2>
-            <Dialog>
+            <h2 className="text-5xl font-black font-headline text-white tracking-tighter uppercase italic">{t('section_feedback_title')}</h2>
+            <Dialog open={isIdeaDialogOpen} onOpenChange={setIsIdeaDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-secondary hover:bg-white text-white hover:text-black font-black uppercase tracking-widest px-8 rounded-2xl h-14 cyan-glow flex items-center gap-3">
                   <Lightbulb className="w-6 h-6 animate-pulse" /> {t('propose_title')}
                 </Button>
               </DialogTrigger>
-              <DialogContent className="bg-[#14181B] border-secondary/20 rounded-[2.5rem] shadow-2xl max-w-lg">
+              <DialogContent className="bg-[#14181B]/95 backdrop-blur-3xl border-secondary/20 rounded-[2.5rem] shadow-2xl max-w-lg">
                 <DialogHeader>
                   <DialogTitle className="text-3xl font-black uppercase text-white tracking-tighter italic">Propose <span className="text-secondary">Innovation</span> Node</DialogTitle>
                   <DialogDescription className="text-white/40 font-medium">Broadcast your architectural ideas for a better Bharat.</DialogDescription>
@@ -149,7 +147,7 @@ export function FeedbackSection() {
                       value={ideaTitle}
                       onChange={(e) => setIdeaTitle(e.target.value)}
                       placeholder="e.g., Rural Solar Mesh Grid" 
-                      className="bg-black/40 border-white/5 rounded-xl h-12 text-white"
+                      className="bg-black/40 border-white/5 rounded-xl h-12 text-white font-bold"
                     />
                   </div>
                   <div className="space-y-2">
@@ -158,7 +156,7 @@ export function FeedbackSection() {
                       value={ideaDesc}
                       onChange={(e) => setIdeaDesc(e.target.value)}
                       placeholder="Describe the impact and implementation..." 
-                      className="bg-black/40 border-white/5 rounded-2xl min-h-[120px] text-white"
+                      className="bg-black/40 border-white/5 rounded-2xl min-h-[120px] text-white font-medium"
                     />
                   </div>
                 </div>
@@ -166,9 +164,10 @@ export function FeedbackSection() {
                   <Button 
                     onClick={handleSubmitIdea}
                     disabled={isSubmittingIdea || !ideaTitle.trim() || !ideaDesc.trim()}
-                    className="w-full h-14 bg-secondary text-white font-black uppercase tracking-widest rounded-2xl hover:scale-105 transition-all"
+                    className="w-full h-14 bg-secondary text-white font-black uppercase tracking-widest rounded-2xl hover:scale-105 transition-all shadow-xl group"
                   >
                     {isSubmittingIdea ? "SYNCING NODE..." : t('submit_idea')}
+                    <Sparkles className="ml-2 w-5 h-5 group-hover:rotate-12 transition-transform" />
                   </Button>
                 </DialogFooter>
               </DialogContent>
@@ -205,7 +204,7 @@ export function FeedbackSection() {
               </RadioGroup>
             </CardContent>
             <CardFooter className="flex justify-center p-10 pt-0">
-              <Button onClick={handleVote} className="w-full h-16 bg-white text-black hover:bg-primary transition-all text-lg font-black rounded-2xl uppercase">
+              <Button onClick={handleVote} className="w-full h-16 bg-white text-black hover:bg-primary transition-all text-lg font-black rounded-2xl uppercase shadow-lg">
                 {t('poll_btn')}
               </Button>
             </CardFooter>
@@ -255,7 +254,7 @@ export function FeedbackSection() {
                       value={feedback}
                       onChange={(e) => setFeedback(e.target.value)}
                       placeholder="Share your experience or idea for Vikas Setu..." 
-                      className="resize-none min-h-[80px] flex-1 bg-black/40 border-white/10 focus:border-primary/50 text-white rounded-2xl p-4"
+                      className="resize-none min-h-[80px] flex-1 bg-black/40 border-white/10 focus:border-primary/50 text-white rounded-2xl p-4 font-medium"
                     />
                     <Button 
                       disabled={isSending || !feedback.trim()}

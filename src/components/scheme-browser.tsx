@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
-import { Search, Filter, Mic, MicOff, ArrowUpRight, Sparkles } from "lucide-react"
+import { Search, Filter, Mic, MicOff, ArrowUpRight, Sparkles, ShieldCheck } from "lucide-react"
 import { useLanguage } from "@/context/language-context"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
@@ -246,7 +246,7 @@ export function SchemeBrowser() {
                          <DialogHeader className="pt-10 px-8">
                            <div className="flex items-center gap-3 mb-4">
                              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20">
-                                <Search className="w-6 h-6 text-primary" />
+                                <ShieldCheck className="w-6 h-6 text-primary" />
                              </div>
                              <Badge className="bg-primary/10 text-primary border-primary/20 uppercase text-[10px] tracking-[0.2em] font-black rounded-full px-6">
                                {scheme.type} CORE

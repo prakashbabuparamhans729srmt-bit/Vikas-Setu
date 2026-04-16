@@ -9,10 +9,11 @@ import { Button } from "@/components/ui/button"
 import { ThumbsUp, ThumbsDown, TrendingUp, BarChart3, Clock, Globe, Shield, Activity } from "lucide-react"
 import { useLanguage } from "@/context/language-context"
 import { useToast } from "@/hooks/use-toast"
-import { cn } from "@/lib/utils"
-import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase"
+import { useFirestore, useCollection, useMemoFirebase } from "@/firebase"
 import { doc, serverTimestamp, collection, query, orderBy, limit } from "firebase/firestore"
 import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates"
+import { useUser } from "@/firebase"
+import { cn } from "@/lib/utils"
 
 const fallbackSchemes = [
   { id: "1", name: "PM Kisan", state: "National", averageRating: 4.9, totalUpvotes: 125, currentProgressPercentage: 95 },

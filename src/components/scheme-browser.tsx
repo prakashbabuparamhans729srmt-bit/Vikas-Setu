@@ -24,11 +24,6 @@ import {
 } from "@/components/ui/dialog"
 import Link from "next/link"
 
-/**
- * @fileOverview योजना खोज और डिस्कवरी इंजन (Discovery Engine - B-Y)
- * नागरिक संसाधनों की खोज और 'A to Z' प्रवाह का डिस्कवरी हिस्सा।
- */
-
 const staticCategories = [
   { name: "All Yojanaye", count: 5300, icon: "✅" },
   { name: "Central Sarkar", count: 1200, icon: "🏛️" },
@@ -61,11 +56,11 @@ export function SchemeBrowser() {
   const db = useFirestore()
   const { toast } = useToast()
 
-  const schemesQuery = useMemoFirebase(() => {
+  const yojanayeQuery = useMemoFirebase(() => {
     if (!db) return null;
-    return query(collection(db, "schemes"), orderBy("publishedAt", "desc"));
+    return query(collection(db, "yojanaye"), orderBy("createdAt", "desc"));
   }, [db]);
-  const { data: dbSchemes, isLoading: schemesLoading } = useCollection(schemesQuery);
+  const { data: dbSchemes, isLoading: schemesLoading } = useCollection(yojanayeQuery);
 
   const categoriesQuery = useMemoFirebase(() => {
     if (!db) return null;
@@ -77,7 +72,7 @@ export function SchemeBrowser() {
     if (dbCategories && dbCategories.length > 0) {
       return [
         { name: "All Yojanaye", count: (dbSchemes?.length || 0), icon: "✅" },
-        ...dbCategories.map(c => ({ name: c.name, count: 0, icon: c.iconName || "📦" }))
+        ...dbCategories.map(c => ({ name: c.name, count: 0, icon: c.icon || "📦" }))
       ];
     }
     return staticCategories;

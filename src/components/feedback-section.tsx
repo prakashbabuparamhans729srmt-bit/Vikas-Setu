@@ -26,11 +26,6 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 
-/**
- * @fileOverview नागरिक फीडबैक और पल्स (Citizen Pulse & Feedback)
- * जनता की राय (Janata ki Rai) और इनोवेशन प्रस्तावों का रीयल-टाइम केंद्र।
- */
-
 export function FeedbackSection() {
   const { t } = useLanguage()
   const { user } = useUser()
@@ -48,7 +43,7 @@ export function FeedbackSection() {
 
   const feedbackQuery = useMemoFirebase(() => {
     if (!db) return null;
-    return query(collection(db, "schemeFeedback"), orderBy("createdAt", "desc"), limit(10));
+    return query(collection(db, "feedback"), orderBy("createdAt", "desc"), limit(10));
   }, [db]);
   const { data: feedbackItems, isLoading: feedbackLoading } = useCollection(feedbackQuery);
 
@@ -62,6 +57,7 @@ export function FeedbackSection() {
     const voteRef = doc(db, "userProfiles", user.uid, "pollVotes", "day-poll");
     setDocumentNonBlocking(voteRef, {
       id: "day-poll",
+      pollId: "day-poll",
       pollOptionId: pollValue,
       userId: user.uid,
       createdAt: serverTimestamp()
@@ -80,14 +76,13 @@ export function FeedbackSection() {
     setIsSending(true)
     
     try {
-      const feedbackRef = collection(db, "schemeFeedback");
+      const feedbackRef = collection(db, "feedback");
       addDocumentNonBlocking(feedbackRef, {
-        schemeId: "general",
         userId: user.uid,
         userName: user.displayName || "Citizen Node",
-        comment: feedback,
-        createdAt: serverTimestamp(),
-        isApproved: true 
+        type: "General",
+        content: feedback,
+        createdAt: serverTimestamp()
       });
       
       setFeedback("")
@@ -108,13 +103,13 @@ export function FeedbackSection() {
     setIsSubmittingIdea(true);
 
     try {
-      const ideasRef = collection(db, "publicIdeas");
+      const ideasRef = collection(db, "feedback");
       addDocumentNonBlocking(ideasRef, {
         userId: user.uid,
-        title: ideaTitle,
-        description: ideaDesc,
-        createdAt: serverTimestamp(),
-        isApproved: true
+        userName: user.displayName || "Citizen Node",
+        type: "Idea",
+        content: `Title: ${ideaTitle}\n\nDescription: ${ideaDesc}`,
+        createdAt: serverTimestamp()
       });
 
       setIdeaTitle("");
@@ -245,7 +240,7 @@ export function FeedbackSection() {
                       </div>
                       <div className="relative pl-8">
                         <Quote className="absolute top-0 left-0 w-5 h-5 text-primary/20 interactive-icon" />
-                        <p className="text-white/60 italic font-medium text-lg leading-relaxed group-hover:text-white/90 transition-colors">"{item.comment}"</p>
+                        <p className="text-white/60 italic font-medium text-lg leading-relaxed group-hover:text-white/90 transition-colors">"{item.content}"</p>
                       </div>
                     </div>
                   ))) : (

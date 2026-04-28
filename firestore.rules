@@ -1,190 +1,65 @@
+
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    /**
-     * VIKAS SETU SECURITY ARCHITECTURE
-     *
-     * Core Philosophy: 
-     * This ruleset implements a Hybrid Security Model designed for high-transparency public data access 
-     * coupled with strict identity-based ownership for user interactions. The model prioritizes 
-     * "Authorization Independence," where security decisions are derived directly from the document 
-     * path or internal ownership fields, minimizing expensive cross-document lookups.
-     *
-     * Data Structure:
-     * 1. Public Reference Data: Schemas for Schemes (Yojanaye), Categories, States, and Polls are 
-     *    top-level and publicly readable to facilitate discovery without authentication.
-     * 2. User-Specific Trees: All private interactions (Votes, Ratings, Poll choices) are nested 
-     *    under /userProfiles/{userId}/... to ensure UID-based isolation.
-     * 3. Administrative Control: A dedicated /roles_admin/ collection manages elevated privileges.
-     *
-     * Key Security Decisions:
-     * - Public Listing: Enabled for core entities (Schemes, States) to support global search and discovery.
-     * - Ownership Enforced: User interactions require an exact match between the auth UID and the document path.
-     * - Denormalization: Statistical data (vote counts, average ratings) are stored directly on the Yojana 
-     *   and Poll documents to avoid complex aggregation queries in the client.
-     * - Prototyping Mode: Rules enforce who can access data but allow for flexible data shapes during development.
-     */
-
-    // --- Helper Functions ---
-
-    /** @description Checks if the request is from an authenticated user. */
     function isSignedIn() {
       return request.auth != null;
     }
 
-    /** @description Checks if the user's UID matches the provided ID. */
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    /** @description Combines ownership check with a check for document existence for safe updates/deletes. */
-    function isExistingOwner(userId) {
-      return resource != null && isOwner(userId);
-    }
-
-    /** @description Verifies if the authenticated user has administrative privileges. */
     function isAdmin() {
       return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
     }
 
-    // --- Collection Rules ---
-
-    /**
-     * @description Publicly readable government schemes. Writes restricted to administrators.
-     * @path /yojanaye/{yojanaId}
-     * @allow (get, list) if true; (create, update, delete) if isAdmin();
-     * @deny (write) if request.auth.uid is not in roles_admin.
-     * @principle Public consumption with administrative content management.
-     */
     match /yojanaye/{yojanaId} {
-      allow get, list: if true;
-      allow create, update, delete: if isAdmin();
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
-    /**
-     * @description Public categories for scheme organization.
-     * @path /categories/{categoryId}
-     * @allow (get, list) if true; (create, update, delete) if isAdmin();
-     * @deny (create) if not an admin.
-     * @principle Read-only reference data for standard users.
-     */
     match /categories/{categoryId} {
-      allow get, list: if true;
-      allow create, update, delete: if isAdmin();
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
-    /**
-     * @description Indian states data for map visualization and progress tracking.
-     * @path /states/{stateId}
-     * @allow (get, list) if true; (create, update, delete) if isAdmin();
-     * @deny (update) if requested by a non-admin user.
-     * @principle Centralized state data management.
-     */
     match /states/{stateId} {
-      allow get, list: if true;
-      allow create, update, delete: if isAdmin();
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
-    /**
-     * @description User profile management. Publicly viewable, owner-managed writes.
-     * @path /userProfiles/{userId}
-     * @allow (get, list) if true; (create) if isOwner(userId); (update, delete) if isExistingOwner(userId);
-     * @deny (create) if request.auth.uid != userId.
-     * @principle Enforces identity-to-path consistency for user records.
-     */
     match /userProfiles/{userId} {
-      allow get, list: if true;
-      allow create: if isOwner(userId) && request.resource.data.id == userId;
-      allow update, delete: if isExistingOwner(userId);
+      allow read: if true;
+      allow create: if isOwner(userId);
+      allow update, delete: if isOwner(userId);
 
-      /**
-       * @description User's specific votes on government schemes.
-       * @path /userProfiles/{userId}/schemeVotes/{yojanaId}
-       * @allow (get, list, create, update, delete) if isOwner(userId);
-       * @deny (list) if requesting a different user's vote collection.
-       * @principle Isolated user interaction subcollections.
-       */
+      match /applications/{appId} {
+        allow read: if isOwner(userId);
+        allow create, update, delete: if isOwner(userId);
+      }
+
       match /schemeVotes/{yojanaId} {
-        allow get, list: if isOwner(userId);
-        allow create: if isOwner(userId) && request.resource.data.userId == request.auth.uid;
-        allow update, delete: if isExistingOwner(userId);
+        allow read: if isOwner(userId);
+        allow create, update, delete: if isOwner(userId);
       }
 
-      /**
-       * @description User's 5-star ratings for specific schemes.
-       * @path /userProfiles/{userId}/schemeRatings/{yojanaId}
-       * @allow (get, list, create, update, delete) if isOwner(userId);
-       * @deny (update) if the existing document doesn't belong to the user.
-       * @principle Ownership-based write access for ratings.
-       */
-      match /schemeRatings/{yojanaId} {
-        allow get, list: if isOwner(userId);
-        allow create: if isOwner(userId) && request.resource.data.userId == request.auth.uid;
-        allow update, delete: if isExistingOwner(userId);
-      }
-
-      /**
-       * @description User's individual votes on active polls.
-       * @path /userProfiles/{userId}/pollVotes/{pollId}
-       * @allow (get, list, create, update, delete) if isOwner(userId);
-       * @deny (create) if the userId in data doesn't match the auth token.
-       * @principle Path-based isolation for poll interactions.
-       */
       match /pollVotes/{pollId} {
-        allow get, list: if isOwner(userId);
-        allow create: if isOwner(userId) && request.resource.data.userId == request.auth.uid;
-        allow update, delete: if isExistingOwner(userId);
+        allow read: if isOwner(userId);
+        allow create, update, delete: if isOwner(userId);
       }
     }
 
-    /**
-     * @description Public feedback and idea submission.
-     * @path /feedback/{feedbackId}
-     * @allow (get, list) if true; (create) if isSignedIn(); (update, delete) if author or admin.
-     * @deny (update) if user is not the original author or an admin.
-     * @principle Public read with author-controlled or moderated writes.
-     */
     match /feedback/{feedbackId} {
-      allow get, list: if true;
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if resource != null && (resource.data.userId == request.auth.uid || isAdmin());
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
     }
 
-    /**
-     * @description Public polls and their results.
-     * @path /polls/{pollId}
-     * @allow (get, list) if true; (create, update, delete) if isAdmin();
-     * @deny (write) if user is not an administrator.
-     * @principle Public engagement content with administrative oversight.
-     */
-    match /polls/{pollId} {
-      allow get, list: if true;
-      allow create, update, delete: if isAdmin();
-
-      /**
-       * @description Individual options for a poll.
-       * @path /polls/{pollId}/options/{optionId}
-       * @allow (get, list) if true; (create, update, delete) if isAdmin();
-       * @deny (delete) if not an admin.
-       * @principle Nested public read access for poll details.
-       */
-      match /options/{optionId} {
-        allow get, list: if true;
-        allow create, update, delete: if isAdmin();
-      }
-    }
-
-    /**
-     * @description Administrative role lookup. Read-only for system checks.
-     * @path /roles_admin/{userId}
-     * @allow (get) if isSignedIn(); (list, create, update, delete) if false;
-     * @deny (write) for all users; must be provisioned via Admin SDK or Console.
-     * @principle Database-backed access control (DBAC) lookup table.
-     */
     match /roles_admin/{userId} {
       allow get: if isSignedIn();
-      allow list, create, update, delete: if false;
+      allow list, write: if false;
     }
   }
 }

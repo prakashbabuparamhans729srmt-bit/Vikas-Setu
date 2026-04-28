@@ -31,19 +31,11 @@ export function ImpactDashboard() {
 
   const topSchemesQuery = useMemoFirebase(() => {
     if (!db) return null;
-    return query(collection(db, "schemes"), orderBy("averageRating", "desc"), limit(5));
+    return query(collection(db, "yojanaye"), orderBy("averageRating", "desc"), limit(5));
   }, [db]);
 
   const { data: dbSchemes } = useCollection(topSchemesQuery);
   const displaySchemes = (dbSchemes && dbSchemes.length > 0) ? dbSchemes : fallbackSchemes;
-
-  const snapshotsQuery = useMemoFirebase(() => {
-    if (!db) return null;
-    return query(collection(db, "nationalProgressSnapshots"), orderBy("year", "desc"), limit(4));
-  }, [db]);
-  const { data: snapshots } = useCollection(snapshotsQuery);
-
-  const currentProgress = snapshots?.[0]?.overallDevelopmentPercentage || 68.4;
 
   const handleAction = (id: string, type: 'up' | 'down') => {
     if (!user) {
@@ -52,13 +44,12 @@ export function ImpactDashboard() {
     }
     if (!db) return;
 
-    const voteType = type === 'up' ? 'upvote' : 'downvote';
-    const voteId = `vote-scheme-${id}`;
-    const voteRef = doc(db, "userProfiles", user.uid, "schemeVotes", voteId);
+    const voteType = type === 'up' ? 'Upvote' : 'Downvote';
+    const voteRef = doc(db, "userProfiles", user.uid, "schemeVotes", id);
 
     setDocumentNonBlocking(voteRef, {
-      id: voteId,
-      schemeId: String(id),
+      id: id,
+      yojanaId: String(id),
       userId: user.uid,
       voteType: voteType,
       createdAt: serverTimestamp()
@@ -91,28 +82,28 @@ export function ImpactDashboard() {
             <CardContent className="p-12 space-y-12">
               <div className="space-y-6">
                 <div className="flex justify-between items-end">
-                  <span className="text-6xl font-black text-white tracking-tighter">{currentProgress}% <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em] ml-4">Overall Completion</span></span>
+                  <span className="text-6xl font-black text-white tracking-tighter">68.4% <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em] ml-4">Overall Completion</span></span>
                   <Badge className="bg-primary text-black font-black px-6 py-2 rounded-xl text-[10px] tracking-widest uppercase">TARGET 2030: 100%</Badge>
                 </div>
                 <div className="relative h-6 w-full bg-white/5 rounded-full overflow-hidden">
-                   <div className="absolute inset-y-0 left-0 bg-primary shadow-[0_0_20px_#07f1d6] transition-all duration-1000 ease-out" style={{ width: `${currentProgress}%` }} />
+                   <div className="absolute inset-y-0 left-0 bg-primary shadow-[0_0_20px_#07f1d6] transition-all duration-1000 ease-out" style={{ width: `68.4%` }} />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
-                {(snapshots && snapshots.length > 0 ? snapshots : [
-                  { year: 2021, overallDevelopmentPercentage: 70 },
-                  { year: 2022, overallDevelopmentPercentage: 75 },
-                  { year: 2023, overallDevelopmentPercentage: 82 },
-                  { year: 2024, overallDevelopmentPercentage: 68 }
-                ]).map((stat: any, i) => (
-                  <div key={i} className="space-y-4 group/stat cursor-pointer" onClick={() => toast({ title: `${stat.year} Snapshot`, description: `Historical completion vector: ${stat.overallDevelopmentPercentage}%` })}>
+                {[
+                  { year: 2021, val: 70 },
+                  { year: 2022, val: 75 },
+                  { year: 2023, val: 82 },
+                  { year: 2024, val: 68 }
+                ].map((stat: any, i) => (
+                  <div key={i} className="space-y-4 group/stat cursor-pointer">
                     <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-[0.2em] text-white/30 group-hover/stat:text-white transition-colors">
                       <span className="flex items-center gap-3"><Clock className="w-4 h-4 text-primary interactive-icon" /> {stat.year} FY</span>
-                      <span className={cn("transition-colors", i === 0 ? 'text-primary' : '')}>{stat.overallDevelopmentPercentage}%</span>
+                      <span className={cn("transition-colors", i === 0 ? 'text-primary' : '')}>{stat.val}%</span>
                     </div>
                     <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
-                       <div className={cn("h-full transition-all duration-700", i === 0 ? 'bg-primary' : 'bg-white/20')} style={{ width: `${stat.overallDevelopmentPercentage}%` }} />
+                       <div className={cn("h-full transition-all duration-700", i === 0 ? 'bg-primary' : 'bg-white/20')} style={{ width: `${stat.val}%` }} />
                     </div>
                   </div>
                 ))}
@@ -134,13 +125,13 @@ export function ImpactDashboard() {
                 { label: "High-Velocity Sector", title: "Infrastructure (NHAI)", desc: "+15.4% Completion YoY", color: "hover:border-primary/50" },
                 { label: "Public Trust Vector", title: "8.4 / 10.0", desc: "250,000 Verified Nodes", color: "hover:border-secondary/50" }
               ].map((item, i) => (
-                <div key={i} className={cn("p-8 rounded-[2rem] bg-white/5 border border-white/10 space-y-3 group transition-all cursor-pointer", item.color)} onClick={() => toast({ title: item.label, description: item.title })}>
+                <div key={i} className={cn("p-8 rounded-[2rem] bg-white/5 border border-white/10 space-y-3 group transition-all cursor-pointer", item.color)}>
                   <p className={cn("text-[10px] font-black uppercase tracking-[0.3em]", i === 0 ? "text-primary" : "text-secondary")}>{item.label}</p>
                   <p className="text-2xl font-black text-white leading-tight uppercase tracking-tighter">{item.title}</p>
                   <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">{item.desc}</p>
                 </div>
               ))}
-              <div className="p-8 rounded-[2rem] bg-primary/[0.05] border border-primary/30 flex items-center justify-between group hover:bg-primary transition-all duration-500 cursor-pointer" onClick={() => toast({ title: "Hyper Growth Protocol", description: "Digital index performance exceeded expectations." })}>
+              <div className="p-8 rounded-[2rem] bg-primary/[0.05] border border-primary/30 flex items-center justify-between group hover:bg-primary transition-all duration-500 cursor-pointer">
                  <div className="space-y-1">
                    <p className="text-[10px] font-black uppercase tracking-widest text-primary group-hover:text-black">Digital Index</p>
                    <p className="text-xl font-black text-white group-hover:text-black uppercase tracking-tighter">HYPER GROWTH</p>
@@ -159,7 +150,7 @@ export function ImpactDashboard() {
               <CardTitle className="text-3xl font-black font-headline flex items-center gap-6 text-white uppercase tracking-tighter">
                 <Shield className="w-10 h-10 text-primary interactive-icon" /> TOP RATED RESOURCE NODES
               </CardTitle>
-              <Button variant="outline" className="border-primary/20 text-primary uppercase font-black tracking-widest h-12 px-8 rounded-xl hover:bg-primary/10" onClick={() => toast({ title: "Analysis Refreshed", description: "Fetching latest node performance metrics..." })}>
+              <Button variant="outline" className="border-primary/20 text-primary uppercase font-black tracking-widest h-12 px-8 rounded-xl hover:bg-primary/10">
                 <Activity className="mr-2 w-4 h-4 animate-pulse interactive-icon" /> REFRESH SYNC
               </Button>
             </div>

@@ -81,7 +81,7 @@ export default function MyApplicationsPage() {
                   <div className="flex flex-col items-end gap-3">
                     <Badge className={cn(
                       "px-6 py-2 rounded-xl font-black uppercase tracking-widest text-[10px] flex items-center gap-2",
-                      app.status === "Submitted" ? "bg-white/10 text-white" : "bg-primary text-black"
+                      app.status === "Approved" ? "bg-primary text-black" : "bg-white/10 text-white"
                     )}>
                       {app.status === "Submitted" && <Activity className="w-3 h-3 animate-pulse" />}
                       {app.status}
@@ -114,7 +114,7 @@ export default function MyApplicationsPage() {
                 </div>
                 <div className="space-y-2">
                     <h4 className="text-lg font-black uppercase tracking-tighter text-white">Verified Security Protocol</h4>
-                    <p className="text-sm text-white/40 leading-relaxed font-medium">All applications are encrypted with Bharat-Sync technology and linked directly to your digital identity node. Data integrity is guaranteed by national consensus protocols. Your information is only accessible by the relevant department nodes.</p>
+                    <p className="text-sm text-white/40 leading-relaxed font-medium">All applications are encrypted with Bharat-Sync technology and linked directly to your digital identity node. Data integrity is guaranteed by national consensus protocols.</p>
                 </div>
             </CardContent>
         </Card>

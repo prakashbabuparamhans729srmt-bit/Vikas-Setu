@@ -1,13 +1,11 @@
-
 {
-  "name": "Vikas Setu | The Growth Bridge",
+  "name": "Vikas Setu | 🇮🇳 The Growth Bridge",
   "short_name": "Vikas Setu",
-  "description": "Indian government schemes and national progress tracking platform.",
+  "description": "National Digital Infrastructure for Government Schemes and Public Feedback.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#070707",
   "theme_color": "#07F1D6",
-  "orientation": "portrait",
   "icons": [
     {
       "src": "https://picsum.photos/seed/vikas-setu-app-icon/192/192",

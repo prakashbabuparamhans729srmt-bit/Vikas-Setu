@@ -1,13 +1,20 @@
+// Vikas Setu Service Worker
+const CACHE_NAME = 'vikas-setu-v1';
+const urlsToCache = [
+  '/',
+  '/manifest.webmanifest'
+];
 
 self.addEventListener('install', (event) => {
-  console.log('Vikas Setu Service Worker installed.');
-  self.skipWaiting();
-});
-
-self.addEventListener('activate', (event) => {
-  console.log('Vikas Setu Service Worker activated.');
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then((cache) => cache.addAll(urlsToCache))
+  );
 });
 
 self.addEventListener('fetch', (event) => {
-  // Minimal fetch listener to satisfy PWA installation criteria
+  event.respondWith(
+    caches.match(event.request)
+      .then((response) => response || fetch(event.request))
+  );
 });

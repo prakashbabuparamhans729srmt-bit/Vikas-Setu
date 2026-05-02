@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect } from 'react';
@@ -17,10 +16,12 @@ export default function RootLayout({
   
   useEffect(() => {
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker
-        .register('/sw.js')
-        .then((reg) => console.log('Vikas Setu Node Initialized (SW registered)'))
-        .catch((err) => console.log('SW registration failed', err));
+      window.addEventListener('load', () => {
+        navigator.serviceWorker
+          .register('/sw.js')
+          .then((reg) => console.log('Vikas Setu Node Initialized (SW registered)', reg.scope))
+          .catch((err) => console.log('SW registration failed', err));
+      });
     }
   }, []);
 

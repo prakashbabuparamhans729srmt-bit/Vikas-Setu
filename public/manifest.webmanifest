@@ -1,7 +1,8 @@
+
 {
-  "name": "Vikas Setu | 🇮🇳 The Growth Bridge",
+  "name": "Vikas Setu | The Growth Bridge",
   "short_name": "Vikas Setu",
-  "description": "National Digital Infrastructure for Government Schemes and Public Feedback.",
+  "description": "Bharat's A to Z Digital Infrastructure for Government Schemes and Progress Tracking.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#070707",
@@ -19,5 +20,7 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "orientation": "portrait",
+  "scope": "/"
 }

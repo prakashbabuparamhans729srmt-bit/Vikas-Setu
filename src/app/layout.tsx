@@ -1,4 +1,6 @@
-import type {Metadata, Viewport} from 'next';
+'use client';
+
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { LanguageProvider } from '@/context/language-context';
 import { ThemeProvider } from '@/context/theme-context';
@@ -6,33 +8,8 @@ import { AIChatbot } from '@/components/ai-chatbot';
 import { FirebaseClientProvider } from '@/firebase';
 import { Toaster } from '@/components/ui/toaster';
 
-export const metadata: Metadata = {
-  title: 'Vikas Setu | 🇮🇳 The Growth Bridge',
-  description: 'A platform for Indian government schemes, public feedback, and national progress tracking.',
-  manifest: '/manifest.webmanifest',
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: 'black-translucent',
-    title: 'Vikas Setu',
-  },
-  applicationName: 'Vikas Setu',
-  formatDetection: {
-    telephone: false,
-  },
-  icons: {
-    icon: 'https://picsum.photos/seed/vikas-setu-favicon/32/32',
-    apple: 'https://picsum.photos/seed/vikas-setu-app-icon/180/180',
-  }
-};
-
-export const viewport: Viewport = {
-  themeColor: '#07F1D6',
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-  viewportFit: 'cover',
-};
+// Metadata and Viewport are handled differently in Next.js 15 App Router when using 'use client'
+// For a fully functional PWA, we ensure these are present in the layout or head.
 
 export default function RootLayout({
   children,
@@ -42,12 +19,19 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <title>Vikas Setu | 🇮🇳 The Growth Bridge</title>
+        <meta name="description" content="A platform for Indian government schemes, public feedback, and national progress tracking." />
+        <link rel="manifest" href="/manifest.webmanifest" />
+        <meta name="theme-color" content="#07F1D6" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Vikas Setu" />
+        <meta name="format-detection" content="telephone=no" />
+        <link rel="apple-touch-icon" href="https://picsum.photos/seed/vikas-setu-app-icon/180/180" />
+        
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </head>
       <body className="font-body antialiased min-h-screen flex flex-col bg-background text-foreground selection:bg-primary selection:text-black">
         <FirebaseClientProvider>

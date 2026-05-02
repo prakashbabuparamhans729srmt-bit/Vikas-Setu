@@ -8,9 +8,6 @@ import { AIChatbot } from '@/components/ai-chatbot';
 import { FirebaseClientProvider } from '@/firebase';
 import { Toaster } from '@/components/ui/toaster';
 
-// Metadata and Viewport are handled differently in Next.js 15 App Router when using 'use client'
-// For a fully functional PWA, we ensure these are present in the layout or head.
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -23,9 +20,11 @@ export default function RootLayout({
         <meta name="description" content="A platform for Indian government schemes, public feedback, and national progress tracking." />
         <link rel="manifest" href="/manifest.webmanifest" />
         <meta name="theme-color" content="#07F1D6" />
+        <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="Vikas Setu" />
+        <meta name="application-name" content="Vikas Setu" />
         <meta name="format-detection" content="telephone=no" />
         <link rel="apple-touch-icon" href="https://picsum.photos/seed/vikas-setu-app-icon/180/180" />
         

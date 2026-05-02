@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Navbar } from "@/components/navbar";
 import { Hero } from "@/components/hero";
 import { SchemeBrowser } from "@/components/scheme-browser";
@@ -23,6 +24,7 @@ import { useToast } from "@/hooks/use-toast";
 /**
  * @fileOverview विकास सेतु मुख्य टर्मिनल (Vikas Setu Core Terminal)
  * 'A to Z' प्रवाह का प्रारंभिक बिंदु: Identity Verification (A).
+ * PWA समर्थन के साथ अब यह डेस्कटॉप और मोबाइल पर इंस्टॉल योग्य है।
  */
 
 export default function Home() {
@@ -35,6 +37,7 @@ export default function Home() {
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [isGuest, setIsGuest] = useState(false);
 
+  // Sync user profile to Firestore Node
   const syncProfile = (u: User) => {
     if (!db) return;
     const userRef = doc(db, "userProfiles", u.uid);

@@ -33,7 +33,9 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-body antialiased selection:bg-primary selection:text-primary-foreground;
+    @apply bg-background text-foreground font-body antialiased selection:bg-primary selection:text-primary-foreground overflow-x-hidden;
+    /* Prevent mobile pull-to-refresh to feel like a native app */
+    overscroll-behavior-y: contain;
   }
 }
 
@@ -89,4 +91,14 @@
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: rgba(7, 241, 214, 0.2);
   border-radius: 10px;
+}
+
+/* Standalone (App) Mode Specifics */
+@media (display-mode: standalone) {
+  .sticky {
+    padding-top: env(safe-area-inset-top);
+  }
+  nav {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
 }

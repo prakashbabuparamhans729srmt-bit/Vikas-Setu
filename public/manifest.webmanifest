@@ -1,26 +1,25 @@
 
 {
-  "name": "Vikas Setu | The Growth Bridge",
+  "name": "Vikas Setu | 🇮🇳 The Growth Bridge",
   "short_name": "Vikas Setu",
-  "description": "Bharat's A to Z Digital Infrastructure for Government Schemes and Progress Tracking.",
+  "description": "A national platform for government schemes, public feedback, and growth tracking.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#070707",
   "theme_color": "#07F1D6",
+  "orientation": "any",
   "icons": [
     {
       "src": "https://picsum.photos/seed/vikas-setu-app-icon/192/192",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "https://picsum.photos/seed/vikas-setu-app-icon/512/512",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable"
     }
-  ],
-  "orientation": "portrait",
-  "scope": "/"
+  ]
 }

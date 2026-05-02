@@ -20,7 +20,7 @@ export default function RootLayout({
       window.addEventListener('load', () => {
         navigator.serviceWorker
           .register('/sw.js')
-          .then((reg) => console.log('Vikas Setu Node Initialized (SW registered)', reg.scope))
+          .then((reg) => console.log('Vikas Setu Core Sync (SW registered)', reg.scope))
           .catch((err) => console.log('SW registration failed', err));
       });
     }

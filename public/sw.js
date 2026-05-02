@@ -1,9 +1,9 @@
 
-const CACHE_NAME = 'vikas-setu-v1';
+const CACHE_NAME = 'vikas-setu-cache-v1';
 const urlsToCache = [
   '/',
   '/manifest.webmanifest',
-  'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap'
+  '/globals.css'
 ];
 
 self.addEventListener('install', (event) => {
@@ -17,5 +17,20 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request)
       .then((response) => response || fetch(event.request))
+  );
+});
+
+self.addEventListener('activate', (event) => {
+  const cacheWhitelist = [CACHE_NAME];
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (cacheWhitelist.indexOf(cacheName) === -1) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
   );
 });

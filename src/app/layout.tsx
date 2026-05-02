@@ -13,13 +13,17 @@ export const metadata: Metadata = {
   manifest: '/manifest.webmanifest',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'default',
+    statusBarStyle: 'black-translucent',
     title: 'Vikas Setu',
   },
   applicationName: 'Vikas Setu',
   formatDetection: {
     telephone: false,
   },
+  icons: {
+    icon: 'https://picsum.photos/seed/vikas-setu-favicon/32/32',
+    apple: 'https://picsum.photos/seed/vikas-setu-app-icon/180/180',
+  }
 };
 
 export const viewport: Viewport = {
@@ -28,6 +32,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  viewportFit: 'cover',
 };
 
 export default function RootLayout({
@@ -41,11 +46,10 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
-        {/* Favicon / Icon node for PWA */}
-        <link rel="icon" href="https://picsum.photos/seed/vikas-setu-favicon/32/32" />
-        <link rel="apple-touch-icon" href="https://picsum.photos/seed/vikas-setu-app-icon/180/180" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="mobile-web-app-capable" content="yes" />
       </head>
-      <body className="font-body antialiased min-h-screen flex flex-col bg-background text-foreground">
+      <body className="font-body antialiased min-h-screen flex flex-col bg-background text-foreground selection:bg-primary selection:text-black">
         <FirebaseClientProvider>
           <ThemeProvider>
             <LanguageProvider>
@@ -57,9 +61,9 @@ export default function RootLayout({
         </FirebaseClientProvider>
         {/* Tricolor Bottom Accent - National Integrity Layer */}
         <div className="fixed bottom-0 left-0 w-full h-1 flex shadow-[0_-5px_20px_rgba(7,241,214,0.2)] z-[100]">
-           <div className="flex-1 bg-primary" />
-           <div className="flex-1 bg-white" />
            <div className="flex-1 bg-secondary" />
+           <div className="flex-1 bg-white" />
+           <div className="flex-1 bg-primary" />
         </div>
       </body>
     </html>

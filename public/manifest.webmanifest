@@ -1,23 +1,23 @@
-
 {
-  "name": "Vikas Setu | The Growth Bridge",
+  "name": "Vikas Setu | 🇮🇳 The Growth Bridge",
   "short_name": "Vikas Setu",
-  "description": "National platform for Indian government schemes and tracking progress.",
+  "description": "Secure Gateway to Bharat 2.0 - Tracking national schemes and public progress.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#070707",
   "theme_color": "#07F1D6",
   "icons": [
     {
-      "src": "https://picsum.photos/seed/vikas-setu-192/192/192",
+      "src": "https://picsum.photos/seed/vikas-setu-app-icon/192/192",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "https://picsum.photos/seed/vikas-setu-512/512/512",
+      "src": "https://picsum.photos/seed/vikas-setu-app-icon-large/512/512",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
